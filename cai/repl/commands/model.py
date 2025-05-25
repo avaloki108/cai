@@ -278,7 +278,7 @@ class ModelCommand(Command):
                 ollama_base = api_base.replace('/v1', '')
                 response = requests.get(
                     f"{ollama_base}/api/tags",
-                    timeout=1
+                    timeout=5
                 )
 
                 if response.status_code == 200:
@@ -691,7 +691,7 @@ class ModelShowCommand(Command):
                 # Get Ollama models with a short timeout
                 api_base = get_ollama_api_base()
                 api_tags = f"{api_base.replace('/v1', '')}/api/tags"
-                ollama_response = requests.get(api_tags, timeout=1)
+                ollama_response = requests.get(api_tags, timeout=5)
 
                 if ollama_response.status_code == 200:
                     ollama_data = ollama_response.json()

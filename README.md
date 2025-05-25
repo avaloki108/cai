@@ -155,7 +155,7 @@ python3.12 -m venv cai_env
 source cai_env/bin/activate && pip install cai-framework
 
 # Generate a .env file and set up with defaults
-echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nPROMPT_TOOLKIT_NO_CPR=1' > .env
+echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA_API_BASE="http://localhost:11434/v1"\nPROMPT_TOOLKIT_NO_CPR=1' > .env
 
 # Launch CAI
 cai  # first launch it can take up to 30 seconds
@@ -173,7 +173,7 @@ python3.12 -m venv cai_env
 source cai_env/bin/activate && pip install cai-framework
 
 # Generate a .env file and set up with defaults
-echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nPROMPT_TOOLKIT_NO_CPR=1' > .env
+echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA_API_BASE="http://localhost:11434/v1"\nPROMPT_TOOLKIT_NO_CPR=1' > .env
 
 # Launch CAI
 cai  # first launch it can take up to 30 seconds
@@ -195,7 +195,7 @@ python3.12 -m venv cai_env
 source cai_env/bin/activate && pip install cai-framework
 
 # Generate a .env file and set up with defaults
-echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nPROMPT_TOOLKIT_NO_CPR=1' > .env
+echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA_API_BASE="http://localhost:11434/v1"\nPROMPT_TOOLKIT_NO_CPR=1' > .env
 
 # Launch CAI
 cai  # first launch it can take up to 30 seconds
@@ -218,7 +218,7 @@ python3 -m venv cai_env
 source cai_env/bin/activate && pip install cai-framework
 
 # Generate a .env file and set up with defaults
-echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA=""\nPROMPT_TOOLKIT_NO_CPR=1' > .env
+echo -e 'OPENAI_API_KEY="sk-1234"\nANTHROPIC_API_KEY=""\nOLLAMA_API_BASE="http://localhost:11434/v1"\nPROMPT_TOOLKIT_NO_CPR=1' > .env
 
 # Launch CAI
 cai  # first launch it can take up to 30 seconds
@@ -381,12 +381,13 @@ from cai.types import Agent
 from cai.tools.common import run_command
 from cai.core import CAI
 
-def listing_tool():
-   """
-   This is a tool used list the files in the current directory
-   """
-    command = "ls -la"
-    return run_command(command, ctf=ctf)
+
+def listing_tool(ctf=None):
+  """
+  This is a tool used list the files in the current directory
+  """
+  command = "ls -la"
+  return run_command(command, ctf=ctf)
 
 def generic_linux_command(command: str = "", args: str = "", ctf=None) -> str:
     """
@@ -775,7 +776,7 @@ Ollama's API in OpenAI mode uses `/v1/chat/completions` whereas the `openai` lib
 We adopt the latter for overall alignment with the gen AI community and empower the former by allowing users to add the `v1` themselves via:
 
 ```bash
-OLLAMA_API_BASE=http://IP:PORT/v1
+OLLAMA_API_BASE=http://localhost:11434/v1
 ```
 
 See the following issues that treat this topic in more detail:
@@ -843,7 +844,7 @@ Make sure this has been addressed and also that the Dev Container is not forward
 
 To verify connection, from within the VSCode devcontainer:
 ```bash
-curl -v http://host.docker.internal:8000/api/version
+curl -v http://host.docker.internal:11434/api/version
 ```
 
 </details>

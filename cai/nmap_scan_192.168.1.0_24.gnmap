@@ -1,0 +1,24 @@
+# Nmap 7.95 scan initiated Fri May 23 16:40:03 2025 as: /usr/lib/nmap/nmap --privileged -T5 -sV -oA nmap_scan_192.168.1.0_24 192.168.1.0/24
+Host: 192.168.1.1 (_gateway)	Status: Up
+Host: 192.168.1.1 (_gateway)	Ports: 22/filtered/tcp//ssh///, 23/filtered/tcp//telnet///, 53/open/tcp//tcpwrapped///, 80/open/tcp//http?///, 111/open/tcp//rpcbind//2-4 (RPC #100000)/, 443/open/tcp//https?///, 5000/open/tcp//upnp?///, 9000/filtered/tcp//cslistener///, 49152/open/tcp//upnp//Portable SDK for UPnP devices 1.8.4 (Linux 4.9.232-prod-21.1; UPnP 1.0)/	Ignored State: closed (991)
+Host: 192.168.1.2 ()	Status: Up
+Host: 192.168.1.2 ()	Ports: 80/open/tcp//http//HP DeskJet 3700 series printer http config (Serial CN27LBP23V07PX)/, 443/open/tcp//ssl|http//HP DeskJet 3700 series printer http config (Serial CN27LBP23V07PX)/, 631/open/tcp//http//HP DeskJet 3700 series printer http config (Serial CN27LBP23V07PX)/, 8080/open/tcp//http//HP DeskJet 3700 series printer http config (Serial CN27LBP23V07PX)/, 9100/open/tcp//jetdirect?///, 9220/open/tcp//hp-gsg//HP Generic Scan Gateway 1.0/	Ignored State: closed (994)
+Host: 192.168.1.3 ()	Status: Up
+Host: 192.168.1.3 ()	Ports: 	Ignored State: filtered (1000)
+Host: 192.168.1.6 ()	Status: Up
+Host: 192.168.1.6 ()	Ports: 	Ignored State: closed (1000)
+Host: 192.168.1.7 ()	Status: Up
+Host: 192.168.1.7 ()	Ports: 	Ignored State: closed (1000)
+Host: 192.168.1.10 ()	Status: Up
+Host: 192.168.1.10 ()	Ports: 	Ignored State: closed (1000)
+Host: 192.168.1.13 ()	Status: Up
+Host: 192.168.1.13 ()	Ports: 22/open/tcp//ssh//OpenSSH 9.2p1 Debian 2+deb12u5 (protocol 2.0)/, 25/open/tcp//smtp//Burp Collaborator smtpd/, 80/open/tcp//http//Burp Collaborator 4/, 443/open/tcp//ssl|http//Burp Collaborator 4/, 465/open/tcp//ssl|smtp//Burp Collaborator smtpd/, 587/open/tcp//smtp//Burp Collaborator smtpd/, 9090/open/tcp//http//SAGE EAS Digital Endec remote audio monitor|level meter/	Ignored State: closed (993)
+Host: 192.168.1.14 ()	Status: Up
+Host: 192.168.1.14 ()	Ports: 1080/open/tcp//socks5//(No authentication; connection failed)/, 8009/open/tcp//http//Amazon Whisperplay DIAL REST service/, 8888/open/tcp//tcpwrapped///	Ignored State: closed (997)
+Host: 192.168.1.18 ()	Status: Up
+Host: 192.168.1.18 ()	Ports: 1080/open/tcp//socks5//(No authentication; connection failed)/, 8888/open/tcp//tcpwrapped///, 10001/open/tcp//ssl|scp-config?///
+Host: 192.168.1.29 ()	Status: Up
+Host: 192.168.1.29 ()	Ports: 5000/open/tcp//rtsp///, 7000/open/tcp//rtsp///, 7100/open/tcp//rtsp///, 49152/open/tcp//tcpwrapped///, 49153/open/tcp/////, 62078/open/tcp//tcpwrapped///	Ignored State: closed (994)
+Host: 192.168.1.8 (poppa)	Status: Up
+Host: 192.168.1.8 (poppa)	Ports: 25/open/tcp//smtp//Postfix smtpd/	Ignored State: closed (999)
+# Nmap done at Fri May 23 16:43:47 2025 -- 256 IP addresses (11 hosts up) scanned in 223.76 seconds

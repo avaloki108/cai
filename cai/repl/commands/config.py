@@ -46,7 +46,7 @@ ENV_VARS = {
     6: {
         "name": "CAI_MODEL",
         "description": "Model to use for agents",
-        "default": "qwen2.5:14b"
+        "default": "ollama/devstral:latest"
     },
     7: {
         "name": "CAI_DEBUG",
@@ -71,7 +71,7 @@ ENV_VARS = {
     11: {
         "name": "CAI_AGENT_TYPE",
         "description": "Specify the agents to use (boot2root, one_tool...)",  # noqa: E501 # pylint: disable=line-too-long
-        "default": "one_tool"
+        "default": "bug_bounter_agent"
     },
     12: {
         "name": "CAI_STATE",

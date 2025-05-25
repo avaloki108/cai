@@ -1,0 +1,192 @@
+# Nmap 7.95 scan initiated Fri May 23 16:40:03 2025 as: /usr/lib/nmap/nmap --privileged -T5 -sV -oA nmap_scan_192.168.1.0_24 192.168.1.0/24
+Nmap scan report for _gateway (192.168.1.1)
+Host is up (0.0022s latency).
+Not shown: 991 closed tcp ports (reset)
+PORT      STATE    SERVICE    VERSION
+22/tcp    filtered ssh
+23/tcp    filtered telnet
+53/tcp    open     tcpwrapped
+80/tcp    open     http?
+111/tcp   open     rpcbind    2-4 (RPC #100000)
+443/tcp   open     https?
+5000/tcp  open     upnp?
+9000/tcp  filtered cslistener
+49152/tcp open     upnp       Portable SDK for UPnP devices 1.8.4 (Linux 4.9.232-prod-21.1; UPnP 1.0)
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port5000-TCP:V=7.95%I=7%D=5/23%Time=6830F968%P=x86_64-pc-linux-gnu%r(DN
+SF:SVersionBindReqTCP,19D,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nServer:\x
+SF:20\"OS/version\"\x20UPnP/1\.0\x20\"product/version\"\r\nDate:\x20Fri,\x
+SF:2023\x20May\x202025\x2022:40:40\x20GMT\r\nContent-Type:\x20text/html\r\
+SF:nConnection:\x20close\r\n\r\n<HTML><HEAD><TITLE>400\x20Bad\x20Request</
+SF:TITLE></HEAD>\n<BODY\x20BGCOLOR=\"#cc9999\"><H4>400\x20Bad\x20Request</
+SF:H4>\nCan't\x20parse\x20request\.\n<HR>\n<ADDRESS><A\x20HREF=\"http://sc
+SF:hemas\.xmlsoap\.org/soap/encoding/\">\"OS/version\"\x20UPnP/1\.0\x20\"p
+SF:roduct/version\"</A></ADDRESS>\n</BODY></HTML>\n")%r(SMBProgNeg,19D,"HT
+SF:TP/1\.1\x20400\x20Bad\x20Request\r\nServer:\x20\"OS/version\"\x20UPnP/1
+SF:\.0\x20\"product/version\"\r\nDate:\x20Fri,\x2023\x20May\x202025\x2022:
+SF:40:40\x20GMT\r\nContent-Type:\x20text/html\r\nConnection:\x20close\r\n\
+SF:r\n<HTML><HEAD><TITLE>400\x20Bad\x20Request</TITLE></HEAD>\n<BODY\x20BG
+SF:COLOR=\"#cc9999\"><H4>400\x20Bad\x20Request</H4>\nCan't\x20parse\x20req
+SF:uest\.\n<HR>\n<ADDRESS><A\x20HREF=\"http://schemas\.xmlsoap\.org/soap/e
+SF:ncoding/\">\"OS/version\"\x20UPnP/1\.0\x20\"product/version\"</A></ADDR
+SF:ESS>\n</BODY></HTML>\n")%r(ZendJavaBridge,19D,"HTTP/1\.1\x20400\x20Bad\
+SF:x20Request\r\nServer:\x20\"OS/version\"\x20UPnP/1\.0\x20\"product/versi
+SF:on\"\r\nDate:\x20Fri,\x2023\x20May\x202025\x2022:40:40\x20GMT\r\nConten
+SF:t-Type:\x20text/html\r\nConnection:\x20close\r\n\r\n<HTML><HEAD><TITLE>
+SF:400\x20Bad\x20Request</TITLE></HEAD>\n<BODY\x20BGCOLOR=\"#cc9999\"><H4>
+SF:400\x20Bad\x20Request</H4>\nCan't\x20parse\x20request\.\n<HR>\n<ADDRESS
+SF:><A\x20HREF=\"http://schemas\.xmlsoap\.org/soap/encoding/\">\"OS/versio
+SF:n\"\x20UPnP/1\.0\x20\"product/version\"</A></ADDRESS>\n</BODY></HTML>\n
+SF:")%r(RPCCheck,19D,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nServer:\x20\"O
+SF:S/version\"\x20UPnP/1\.0\x20\"product/version\"\r\nDate:\x20Fri,\x2023\
+SF:x20May\x202025\x2022:40:40\x20GMT\r\nContent-Type:\x20text/html\r\nConn
+SF:ection:\x20close\r\n\r\n<HTML><HEAD><TITLE>400\x20Bad\x20Request</TITLE
+SF:></HEAD>\n<BODY\x20BGCOLOR=\"#cc9999\"><H4>400\x20Bad\x20Request</H4>\n
+SF:Can't\x20parse\x20request\.\n<HR>\n<ADDRESS><A\x20HREF=\"http://schemas
+SF:\.xmlsoap\.org/soap/encoding/\">\"OS/version\"\x20UPnP/1\.0\x20\"produc
+SF:t/version\"</A></ADDRESS>\n</BODY></HTML>\n");
+MAC Address: 80:CC:9C:E0:1D:1A (Netgear)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel:4.9.232-prod-21.1
+
+Nmap scan report for 192.168.1.2
+Host is up (0.0056s latency).
+Not shown: 994 closed tcp ports (reset)
+PORT     STATE SERVICE    VERSION
+80/tcp   open  http       HP DeskJet 3700 series printer http config (Serial CN27LBP23V07PX)
+443/tcp  open  ssl/http   HP DeskJet 3700 series printer http config (Serial CN27LBP23V07PX)
+631/tcp  open  http       HP DeskJet 3700 series printer http config (Serial CN27LBP23V07PX)
+8080/tcp open  http       HP DeskJet 3700 series printer http config (Serial CN27LBP23V07PX)
+9100/tcp open  jetdirect?
+9220/tcp open  hp-gsg     HP Generic Scan Gateway 1.0
+MAC Address: 5C:60:BA:24:FD:09 (HP)
+Service Info: Device: printer; CPE: cpe:/h:hp:deskjet_3700_series
+
+Nmap scan report for 192.168.1.3
+Host is up (0.069s latency).
+All 1000 scanned ports on 192.168.1.3 are in ignored states.
+Not shown: 1000 filtered tcp ports (no-response)
+MAC Address: 70:2A:D5:4F:CF:13 (Samsung Electronics)
+
+Nmap scan report for 192.168.1.6
+Host is up (0.012s latency).
+All 1000 scanned ports on 192.168.1.6 are in ignored states.
+Not shown: 1000 closed tcp ports (reset)
+MAC Address: 44:61:32:32:7D:19 (ecobee)
+
+Nmap scan report for 192.168.1.7
+Host is up (0.0091s latency).
+All 1000 scanned ports on 192.168.1.7 are in ignored states.
+Not shown: 1000 closed tcp ports (reset)
+MAC Address: D0:3F:27:0D:74:D1 (Wyze Labs)
+
+Nmap scan report for 192.168.1.10
+Host is up (0.011s latency).
+All 1000 scanned ports on 192.168.1.10 are in ignored states.
+Not shown: 1000 closed tcp ports (reset)
+MAC Address: D0:3F:27:2E:6D:0E (Wyze Labs)
+
+Nmap scan report for 192.168.1.13
+Host is up (0.0083s latency).
+Not shown: 993 closed tcp ports (reset)
+PORT     STATE SERVICE  VERSION
+22/tcp   open  ssh      OpenSSH 9.2p1 Debian 2+deb12u5 (protocol 2.0)
+25/tcp   open  smtp     Burp Collaborator smtpd
+80/tcp   open  http     Burp Collaborator 4
+443/tcp  open  ssl/http Burp Collaborator 4
+465/tcp  open  ssl/smtp Burp Collaborator smtpd
+587/tcp  open  smtp     Burp Collaborator smtpd
+9090/tcp open  http     SAGE EAS Digital Endec remote audio monitor/level meter
+MAC Address: D8:3A:DD:49:B2:47 (Raspberry Pi Trading)
+Service Info: Host: d0k.quest; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Nmap scan report for 192.168.1.14
+Host is up (0.0090s latency).
+Not shown: 997 closed tcp ports (reset)
+PORT     STATE SERVICE    VERSION
+1080/tcp open  socks5     (No authentication; connection failed)
+8009/tcp open  http       Amazon Whisperplay DIAL REST service
+8888/tcp open  tcpwrapped
+MAC Address: 2C:71:FF:89:4E:85 (Amazon Technologies)
+Service Info: Device: media device
+
+Nmap scan report for 192.168.1.18
+Host is up (0.0052s latency).
+Not shown: 956 filtered tcp ports (no-response), 41 closed tcp ports (reset)
+PORT      STATE SERVICE         VERSION
+1080/tcp  open  socks5          (No authentication; connection failed)
+8888/tcp  open  tcpwrapped
+10001/tcp open  ssl/scp-config?
+MAC Address: 94:3A:91:24:B5:D0 (Amazon Technologies)
+
+Nmap scan report for 192.168.1.29
+Host is up (0.0054s latency).
+Not shown: 994 closed tcp ports (reset)
+PORT      STATE SERVICE    VERSION
+5000/tcp  open  rtsp
+7000/tcp  open  rtsp
+7100/tcp  open  rtsp
+49152/tcp open  tcpwrapped
+49153/tcp open  unknown
+62078/tcp open  tcpwrapped
+3 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port5000-TCP:V=7.95%I=7%D=5/23%Time=6830F967%P=x86_64-pc-linux-gnu%r(Ge
+SF:tRequest,90,"HTTP/1\.1\x20403\x20Forbidden\r\nContent-Length:\x200\r\nS
+SF:erver:\x20AirTunes/850\.19\.1\r\nX-Apple-ProcessingTime:\x203\r\nX-Appl
+SF:e-RequestReceivedTimestamp:\x20967350876\r\n\r\n")%r(RTSPRequest,90,"RT
+SF:SP/1\.0\x20403\x20Forbidden\r\nContent-Length:\x200\r\nServer:\x20AirTu
+SF:nes/850\.19\.1\r\nX-Apple-ProcessingTime:\x204\r\nX-Apple-RequestReceiv
+SF:edTimestamp:\x20967350893\r\n\r\n")%r(HTTPOptions,90,"HTTP/1\.1\x20403\
+SF:x20Forbidden\r\nContent-Length:\x200\r\nServer:\x20AirTunes/850\.19\.1\
+SF:r\nX-Apple-ProcessingTime:\x204\r\nX-Apple-RequestReceivedTimestamp:\x2
+SF:0967355899\r\n\r\n")%r(FourOhFourRequest,90,"HTTP/1\.1\x20403\x20Forbid
+SF:den\r\nContent-Length:\x200\r\nServer:\x20AirTunes/850\.19\.1\r\nX-Appl
+SF:e-ProcessingTime:\x204\r\nX-Apple-RequestReceivedTimestamp:\x2096735591
+SF:9\r\n\r\n")%r(SIPOptions,A2,"RTSP/1\.0\x20403\x20Forbidden\r\nContent-L
+SF:ength:\x200\r\nServer:\x20AirTunes/850\.19\.1\r\nCSeq:\x2042\x20OPTIONS
+SF:\r\nX-Apple-ProcessingTime:\x202\r\nX-Apple-RequestReceivedTimestamp:\x
+SF:20967355936\r\n\r\n");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port7000-TCP:V=7.95%I=7%D=5/23%Time=6830F96C%P=x86_64-pc-linux-gnu%r(RT
+SF:SPRequest,90,"RTSP/1\.0\x20403\x20Forbidden\r\nContent-Length:\x200\r\n
+SF:Server:\x20AirTunes/850\.19\.1\r\nX-Apple-ProcessingTime:\x204\r\nX-App
+SF:le-RequestReceivedTimestamp:\x20967350845\r\n\r\n")%r(GetRequest,90,"HT
+SF:TP/1\.1\x20403\x20Forbidden\r\nContent-Length:\x200\r\nServer:\x20AirTu
+SF:nes/850\.19\.1\r\nX-Apple-ProcessingTime:\x203\r\nX-Apple-RequestReceiv
+SF:edTimestamp:\x20967355868\r\n\r\n")%r(HTTPOptions,90,"HTTP/1\.1\x20403\
+SF:x20Forbidden\r\nContent-Length:\x200\r\nServer:\x20AirTunes/850\.19\.1\
+SF:r\nX-Apple-ProcessingTime:\x204\r\nX-Apple-RequestReceivedTimestamp:\x2
+SF:0967355887\r\n\r\n")%r(FourOhFourRequest,90,"HTTP/1\.1\x20403\x20Forbid
+SF:den\r\nContent-Length:\x200\r\nServer:\x20AirTunes/850\.19\.1\r\nX-Appl
+SF:e-ProcessingTime:\x203\r\nX-Apple-RequestReceivedTimestamp:\x2096735591
+SF:1\r\n\r\n")%r(SIPOptions,A2,"RTSP/1\.0\x20403\x20Forbidden\r\nContent-L
+SF:ength:\x200\r\nServer:\x20AirTunes/850\.19\.1\r\nCSeq:\x2042\x20OPTIONS
+SF:\r\nX-Apple-ProcessingTime:\x203\r\nX-Apple-RequestReceivedTimestamp:\x
+SF:20967355928\r\n\r\n");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port7100-TCP:V=7.95%I=7%D=5/23%Time=6830F967%P=x86_64-pc-linux-gnu%r(Ge
+SF:tRequest,90,"HTTP/1\.1\x20403\x20Forbidden\r\nContent-Length:\x200\r\nS
+SF:erver:\x20AirTunes/850\.19\.1\r\nX-Apple-ProcessingTime:\x200\r\nX-Appl
+SF:e-RequestReceivedTimestamp:\x20967350850\r\n\r\n")%r(HTTPOptions,90,"HT
+SF:TP/1\.1\x20403\x20Forbidden\r\nContent-Length:\x200\r\nServer:\x20AirTu
+SF:nes/850\.19\.1\r\nX-Apple-ProcessingTime:\x200\r\nX-Apple-RequestReceiv
+SF:edTimestamp:\x20967355895\r\n\r\n")%r(RTSPRequest,90,"RTSP/1\.0\x20403\
+SF:x20Forbidden\r\nContent-Length:\x200\r\nServer:\x20AirTunes/850\.19\.1\
+SF:r\nX-Apple-ProcessingTime:\x200\r\nX-Apple-RequestReceivedTimestamp:\x2
+SF:0967355914\r\n\r\n")%r(FourOhFourRequest,90,"HTTP/1\.1\x20403\x20Forbid
+SF:den\r\nContent-Length:\x200\r\nServer:\x20AirTunes/850\.19\.1\r\nX-Appl
+SF:e-ProcessingTime:\x200\r\nX-Apple-RequestReceivedTimestamp:\x2096736091
+SF:6\r\n\r\n")%r(SIPOptions,90,"RTSP/1\.0\x20403\x20Forbidden\r\nContent-L
+SF:ength:\x200\r\nServer:\x20AirTunes/850\.19\.1\r\nX-Apple-ProcessingTime
+SF::\x200\r\nX-Apple-RequestReceivedTimestamp:\x20967360931\r\n\r\n");
+MAC Address: E0:89:7E:64:74:E5 (Apple)
+
+Nmap scan report for poppa (192.168.1.8)
+Host is up (0.0000030s latency).
+Not shown: 999 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+25/tcp open  smtp    Postfix smtpd
+Service Info: Host:  poppa.hsd1.co.comcast.net
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri May 23 16:43:47 2025 -- 256 IP addresses (11 hosts up) scanned in 223.76 seconds

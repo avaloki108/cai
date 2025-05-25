@@ -10,7 +10,7 @@ import json
 import os
 import re
 from datetime import datetime
-from typing import Dict, Any, Callable, Type, Literal
+from typing import Dict, Any, Callable, Type, Literal, Tuple
 import importlib.resources
 import pathlib
 
@@ -413,8 +413,10 @@ def format_chat_completion(msg, prev_msg=None) -> str:  # pylint: disable=unused
 def get_ollama_api_base() -> str:
     """
     Get the Ollama API base URL from the environment variable.
+    Standard Ollama installations use port 11434. If running in Docker,
+    you may need to use 'host.docker.internal' instead of 'localhost'.
     """
-    return os.getenv("OLLAMA_API_BASE", "http://host.docker.internal:8000/v1")
+    return os.getenv("OLLAMA_API_BASE", "http://localhost:11434/v1")
 
 
 def cli_print_agent_messages(agent_name, message, counter, model, debug,  # pylint: disable=too-many-arguments,too-many-locals,unused-argument # noqa: E501
@@ -1175,6 +1177,7 @@ def function_to_json(
         KeyError: If an unknown type annotation is encountered for a parameter.
         TypeError: If a type annotation is not a valid type.
     """
+    import typing  # Import typing module for advanced type handling
 
     # Map Python types to OpenAPI/JSON schema types
     # Ref: https://swagger.io/docs/specification/data-models/data-types/
@@ -1188,6 +1191,62 @@ def function_to_json(
         dict: "object",  # Note: Further details (properties) might be needed
         type(None): "null", # Rarely used for parameters
     }
+
+    def resolve_type_annotation(annotation) -> Tuple[str, bool]:
+        """
+        Resolve complex type annotations to (schema_type, is_optional)
+        
+        Handles:
+        - Optional[T] -> (T's schema, True)
+        - Union[T, None] -> (T's schema, True)  
+        - List[T] -> ("array", False) with items info
+        - Basic types -> (schema_type, False)
+        """
+        is_optional = False
+
+        # Handle Optional[T] and Union[T, None]
+        if hasattr(annotation, '__origin__'):
+            origin = annotation.__origin__
+
+            # Handle Union types (including Optional)
+            if origin is typing.Union:
+                args = annotation.__args__
+                # Check if it's Optional (Union with None)
+                if len(args) == 2 and type(None) in args:
+                    is_optional = True
+                    # Get the non-None type
+                    non_none_type = next(arg for arg in args if arg != type(None))
+                    return resolve_type_annotation(non_none_type)[0], is_optional
+                else:
+                    # For other Union types, just use the first type
+                    return resolve_type_annotation(args[0])[0], is_optional
+
+            # Handle List[T], Dict[K,V], etc.
+            elif origin in (list, typing.List):
+                return "array", is_optional
+            elif origin in (dict, typing.Dict):
+                return "object", is_optional
+
+        # Handle basic types
+        if annotation in type_map:
+            return type_map[annotation], is_optional
+        elif hasattr(annotation, '__name__'):
+            # Try to map by class name for custom types
+            if annotation.__name__ in ['str', 'string']:
+                return "string", is_optional
+            elif annotation.__name__ in ['int', 'integer']:
+                return "integer", is_optional
+            elif annotation.__name__ in ['float', 'number']:
+                return "number", is_optional
+            elif annotation.__name__ in ['bool', 'boolean']:
+                return "boolean", is_optional
+            elif annotation.__name__ in ['list', 'List']:
+                return "array", is_optional
+            elif annotation.__name__ in ['dict', 'Dict']:
+                return "object", is_optional
+
+        # Default fallback
+        return "string", is_optional
 
     try:
         signature = inspect.signature(func)
@@ -1288,37 +1347,29 @@ def function_to_json(
         if is_required:
             required_params.append(param.name)
 
+        # Determine if the parameter is required (no default value)
+        param_has_default = param.default != inspect.Parameter.empty
+
         # Get parameter type annotation
         param_type_annotation = param.annotation
         param_schema_type = "string" # Default if no annotation
+        annotation_is_optional = False
 
         if param_type_annotation != inspect.Parameter.empty:
-            # Handle generic types like list[str] or dict[str, int] (simplified)
-            origin_type = getattr(param_type_annotation, '__origin__', None)
-            param_base_type = origin_type if origin_type else param_type_annotation
-
-            # Check if it's a valid type before lookup
-            if not isinstance(param_base_type, type) and not origin_type:
-                # Could be a typing alias like typing.List, etc.
-                # Attempt mapping anyway, might fail if not in type_map
-                 pass # Fall through to the type_map lookup
-
             try:
-                param_schema_type = type_map[param_base_type]
-            except KeyError as e:
-                 # Provide more context in the error
-                raise KeyError(
-                    f"Unknown type annotation '{param_type_annotation}' (base type: {param_base_type}) "
-                    f"for parameter '{param.name}' in function '{func.__name__}'. "
-                    f"Supported base types: {list(type_map.keys())}"
-                ) from e
-            except TypeError as e:
-                # Catch cases where annotation is not a type (e.g., a string literal)
-                 raise TypeError(
-                    f"Invalid type annotation '{param_type_annotation}' for parameter '{param.name}' "
-                    f"in function '{func.__name__}'. Expected a type (like str, int, list[str]), "
-                    f"but got {type(param_type_annotation)}."
-                 ) from e
+                param_schema_type, annotation_is_optional = resolve_type_annotation(param_type_annotation)
+            except Exception as e:
+                print(
+                    f"Warning: Could not resolve type annotation '{param_type_annotation}' for parameter '{param.name}' in function '{func.__name__}': {e}")
+                param_schema_type = "string"  # Fallback to string
+                annotation_is_optional = False
+
+        # A parameter is required if:
+        # 1. It has no default value AND
+        # 2. It's not annotated as Optional
+        is_required = not param_has_default and not annotation_is_optional
+        if is_required:
+            required_params.append(param.name)
 
         # Build the schema for this parameter, including description
         parameter_schema: Dict[str, Any] = {
@@ -1326,15 +1377,18 @@ def function_to_json(
             "description": param_descriptions.get(param.name, "") # Use parsed description or empty string
         }
 
-        # (Optional) Add 'items' detail for arrays if type hint specifies it
-        # Example: list[str] -> {"type": "array", "items": {"type": "string"}}
-        if param_schema_type == "array" and origin_type and hasattr(param_type_annotation, '__args__') and param_type_annotation.__args__:
-            item_type_annotation = param_type_annotation.__args__[0]
-            item_origin_type = getattr(item_type_annotation, '__origin__', None)
-            item_base_type = item_origin_type if item_origin_type else item_type_annotation
-            if item_base_type in type_map:
-                 parameter_schema["items"] = {"type": type_map[item_base_type]}
-            # Add nested handling here if needed (e.g., list[list[int]])
+        # Add 'items' detail for arrays if type hint specifies it
+        if param_schema_type == "array" and param_type_annotation != inspect.Parameter.empty:
+            try:
+                if hasattr(param_type_annotation, '__origin__') and hasattr(param_type_annotation, '__args__'):
+                    origin = param_type_annotation.__origin__
+                    if origin in (list, typing.List) and param_type_annotation.__args__:
+                        item_type_annotation = param_type_annotation.__args__[0]
+                        item_schema_type, _ = resolve_type_annotation(item_type_annotation)
+                        parameter_schema["items"] = {"type": item_schema_type}
+            except Exception:
+                # If we can't determine the item type, just leave it as a generic array
+                pass
 
         parameters_properties[param.name] = parameter_schema
 
