@@ -12,6 +12,7 @@ from collections.abc import AsyncIterator, Iterable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
+import uuid
 import litellm
 import tiktoken
 from openai import NOT_GIVEN, AsyncOpenAI, AsyncStream, NotGiven
@@ -968,6 +969,15 @@ class OpenAIChatCompletionsModel(Model):
                 # Store pending tool calls but don't add to history yet
                 if not hasattr(self, "_pending_tool_calls"):
                     self._pending_tool_calls = {}
+
+
+                # Fix Google Gemini OpenAI compatibility issues.
+                # When using the OpenAI-compatible API to call tools with Google Gemini
+                # tool_call.id is returned as an empty string.
+                if "openai/gemini" in os.getenv("CAI_MODEL"):
+                    for tool_call in assistant_msg.tool_calls:
+                        if tool_call.id is None or tool_call.id == "":
+                            tool_call.id = uuid.uuid4().hex[:16]
 
                 for tool_call in assistant_msg.tool_calls:
                     # Handle empty arguments before storing
@@ -2681,7 +2691,7 @@ class OpenAIChatCompletionsModel(Model):
         if "alias" in model_str and "alias0.5" not in model_str:  # NOTE: exclude alias0.5
             kwargs["api_base"] = "https://api.aliasrobotics.com:666/"
             kwargs["custom_llm_provider"] = "openai"
-            kwargs["api_key"] = os.getenv("ALIAS_API_KEY", "sk-alias-1234567890")
+            kwargs["api_key"] = os.getenv("ALIAS_API_KEY", "REDACTED_ALIAS_KEY")
         elif "/" in model_str:
             # Handle provider/model format
             provider = model_str.split("/")[0]

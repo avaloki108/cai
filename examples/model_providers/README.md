@@ -46,5 +46,5 @@ curl -s http://localhost:4000/v1/chat/completions -H "Content-Type: application/
 
 When using virtual keys:
 ```bash
-curl -s http://localhost:4000/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer sk-pNCn8ZA0SCtWMpkZNUWe5g" -d '{"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Say hi"}], "max_tokens": 10}' | jq
+curl -s http://localhost:4000/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer REDACTED_EXAMPLE_KEY" -d '{"model": "gpt-4o-mini", "messages": [{"role": "user", "content": "Say hi"}], "max_tokens": 10}' | jq
 ```
