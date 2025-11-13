@@ -25,9 +25,6 @@ AutoPenBench                                             │
                                   Beginner Novice     Graduate     Professional      Elite
 
 ```
-
-*Categories marked with asterisk are available in CAI PRO version [^8].
-
 <table>
   <tr>
     <th style="text-align:center;"><b>Best performance in Agent vs Agent A&amp;D</b></th>
