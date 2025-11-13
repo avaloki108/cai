@@ -58,13 +58,16 @@ Cybersecurity AI Benchmark or `CAIBench` for short is a meta-benchmark (*benchma
     - [📁 Dataset: `memory01_80/`](#-dataset-memory01_80)
     - [🔍 Entity Coverage](#-entity-coverage)
     - [📐 Metrics](#-metrics)
-    - [📊 Evaluation](#-evaluation)
+    - [📊  Evaluation](#--evaluation)
   - [About `Attack-Defense CTF`](#about-attack-defense-ctf)
     - [Game Structure](#game-structure)
     - [Rules and Scoring](#rules-and-scoring)
     - [Architecture](#architecture)
     - [Technical Features](#technical-features)
   - [About challenges in benchmarks](#about-challenges-in-benchmarks)
+    - [`Jeopardy CTF`](#jeopardy-ctf)
+    - [`A&D`](#ad)
+    - [Cyber Ranges](#cyber-ranges)
 
 
 ## Difficulty classification
@@ -127,11 +130,11 @@ Currently, supporting the following benchmarks, refer to [`ctf_configs.jsonl`](.
 
 | Category | Benchmark | Difficulty | Description |
 |----------|-----------|------------|-------------|
-| :one: `jeopardy` [^8] | Base | 🚩 - 🚩🚩🚩 | `21` curated CTFs that measures initial penetration testing capabilities across challenges in rev, misc, pwn, web, crypto and forensics. *This benchmark has been saturated and frontier Cybersecurity models are able to conquer most*. |
-| :one: `jeopardy` [^8] | [Cybench](https://github.com/andyzorigin/cybench) | 🚩 - 🚩🚩🚩🚩🚩 | A curated list with `35` CTFs stemming from the popular *`Cybench` Framework for Evaluating Cybersecurity Capabilities and Risk*[^7]. |
-| :one: `jeopardy` [^8] | RCTF2 | 🚩 - 🚩🚩🚩🚩🚩 |  `27` Robotics CTFs challenges to attack and defend robots and robotic frameworks. Robots and robotics-related technologies considered include ROS, ROS 2, manipulators, AGVs and AMRs, collaborative robots, legged robots, humanoids and more. |
-| :two: `A&D` [^8] | `A&D` | 🚩 - 🚩🚩🚩🚩 | A compilation of `10` **n** vs **n** attack and defense challenges wherein each team defends their own vulnerable assets while simultaneously attacking others'. Includes IT and OT/ICS themed challenges across multiple difficulty levels. |
-| :three: `cyber-range` [^8] |  Cyber Ranges | 🚩🚩 - 🚩🚩🚩🚩|  12 Cyber Ranges with 16 challenges to practice and test cybersecurity skills in realistic simulated environments. |
+| :one: `jeopardy`  | Base | 🚩 - 🚩🚩🚩 | `21` curated CTFs that measures initial penetration testing capabilities across challenges in rev, misc, pwn, web, crypto and forensics. *This benchmark has been saturated and frontier Cybersecurity models are able to conquer most*. |
+| :one: `jeopardy`  | [Cybench](https://github.com/andyzorigin/cybench) | 🚩 - 🚩🚩🚩🚩🚩 | A curated list with `35` CTFs stemming from the popular *`Cybench` Framework for Evaluating Cybersecurity Capabilities and Risk*[^7]. |
+| :one: `jeopardy`  | RCTF2 | 🚩 - 🚩🚩🚩🚩🚩 |  `27` Robotics CTFs challenges to attack and defend robots and robotic frameworks. Robots and robotics-related technologies considered include ROS, ROS 2, manipulators, AGVs and AMRs, collaborative robots, legged robots, humanoids and more. |
+| :two: `A&D`  | `A&D` | 🚩 - 🚩🚩🚩🚩 | A compilation of `10` **n** vs **n** attack and defense challenges wherein each team defends their own vulnerable assets while simultaneously attacking others'. Includes IT and OT/ICS themed challenges across multiple difficulty levels. |
+| :three: `cyber-range`  |  Cyber Ranges | 🚩🚩 - 🚩🚩🚩🚩|  12 Cyber Ranges with 16 challenges to practice and test cybersecurity skills in realistic simulated environments. |
 | :four: `knowledge` | [SecEval](https://github.com/XuanwuAI/SecEval) | N/A | Benchmark designed to evaluate large language models (LLMs) on security-related tasks. It includes various real-world scenarios such as phishing email analysis, vulnerability classification, and response generation. |
 | :four: `knowledge` | [CyberMetric](https://github.com/CyberMetric) | N/A | Benchmark framework that focuses on measuring the performance of AI systems in cybersecurity-specific question answering, knowledge extraction, and contextual understanding. It emphasizes both domain knowledge and reasoning ability. |
 | :four: `knowledge` | [CTIBench](https://github.com/xashru/cti-bench) | N/A | Benchmark focused on evaluating LLM models' capabilities in understanding and processing Cyber Threat Intelligence (CTI) information. |
@@ -151,8 +154,6 @@ Currently, supporting the following benchmarks, refer to [`ctf_configs.jsonl`](.
 [^6]: A meta-benchmark is a a benchmark of benchmarks: a structured evaluation framework that measures, compares, and summarizes the performance of systems, models, or methods across multiple underlying benchmarks rather than a single one.
 
 [^7]: CAIBench integrates only 35 (out of 40) curated Cybench scenarios for evaluation purposes. This reduction comes mainly down to restrictions in our testing infrastructure as well as reproducibility issues.
-
-[^8]: Internal exercises related to Jeopardy-style CTFs, Attack–Defense CTF, and Cyber Range Exercises are available upon request to [CAI PRO](https://aliasrobotics.com/cybersecurityai.php) subscribers on a use case basis. Learn more at https://aliasrobotics.com/cybersecurityai.php
 
 
 ## About `Cybersecurity Knowledge` benchmarks
@@ -450,7 +451,9 @@ The A&D benchmark includes **10 machines** spanning IT and OT/ICS domains across
 
 ## About challenges in benchmarks
 
-### `Jeopardy CTF` [^8]
+**NOTE: Various of the challenges used in the benchmarks have been sourced from public repositories. Proper credit is given to the original authors and repositories in the tables below. The challenges have been containerized to ensure reproducibility and ease of deployment within the CAIBench framework. Some images contain confidential information and are thereby unavailable.
+
+### `Jeopardy CTF` 
 
 <details>
 <summary>"Base" Benchmark</summary>
@@ -581,7 +584,7 @@ The A&D benchmark includes **10 machines** spanning IT and OT/ICS domains across
 </details>
 
 
-### `A&D` [^8]
+### `A&D` 
 
 <details>
 <summary>"Attack/Defense CTF" Benchmark</summary>
@@ -601,7 +604,7 @@ The A&D benchmark includes **10 machines** spanning IT and OT/ICS domains across
 
 </details>
 
-### Cyber Ranges [^8]
+### Cyber Ranges 
 
 <details>
 <summary>"Cyber Ranges" Benchmark</summary>
