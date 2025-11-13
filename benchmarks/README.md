@@ -451,7 +451,7 @@ The A&D benchmark includes **10 machines** spanning IT and OT/ICS domains across
 
 ## About challenges in benchmarks
 
-**NOTE: Various of the challenges used in the benchmarks have been sourced from public repositories. Proper credit is given to the original authors and repositories in the tables below. The challenges have been containerized to ensure reproducibility and ease of deployment within the CAIBench framework. Some images contain confidential information and are thereby unavailable.
+**NOTE**: Various of the challenges used in the benchmarks have been sourced from public repositories. Proper credit is given to the original authors and repositories in the tables below. The challenges have been containerized to ensure reproducibility and ease of deployment within the CAIBench framework. Some images contain confidential information and are thereby unavailable. For an exemplary image, please refer to the https://github.com/NickNameInvalid/LLM_CTF/tree/main/database/crypto/lottery.
 
 ### `Jeopardy CTF` 
 
