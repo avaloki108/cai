@@ -45,6 +45,7 @@ For a complete reference organized by use case, see [Environment Variables Refer
 | CAI_GUARDRAILS | Enable/disable security guardrails for agents. When set to "true", applies security guardrails to prevent potentially dangerous outputs and inputs | false |
 | CAI_GCTR_NITERATIONS | Number of tool interactions before triggering GCTR (Generative Cut-The-Rope) analysis in bug_bounter_gctr agent. Only applies when using gctr-enabled agents | 5 |
 | CAI_ACTIVE_CONTAINER | Docker container ID where commands should be executed. When set, shell commands and tools execute inside the specified container instead of the host. Automatically set when CTF challenges start (if CTF_INSIDE=true) or when switching containers via /virtualization command | - |
+| CAI_TOOL_TIMEOUT | Override the default timeout for tool command executions in seconds. When set, this value overrides all default timeouts for shell commands and tool executions | varies (10s for interactive, 100s for regular) |
 
 ## Custom OpenAI Base URL Support
 

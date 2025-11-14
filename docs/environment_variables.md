@@ -35,6 +35,7 @@ This comprehensive guide documents all environment variables available in CAI, i
 | CAI_GUARDRAILS | Enable/disable security guardrails for agents. When set to "true", applies security guardrails to prevent potentially dangerous outputs and inputs | false |
 | CAI_GCTR_NITERATIONS | Number of tool interactions before triggering GCTR (Generative Cut-The-Rope) analysis in bug_bounter_gctr agent. Only applies when using gctr-enabled agents | 5 |
 | CAI_ACTIVE_CONTAINER | Docker container ID where commands should be executed. When set, shell commands and tools execute inside the specified container instead of the host. Automatically set when CTF challenges start (if CTF_INSIDE=true) or when switching containers via /virtualization command | - |
+| CAI_TOOL_TIMEOUT | Override the default timeout for tool command executions in seconds. When set, this value overrides all default timeouts for shell commands and tool executions | varies (10s for interactive, 100s for regular) |
 
 ---
 
@@ -154,6 +155,9 @@ CAI_STREAM="false"                    # Disable streaming for faster processing
 CAI_ENV_CONTEXT="true"                # Include environment in context
 CAI_MAX_TURNS="50"                    # Limit conversation turns
 
+# Tool execution timeout
+CAI_TOOL_TIMEOUT="60"                 # Override default command timeouts (in seconds)
+
 # Telemetry
 CAI_TELEMETRY="true"                  # Enable usage analytics
 ```
@@ -162,6 +166,7 @@ CAI_TELEMETRY="true"                  # Enable usage analytics
 - Enable `CAI_BRIEF` for concise outputs in automated workflows
 - Set `CAI_MAX_TURNS` to prevent infinite loops
 - Use `CAI_STREAM=false` when output display is not needed
+- Set `CAI_TOOL_TIMEOUT` to control command execution timeouts (default: 10s for interactive, 100s for regular commands)
 
 ---
 
