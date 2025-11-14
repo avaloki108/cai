@@ -36,6 +36,28 @@ That should initialize CAI and provide a prompt to execute any security task you
 
 Here's a quick [demo video](https://asciinema.org/a/zm7wS5DA2o0S9pu1Tb44pnlvy) to help you get started with CAI. We'll walk through the basic steps — from launching the tool to running your first AI-powered task in the terminal. Whether you're a beginner or just curious, this guide will show you how easy it is to begin using CAI.
 
+### Autonomous Mode with --continue
+
+CAI can run autonomously using the `--continue` flag, which makes agents automatically continue their work without waiting for user input:
+
+```bash
+# Have CAI tell security jokes continuously
+cai --continue --prompt "tell me a joke about security"
+
+# Run autonomous security audit
+cai --continue --prompt "perform security audit of authentication system"
+
+# Hunt for vulnerabilities automatically
+cai --continue --prompt "find SQL injection vulnerabilities"
+```
+
+With `--continue`, CAI will:
+- Analyze the conversation context after each turn
+- Generate intelligent continuation prompts
+- Keep working until the task is complete or interrupted
+
+See the [Continue Mode Guide](continue_mode.md) for detailed information.
+
 From here on, type on `CAI` and start your security exercise. Best way to learn is by example:
 
 ### Environment Variables

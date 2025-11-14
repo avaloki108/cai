@@ -18,6 +18,48 @@ CAI offers a few built-in tools when using the [`OpenAIResponsesModel`][cai.sdk.
 5. Data exfiltration - *exfiltration*
 6. Command and control - *control*
 
+### C99 Tool
+
+CAI includes integration with the C99.nl API for subdomain discovery and DNS enumeration. This tool is particularly useful for reconnaissance during security assessments.
+
+#### Configuration
+
+To use the C99 tool, you need to set up your API key:
+
+```bash
+# In your .env file
+C99_API_KEY="your-c99-api-key-here"
+```
+
+You can obtain an API key by registering at [C99.nl](https://c99.nl).
+
+#### Usage Example
+
+```python
+from cai.sdk.agents import Agent, Runner, OpenAIChatCompletionsModel
+from cai.tools.reconnaissance.c99_tool import c99_subdomain_finder
+from openai import AsyncOpenAI
+
+recon_agent = Agent(
+    name="Recon Agent",
+    description="Agent specialized in subdomain discovery",
+    instructions="You are a reconnaissance expert focused on DNS enumeration.",
+    tools=[
+        c99_subdomain_finder,
+    ],
+    model=OpenAIChatCompletionsModel(
+        model="qwen2.5:14b",
+        openai_client=AsyncOpenAI(),
+    )
+)
+
+async def main():
+    result = await Runner.run(recon_agent, "Find all subdomains for example.com")
+    print(result.final_output)
+```
+
+The C99 tool provides comprehensive subdomain enumeration capabilities, making it valuable for the reconnaissance phase of security assessments.
+
 ```python
 from cai.sdk.agents import Agent, Runner, OpenAIChatCompletionsModel
 from cai.tools.reconnaissance.generic_linux_command import generic_linux_command 
