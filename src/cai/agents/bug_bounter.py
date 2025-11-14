@@ -24,6 +24,20 @@ from cai.tools.reconnaissance.shodan import (  # pylint: disable=import-error # 
     shodan_host_info
 )
 
+from cai.tools.web3_security import (  # pylint: disable=import-error # noqa: E501
+    slither_analyze,
+    slither_check_upgradeability,
+    mythril_analyze,
+    mythril_disassemble,
+    securify_analyze,
+    echidna_fuzz,
+    echidna_assertion_mode,
+    medusa_fuzz,
+    medusa_test,
+    fuzz_utils_run,
+    generate_fuzz_seeds,
+)
+
 from cai.agents.guardrails import get_security_guardrails
 
 load_dotenv()
@@ -34,7 +48,19 @@ tools = [
     generic_linux_command,
     execute_code,
     shodan_search,
-    shodan_host_info
+    shodan_host_info,
+    # Web3 Security Tools
+    slither_analyze,
+    slither_check_upgradeability,
+    mythril_analyze,
+    mythril_disassemble,
+    securify_analyze,
+    echidna_fuzz,
+    echidna_assertion_mode,
+    medusa_fuzz,
+    medusa_test,
+    fuzz_utils_run,
+    generate_fuzz_seeds,
 ]
 
 if os.getenv('GOOGLE_SEARCH_API_KEY') and os.getenv('GOOGLE_SEARCH_CX'):

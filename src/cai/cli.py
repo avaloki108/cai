@@ -182,6 +182,11 @@ class ComprehensiveErrorFilter(logging.Filter):
             "client_session:",
             "connector:",
             "connections:",
+            # LiteLLM Pydantic validation errors (non-fatal logging issues)
+            "error creating standard logging object",
+            "output_tokens_details",
+            "field required",
+            "validation error for responseapiusage",
         ]
         
         # Check if any suppress pattern matches
@@ -219,6 +224,7 @@ loggers_to_configure = [
     "anyio._backends._asyncio",
     "cai.sdk.agents",
     "aiohttp",  # Add aiohttp logger to suppress session warnings
+    "litellm",  # Add litellm logger to suppress non-fatal logging errors
 ]
 
 for logger_name in loggers_to_configure:
@@ -227,6 +233,8 @@ for logger_name in loggers_to_configure:
     # Set appropriate level - ERROR for most, WARNING for critical ones
     if logger_name in ["asyncio", "anyio", "anyio._backends._asyncio"]:
         logger.setLevel(logging.ERROR)  # Only show critical errors
+    elif logger_name == "litellm":
+        logger.setLevel(logging.CRITICAL)  # Suppress ERROR level Pydantic validation issues
     else:
         logger.setLevel(logging.WARNING)
 
