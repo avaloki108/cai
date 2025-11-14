@@ -93,6 +93,7 @@ nav:
   # ========================================
   - Guides:
       - Running Agents: running_agents.md
+      - Continue Mode: continue_mode.md
       - Working with Results: results.md
       - Streaming: streaming.md
       - Tracing & Debugging: tracing.md
