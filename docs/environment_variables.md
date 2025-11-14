@@ -36,6 +36,7 @@ This comprehensive guide documents all environment variables available in CAI, i
 | CAI_GCTR_NITERATIONS | Number of tool interactions before triggering GCTR (Generative Cut-The-Rope) analysis in bug_bounter_gctr agent. Only applies when using gctr-enabled agents | 5 |
 | CAI_ACTIVE_CONTAINER | Docker container ID where commands should be executed. When set, shell commands and tools execute inside the specified container instead of the host. Automatically set when CTF challenges start (if CTF_INSIDE=true) or when switching containers via /virtualization command | - |
 | CAI_TOOL_TIMEOUT | Override the default timeout for tool command executions in seconds. When set, this value overrides all default timeouts for shell commands and tool executions | varies (10s for interactive, 100s for regular) |
+| C99_API_KEY | API key for C99.nl subdomain discovery service. Required for using the C99 reconnaissance tool for DNS enumeration and subdomain discovery. Obtain from [C99.nl](https://c99.nl) | - |
 
 ---
 
@@ -86,6 +87,28 @@ CTF_INSIDE="true"                     # Run agent inside container
 
 **Related Documentation:**
 - [CTF Benchmarks](benchmarking/jeopardy_ctfs.md)
+
+---
+
+### 🔍 Reconnaissance & OSINT
+
+For reconnaissance tasks using external tools:
+
+```bash
+# C99.nl subdomain discovery
+C99_API_KEY="your-c99-api-key"        # Enable C99 reconnaissance tool
+
+# Agent configuration for recon
+CAI_AGENT_TYPE="redteam_agent"        # Or create custom recon agent
+```
+
+**Reconnaissance Tools:**
+- **C99 Tool**: Subdomain discovery and DNS enumeration via C99.nl API
+- Configure `C99_API_KEY` to enable the C99 reconnaissance tool
+- See [Tools Documentation](tools.md) for usage examples
+
+**Related Documentation:**
+- [Tools Documentation](tools.md#c99-tool)
 
 ---
 
@@ -312,6 +335,7 @@ OPENAI_API_KEY="sk-..."              # Required (can use "sk-123" as placeholder
 ANTHROPIC_API_KEY="sk-ant-..."       # For Claude models
 ALIAS_API_KEY="sk-..."               # For alias1 (CAI PRO)
 OLLAMA_API_BASE="http://localhost:11434/v1"  # For local models
+C99_API_KEY="your-api-key"           # For C99.nl subdomain discovery tool
 ```
 
 See the [Configuration Guide](cai/getting-started/configuration.md) for more details.
