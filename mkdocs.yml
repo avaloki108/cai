@@ -34,7 +34,7 @@ nav:
   # ========================================
   # CAI PRO (EXPANDIDO - COMERCIAL) ⭐
   # ========================================
-  - '🚀 CAI PRO - Professional Edition':
+  - 'Professional Edition':
       - '🤔 Why CAI PRO?': cai_pro.md
       - '⭐ Alias1 Model': cai_pro_alias1.md
       - '🔥 Exclusive Features': cai_pro_features.md
