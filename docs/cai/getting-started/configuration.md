@@ -72,4 +72,26 @@ CAI_AGENT_TYPE=redteam_agent
 CAI_MODEL=openrouter/meta-llama/llama-4-maverick
 OPENROUTER_API_KEY=<sk-your-key>  # note, add yours
 OPENROUTER_API_BASE=https://openrouter.ai/api/v1
-``` 
+```
+
+### Selecting and pinning providers (routing controls)
+
+OpenRouter can route a model to multiple backend providers. CAI exposes the same routing controls via environment variables and an inline model suffix so you can pin, prefer, or avoid specific providers per request.
+
+Environment variables (comma‑separated lists allowed):
+
+- `OPENROUTER_PROVIDER` → sets `provider.order` (priority list). Use with `OPENROUTER_ALLOW_FALLBACKS` (default `true`).
+- `OPENROUTER_PROVIDER_ONLY` → sets `provider.only` (force these providers only).
+- `OPENROUTER_PROVIDER_IGNORE` → sets `provider.ignore` (skip these providers).
+- `OPENROUTER_QUANTIZATION` → sets `provider.quantizations` (e.g., `fp8,int4`).
+
+Inline (single-call) syntax (overrides env vars for that call):
+
+```
+CAI_MODEL="openrouter/meta-llama/llama-4-maverick::provider=anthropic,azure::only=azure::ignore=deepinfra::quant=fp8"
+```
+
+Notes:
+- Inline `provider` sets `allow_fallbacks=false` for that request (env does not override it).
+- Provider slugs match those shown on OpenRouter model pages (e.g., `azure`, `anthropic`, `deepinfra`, `atlascloud`).
+- The provider used for each response is printed in the CAI CLI header next to the model (e.g., `(openrouter/... • AtlasCloud)`).
