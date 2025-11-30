@@ -116,7 +116,9 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env file from current working directory with override
+# This ensures env vars from .env take precedence over system env vars
+load_dotenv(override=True)
 
 # Configure Python warnings BEFORE any other imports
 import warnings
