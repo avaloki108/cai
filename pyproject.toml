@@ -1,6 +1,6 @@
 [project]
 name = "cai-framework"
-version = "0.5.7"
+version = "0.5.8"
 description = "Cybersecurity AI Framework"
 readme = "README.md"
 requires-python = ">=3.9"
