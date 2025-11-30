@@ -21,7 +21,10 @@ from cai.util import load_prompt_template, create_system_prompt_renderer
 from cai.agents.guardrails import get_security_guardrails
 
 load_dotenv()
-model_name = os.getenv("CAI_MODEL", "alias0")
+model_name = os.getenv("CAI_MODEL", "alias1")
+
+# Determine API key
+api_key = os.getenv("ALIAS_API_KEY", os.getenv("OPENAI_API_KEY", "sk-alias-1234567890"))
 # Prompts
 redteam_agent_system_prompt = load_prompt_template("prompts/system_red_team_agent.md")
 # Define tools list based on available API keys
@@ -48,7 +51,7 @@ redteam_agent = Agent(
     output_guardrails=output_guardrails,
     model=OpenAIChatCompletionsModel(
         model=model_name,
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=api_key),
     ),
 )
 

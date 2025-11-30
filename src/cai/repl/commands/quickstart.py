@@ -260,7 +260,7 @@ class QuickstartCommand(Command):
             console.print("  [yellow]1.[/yellow] Run: [bold green]/model-show[/bold green] to see all available models")
             console.print("  [yellow]2.[/yellow] Run: [bold green]/model-show supported[/bold green] to see only models with function calling support")
             console.print("  [yellow]3.[/yellow] Select a model: [bold green]/model <model-name>[/bold green]")
-            console.print("\n[dim]Note: The default model 'alias0' requires configuration. Please select a specific model.[/dim]")
+            console.print("\n[dim]Note: The default model 'alias1' requires configuration. Please select a specific model.[/dim]")
         else:
             console.print(
                 Panel(

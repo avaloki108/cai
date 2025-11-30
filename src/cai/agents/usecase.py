@@ -7,7 +7,7 @@ from cai.tools.reconnaissance.generic_linux_command import null_tool
 from cai.util import load_prompt_template, create_system_prompt_renderer
 
 load_dotenv()
-model_name = os.getenv("CAI_MODEL", "alias0")
+model_name = os.getenv("CAI_MODEL", "alias1")
 
 # Load prompt
 use_case_agent_system_prompt = load_prompt_template("prompts/system_use_cases.md")

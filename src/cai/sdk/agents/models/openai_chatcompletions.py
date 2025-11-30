@@ -2699,7 +2699,7 @@ class OpenAIChatCompletionsModel(Model):
         # Determine provider based on model string
         model_str = str(kwargs["model"]).lower()
 
-        if "alias" in model_str and "alias0.5" not in model_str:  # NOTE: exclude alias0.5
+        if "alias" in model_str and "alias1.5" not in model_str:  # NOTE: exclude alias1.5
             kwargs["api_base"] = "https://api.aliasrobotics.com:666/"
             kwargs["custom_llm_provider"] = "openai"
             kwargs["api_key"] = os.getenv("ALIAS_API_KEY", "REDACTED_ALIAS_KEY")
@@ -2815,7 +2815,7 @@ class OpenAIChatCompletionsModel(Model):
             elif "gemini" in model_str:
                 kwargs.pop("parallel_tool_calls", None)
             elif "qwen" in model_str or ":" in model_str:
-                # Handle Ollama-served models with custom formats (e.g., alias0)
+                # Handle Ollama-served models with custom formats (e.g., alias1)
                 # These typically need the Ollama provider
                 litellm.drop_params = True
                 kwargs.pop("parallel_tool_calls", None)

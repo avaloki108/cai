@@ -36,15 +36,15 @@ def get_predefined_model_categories() -> Dict[str, List[Dict[str, str]]]:
     return {
         "Alias": [
             {
-                "name": "alias0",
+                "name": "alias1",
                 "description": (
                     "Best model for Cybersecurity AI tasks"
                 )
             },
             {
-                "name": "alias0-fast",
+                "name": "alias1-fast",
                 "description": (
-                    "Fast version of alias0 for quick tasks"
+                    "Fast version of alias1 for quick tasks"
                 )
             }
         ],

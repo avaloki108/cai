@@ -46,7 +46,7 @@ ENV_VARS = {
     6: {
         "name": "CAI_MODEL",
         "description": "Model to use for agents",
-        "default": "alias0"
+        "default": "alias1"
     },
     7: {
         "name": "CAI_DEBUG",

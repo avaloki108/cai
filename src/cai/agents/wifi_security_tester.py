@@ -42,7 +42,7 @@ wifi_security_agent = Agent(
                    Specializes in wireless attacks, password recovery, and communication disruption.""",
     tools=functions,
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
+        model=os.getenv('CAI_MODEL', "alias1"),
         openai_client=AsyncOpenAI(),
     )
 )

@@ -17,6 +17,9 @@ from cai.tools.reconnaissance.exec_code import (  # pylint: disable=import-error
 
 load_dotenv()
 
+# Determine API key
+api_key = os.getenv("ALIAS_API_KEY", os.getenv("OPENAI_API_KEY", "sk-alias-1234567890"))
+
 # Load the triage agent system prompt
 retester_system_prompt = load_prompt_template("prompts/system_triage_agent.md")
 
@@ -36,8 +39,8 @@ retester_agent = Agent(
                    eliminating false positives.""",
     tools=tools,
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
-        openai_client=AsyncOpenAI(),
+        model=os.getenv('CAI_MODEL', "alias1"),
+        openai_client=AsyncOpenAI(api_key=api_key),
     )
 )
 

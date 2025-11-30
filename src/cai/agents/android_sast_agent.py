@@ -32,7 +32,7 @@ tools = [
 
 
 load_dotenv()
-model_name = os.getenv("CAI_MODEL", "alias0")
+model_name = os.getenv("CAI_MODEL", "alias1")
 
 app_logic_mapper = Agent(
     name="AppLogicMapper",

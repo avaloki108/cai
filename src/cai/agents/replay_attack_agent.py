@@ -68,7 +68,7 @@ replay_attack_agent = Agent(
     description="""Agent that specializes in network replay attacks and counteroffensive techniques.
                    Expert in packet manipulation, traffic replay, and protocol exploitation.""",
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
+        model=os.getenv('CAI_MODEL', "alias1"),
         openai_client=AsyncOpenAI(),
     ),
     tools=tools,

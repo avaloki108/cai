@@ -62,7 +62,7 @@ dfir_agent = Agent(
     description="""Agent that specializes in Digital Forensics and Incident Response.
                    Expert in investigation and analysis of digital evidence.""",
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
+        model=os.getenv('CAI_MODEL', "alias1"),
         openai_client=AsyncOpenAI(),
     ),
     tools=tools,

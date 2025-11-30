@@ -9,6 +9,9 @@ from cai.sdk.agents import Agent, OpenAIChatCompletionsModel
 from cai.tools.misc.cli_utils import execute_cli_command
 from cai.sdk.agents import function_tool
 
+# Determine API key
+api_key = os.getenv("ALIAS_API_KEY", os.getenv("OPENAI_API_KEY", "sk-alias-1234567890"))
+
 
 
 def get_txt_record(domain, record_type='TXT'):
@@ -115,7 +118,7 @@ dns_smtp_agent = Agent(
     ),
     tools=[check_mail_spoofing_vulnerability, execute_cli_command],
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
-        openai_client=AsyncOpenAI(),
+        model=os.getenv('CAI_MODEL', "alias1"),
+        openai_client=AsyncOpenAI(api_key=api_key),
     )
 )

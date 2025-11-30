@@ -43,7 +43,7 @@ blueteam_agent = Agent(
     description="""Agent that specializes in system defense and security monitoring.
                    Expert in cybersecurity protection and incident response.""",
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
+        model=os.getenv('CAI_MODEL', "alias1"),
         openai_client=AsyncOpenAI(),
     ),
     tools=tools,

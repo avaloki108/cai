@@ -348,7 +348,7 @@ def display_quick_guide(console: Console):
     )
     
     # Get current environment variable values
-    current_model = os.getenv('CAI_MODEL', "alias0")
+    current_model = os.getenv('CAI_MODEL', "alias1")
     current_agent_type = os.getenv('CAI_AGENT_TYPE', "one_tool_agent")
     
     config_text = Text.assemble(
@@ -413,19 +413,19 @@ def display_quick_guide(console: Console):
         Text.assemble(
             ("🔒 Security-Focused AI Framework\n\n", "bold white"),
             "For optimal cybersecurity AI performance, use\n", 
-            ("alias0", "bold green"), 
+            ("alias1", "bold green"), 
             " - specifically designed for cybersecurity\n"
             "tasks with superior domain knowledge.\n\n",
-            ("alias0", "bold green"), 
+            ("alias1", "bold green"), 
             " outperforms general-purpose models in:\n",
             "• Vulnerability assessment\n",
             "• Penetration testing and bug bounty\n",
             "• Security analysis\n",
             "• Threat detection\n\n",
             "Learn more about ", 
-            ("alias0", "bold green"), 
+            ("alias1", "bold green"), 
             " and its privacy-first approach:\n",
-            ("https://news.aliasrobotics.com/alias0-a-privacy-first-cybersecurity-ai/", "blue underline")
+            ("https://news.aliasrobotics.com/alias1-a-privacy-first-cybersecurity-ai/", "blue underline")
         ),
         title="[bold yellow]🛡️ Alias0 - best model for cybersecurity [/bold yellow]",
         border_style="yellow",

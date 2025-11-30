@@ -76,7 +76,7 @@ network_security_analyzer_agent = Agent(
     description="""Agent that specializes in network security analysis.
                    Expert in monitoring, capturing, and analyzing network communications for security threats.""",
         model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
+        model=os.getenv('CAI_MODEL', "alias1"),
         openai_client=AsyncOpenAI(),
     ),
     tools=tools,

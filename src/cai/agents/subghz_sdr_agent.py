@@ -43,7 +43,7 @@ subghz_sdr_agent = Agent(
                    automotive, industrial, and wireless security applications.""",
     tools=functions,
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
+        model=os.getenv('CAI_MODEL', "alias1"),
         openai_client=AsyncOpenAI(),
     )
 )

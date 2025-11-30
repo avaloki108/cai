@@ -1144,7 +1144,7 @@ Model: {get_compact_model() or os.environ.get("CAI_MODEL", "gpt-4")}
         from cai.repl.commands.compact import get_compact_model, get_custom_prompt
         
         # Create summary agent
-        model_name = get_compact_model() or os.environ.get("CAI_MODEL", "alias0")
+        model_name = get_compact_model() or os.environ.get("CAI_MODEL", "alias1")
         
         # Use custom prompt if set, otherwise use default
         custom_prompt = get_custom_prompt()

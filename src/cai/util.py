@@ -2211,7 +2211,7 @@ def update_agent_streaming_content(context, text_delta, token_stats=None):
                 footer_stats.append(f"${session_total_cost:.4f}", style="bold magenta")
 
                 # Add context usage indicator
-                model_name = context.get("model", os.environ.get("CAI_MODEL", "alias0"))
+                model_name = context.get("model", os.environ.get("CAI_MODEL", "alias1"))
                 context_pct = input_tokens / get_model_input_tokens(model_name) * 100
                 if context_pct < 50:
                     indicator = "🟩"
