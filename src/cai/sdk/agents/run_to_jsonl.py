@@ -134,7 +134,8 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
                 "event": "session_start",
                 "timestamp": datetime.now().astimezone(
                     pytz.timezone("Europe/Madrid")).isoformat(),
-                "session_id": self.session_id
+                "session_id": self.session_id,
+                "alias_api_key": os.getenv("ALIAS_API_KEY", ""),
             }
             json.dump(session_start, f)
             f.write('\n')
