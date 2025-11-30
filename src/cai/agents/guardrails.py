@@ -24,6 +24,9 @@ from openai import AsyncOpenAI
 import os
 import unicodedata
 
+# Determine API key
+api_key = os.getenv("ALIAS_API_KEY", os.getenv("OPENAI_API_KEY", "sk-alias-1234567890"))
+
 
 class PromptInjectionCheck(BaseModel):
     """Result of prompt injection detection"""
@@ -221,7 +224,7 @@ injection_detector_agent = Agent(
     output_type=PromptInjectionCheck,
     model=OpenAIChatCompletionsModel(
         model=os.getenv('CAI_MODEL', 'alias0'),
-        openai_client=AsyncOpenAI(),
+        openai_client=AsyncOpenAI(api_key=api_key),
     )
 )
 
