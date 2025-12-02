@@ -47,6 +47,16 @@ nav:
   # USER INTERFACES (NUEVO AGRUPAMIENTO)
   # ========================================
   - User Interfaces:
+
+      # Mobile UI (MUI) - Subsección
+      - Mobile UI (iOS):
+          - Overview: mui/mui_index.md
+          - Getting Started: mui/getting_started.md
+          - User Interface: mui/user_interface.md
+          - Gestures & Shortcuts: mui/gestures_shortcuts.md
+          - Chat Features: mui/chat_features.md
+
+
       # Terminal UI (TUI) - Subsección
       - Terminal UI (TUI):
           - Overview: tui/tui_index.md

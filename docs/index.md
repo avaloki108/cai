@@ -33,7 +33,8 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 **CAI PRO** delivers the power you need for professional security testing:
 
 - ✅ **Unlimited `alias1` tokens** - Our state-of-the-art cybersecurity model that beats GPT-5 in benchmarks
-- ✅ **Terminal User Interface (TUI)** - Multi-agent parallel execution with visual monitoring
+- ✅ **Mobile User Interface (iOS)** - Native iOS app for security testing on the go - **[Join TestFlight Beta](https://testflight.apple.com/join/nXZZD4Z5)**
+- ✅ **Terminal User Interface (TUI)** - Multi-agent parallel execution with visual monitoring *(Deprecated - Use Mobile UI)*
 - ✅ **Context Monitoring** - Real-time token tracking and optimization
 - ✅ **Zero Refusals** - Unrestricted AI specifically trained for offensive security
 - ✅ **European Hosting** - GDPR & NIS2 compliant with guaranteed data privacy

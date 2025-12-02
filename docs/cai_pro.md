@@ -18,7 +18,8 @@ The cybersecurity AI landscape is rapidly evolving, and professionals need tools
 - **🔓 Zero Restrictions**: Unrestricted AI with no refusals, specifically trained for offensive security tasks
 - **🇪🇺 European Hosting**: GDPR and NIS2 compliant infrastructure ensuring maximum privacy and data sovereignty
 - **💬 Professional Support**: Dedicated technical support to help you maximize your security testing capabilities
-- **⚡ Advanced Features**: Terminal UI, context monitoring, and exclusive tools not available in the Community Edition
+- **📱 Mobile UI (iOS)**: Native iOS app for security testing on the go - **[Join TestFlight Beta](https://testflight.apple.com/join/nXZZD4Z5)**
+- **⚡ Advanced Features**: Terminal UI (deprecated), context monitoring, and exclusive tools not available in the Community Edition
 
 ---
 
@@ -35,7 +36,8 @@ The cybersecurity AI landscape is rapidly evolving, and professionals need tools
 | **Command Line Interface** | ✅ Yes | ✅ Yes |
 | **European Data Hosting** | ✅ **GDPR + NIS2 Compliant** | ✅ **GDPR + NIS2 Compliant** |
 | **`alias1` Model** | ❌ Not Available | ✅ **Unlimited Tokens** |
-| **Terminal User Interface (TUI)** | ❌ | ✅ Multi-terminal parallel execution |
+| **Mobile UI (iOS App)** | ❌ | ✅ **Native iOS App** - [TestFlight](https://testflight.apple.com/join/nXZZD4Z5) |
+| **Terminal User Interface (TUI)** | ❌ | ✅ Multi-terminal (Deprecated) |
 | **Context Monitoring (`/context`)** | ❌ | ✅ Real-time token tracking |
 | **Advanced Reporting** | ❌ | ✅ Professional formats |
 | **Priority Support** | ❌ Community | ✅ **Professional** |

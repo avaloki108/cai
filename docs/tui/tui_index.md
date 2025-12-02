@@ -1,5 +1,10 @@
 # CAI Terminal User Interface (TUI)
 
+> **⚠️ DEPRECATED - Superseded by Mobile UI**  
+> The Terminal User Interface (TUI) has been deprecated in favor of the new **[Mobile UI](../mui/mui_index.md)** for CAI-Pro users.  
+> While the TUI remains functional for existing users, all new features and development efforts are focused on the Mobile UI.  
+> **[Join the Mobile UI TestFlight Beta](https://testflight.apple.com/join/nXZZD4Z5)** for the latest CAI experience.
+
 > **⚡ CAI-Pro Exclusive Feature**  
 > The Terminal User Interface (TUI) is available exclusively in **CAI-Pro**. To access this feature and unlock advanced multi-agent workflows, visit [Alias Robotics](https://aliasrobotics.com/cybersecurityai.php) for more information.
 
