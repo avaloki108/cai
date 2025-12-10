@@ -12,7 +12,7 @@ import requests  # pylint: disable=import-error
 from rich.console import Console  # pylint: disable=import-error
 from rich.table import Table  # pylint: disable=import-error
 from rich.panel import Panel  # pylint: disable=import-error
-from cai.util import get_ollama_api_base, COST_TRACKER
+from cai.util import get_ollama_api_base, get_ollama_auth_headers, COST_TRACKER
 from cai.repl.commands.base import Command, register_command
 
 console = Console()
@@ -99,6 +99,32 @@ def get_predefined_model_categories() -> Dict[str, List[Dict[str, str]]]:
                 "name": "deepseek-r1",
                 "description": "DeepSeek's specialized reasoning model"
             }
+        ],
+        "Ollama Cloud": [
+            {
+                "name": "ollama_cloud/gpt-oss:120b",
+                "description": (
+                    "Ollama Cloud - Large 120B parameter model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/llama3.3:70b",
+                "description": (
+                    "Ollama Cloud - Llama 3.3 70B model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/qwen2.5:72b",
+                "description": (
+                    "Ollama Cloud - Qwen 2.5 72B model (no GPU required)"
+                )
+            },
+            {
+                "name": "ollama_cloud/deepseek-v3:671b",
+                "description": (
+                    "Ollama Cloud - DeepSeek V3 671B model (no GPU required)"
+                )
+            }
         ]
     }
 
@@ -117,7 +143,8 @@ def get_all_predefined_models() -> List[Dict[str, Any]]:
         "Alias": "OpenAI",  # Alias models use OpenAI as base
         "Anthropic Claude": "Anthropic",
         "OpenAI": "OpenAI", 
-        "DeepSeek": "DeepSeek"
+        "DeepSeek": "DeepSeek",
+        "Ollama Cloud": "Ollama Cloud"
     }
     
     for category, models in model_categories.items():
@@ -175,7 +202,11 @@ def load_all_available_models() -> tuple[List[str], List[Dict[str, Any]]]:
     try:
         response = requests.get(LITELLM_URL, timeout=5)
         if response.status_code == 200:
-            litellm_names = sorted(response.json().keys())
+            # Filter out obsolete Ollama Cloud models (replaced by ollama_cloud/ prefix)
+            litellm_names = [
+                model_name for model_name in sorted(response.json().keys())
+                if not (model_name.startswith("ollama/") and "-cloud" in model_name)
+            ]
     except Exception:  # pylint: disable=broad-except
         pass
     
@@ -184,7 +215,17 @@ def load_all_available_models() -> tuple[List[str], List[Dict[str, Any]]]:
     ollama_names = []
     try:
         api_base = get_ollama_api_base()
-        response = requests.get(f"{api_base.replace('/v1', '')}/api/tags", timeout=1)
+        ollama_base = api_base.replace('/v1', '')
+        
+        # Add authentication headers for Ollama Cloud if needed
+        headers = {}
+        is_cloud = "ollama.com" in api_base
+        timeout = 5 if is_cloud else 1  # Cloud needs more time
+        
+        if is_cloud:
+            headers = get_ollama_auth_headers()
+        
+        response = requests.get(f"{ollama_base}/api/tags", headers=headers, timeout=timeout)
         if response.status_code == 200:
             data = response.json()
             ollama_data = data.get('models', data.get('items', []))
@@ -499,7 +540,46 @@ class ModelShowCommand(Command):
             total_models = 0
             displayed_models = 0
 
-            # Process and display models (use global cache for numbering)
+            # First, add predefined models (Alias, Claude, OpenAI, DeepSeek, Ollama Cloud)
+            predefined_models = get_all_predefined_models()
+            for model in predefined_models:
+                model_name = model["name"]
+                
+                # Skip if search term provided and not in model name
+                if search_term and search_term not in model_name.lower():
+                    continue
+                
+                displayed_models += 1
+                total_models += 1
+                
+                # Find index from global cache
+                try:
+                    model_index = _GLOBAL_MODEL_CACHE.index(model_name) + 1
+                except ValueError:
+                    continue
+                
+                # Format pricing info
+                input_cost_str = (
+                    f"${model['input_cost']:.2f}"
+                    if model['input_cost'] is not None else "Unknown"
+                )
+                output_cost_str = (
+                    f"${model['output_cost']:.2f}"
+                    if model['output_cost'] is not None else "Unknown"
+                )
+                
+                # Add row to table
+                model_table.add_row(
+                    str(model_index),
+                    model_name,
+                    model["provider"],
+                    "N/A",  # max_tokens
+                    input_cost_str,
+                    output_cost_str,
+                    model.get("description", "")
+                )
+
+            # Process and display LiteLLM models (use global cache for numbering)
             for model_name, model_info in sorted(model_data.items()):
                 # Find the model index from global cache
                 try:
