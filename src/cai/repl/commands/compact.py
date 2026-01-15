@@ -521,7 +521,7 @@ class CompactCommand(Command):
             # Pass the compact model if set
             if self.compact_model:
                 # Temporarily override the model for this operation
-                original_model = os.environ.get("CAI_MODEL", "alias0")
+                original_model = os.environ.get("CAI_MODEL", "alias1")
                 os.environ["CAI_MODEL"] = self.compact_model
                 try:
                     result = MEMORY_COMMAND_INSTANCE.handle_save([memory_name], preserve_history=False)

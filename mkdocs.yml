@@ -34,18 +34,29 @@ nav:
   # ========================================
   # CAI PRO (EXPANDIDO - COMERCIAL) ⭐
   # ========================================
-  - '🚀 CAI PRO - Professional Edition':
-      - Why CAI PRO?: cai_pro.md
-      - Alias1 Model: cai_pro_alias1.md
-      - Exclusive Features: cai_pro_features.md
-      - Pricing & Plans: cai_pro_pricing.md
-      - Get Started with PRO: cai_pro_quickstart.md
-      - Contact Sales: cai_pro_contact.md
+  - 'Professional Edition':
+      - '🤔 Why CAI PRO?': cai_pro.md
+      - '⭐ Alias1 Model': cai_pro_alias1.md
+      - '🔥 Exclusive Features': cai_pro_features.md
+      - '⭐ API Server (CAI PRO)': api.md
+      - '💰 Pricing & Plans': cai_pro_pricing.md
+      - '🚀 Get Started with PRO': cai_pro_quickstart.md
+      - '📞 Contact Sales': cai_pro_contact.md
 
   # ========================================
   # USER INTERFACES (NUEVO AGRUPAMIENTO)
   # ========================================
   - User Interfaces:
+
+      # Mobile UI (MUI) - Subsección
+      - Mobile UI (iOS):
+          - Overview: mui/mui_index.md
+          - Getting Started: mui/getting_started.md
+          - User Interface: mui/user_interface.md
+          - Gestures & Shortcuts: mui/gestures_shortcuts.md
+          - Chat Features: mui/chat_features.md
+
+
       # Terminal UI (TUI) - Subsección
       - Terminal UI (TUI):
           - Overview: tui/tui_index.md
@@ -94,11 +105,13 @@ nav:
   - Guides:
       - Running Agents: running_agents.md
       - Continue Mode: continue_mode.md
+      - Session Resume: session_resume.md
       - Working with Results: results.md
       - Streaming: streaming.md
       - Tracing & Debugging: tracing.md
       - Context Management: context.md
       - Guardrails & Security: guardrails.md
+      - LLM Council: council.md
       - Environment Variables: environment_variables.md
 
   # ========================================

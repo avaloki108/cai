@@ -36,7 +36,7 @@ where:
 | **Agentic Pattern** | **Description** |
 |--------------------|------------------------|
 | `Swarm` (Decentralized) | Agents share tasks and self-assign responsibilities without a central orchestrator. Handoffs occur dynamically. *An example of a peer-to-peer agentic pattern is the `CTF Agentic Pattern`, which involves a team of agents working together to solve a CTF challenge with dynamic handoffs.* |
-| `Hierarchical` | A top-level agent (e.g., "PlannerAgent") assigns tasks via structured handoffs to specialized sub-agents. Alternatively, the structure of the agents is harcoded into the agentic pattern with pre-defined handoffs. |
+| `Hierarchical` | A top-level agent (e.g., "PlannerAgent") assigns tasks via structured handoffs to specialized sub-agents. Alternatively, the structure of the agents is hardcoded into the agentic pattern with pre-defined handoffs. |
 | `Chain-of-Thought` (Sequential Workflow) | A structured pipeline where Agent A produces an output, hands it to Agent B for reuse or refinement, and so on. Handoffs follow a linear sequence. *An example of a chain-of-thought agentic pattern is the `ReasonerAgent`, which involves a Reasoning-type LLM that provides context to the main agent to solve a CTF challenge with a linear sequence.*[^1] |
 | `Auction-Based` (Competitive Allocation) | Agents "bid" on tasks based on priority, capability, or cost. A decision agent evaluates bids and hands off tasks to the best-fit agent. |
 | `Recursive` | A single agent continuously refines its own output, treating itself as both executor and evaluator, with handoffs (internal or external) to itself. *An example of a recursive agentic pattern is the `CodeAgent` (when used as a recursive agent), which continuously refines its own output by executing code and updating its own instructions.* |
@@ -52,6 +52,11 @@ from typing import Dict
 
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 
+# Load .env file from current directory before importing agents
+# This ensures that .env files in the user's working directory are loaded
+# even when CAI is installed from PyPI
+load_dotenv(override=True)  # override=True ensures env vars from .env take precedence
+
 # Local application imports
 from cai.agents.flag_discriminator import flag_discriminator, transfer_to_flag_discriminator
 from cai.sdk.agents import Agent
@@ -61,7 +66,7 @@ from cai.sdk.agents.handoffs import handoff
 __path__ = pkgutil.extend_path(__path__, __name__)
 
 # Get model from environment or use default
-model = os.environ.get("CAI_MODEL", "alias0")
+model = os.environ.get("CAI_MODEL", "alias1")
 
 
 PATTERNS = ["hierarchical", "swarm", "chain_of_thought", "auction_based", "recursive"]

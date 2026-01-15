@@ -33,7 +33,8 @@ A lightweight, ergonomic framework for building bug bounty-ready Cybersecurity A
 **CAI PRO** delivers the power you need for professional security testing:
 
 - ✅ **Unlimited `alias1` tokens** - Our state-of-the-art cybersecurity model that beats GPT-5 in benchmarks
-- ✅ **Terminal User Interface (TUI)** - Multi-agent parallel execution with visual monitoring
+- ✅ **Mobile User Interface (iOS)** - Native iOS app for security testing on the go - **[Join TestFlight Beta](https://testflight.apple.com/join/nXZZD4Z5)**
+- ✅ **Terminal User Interface (TUI)** - Multi-agent parallel execution with visual monitoring *(Deprecated - Use Mobile UI)*
 - ✅ **Context Monitoring** - Real-time token tracking and optimization
 - ✅ **Zero Refusals** - Unrestricted AI specifically trained for offensive security
 - ✅ **European Hosting** - GDPR & NIS2 compliant with guaranteed data privacy
@@ -117,7 +118,7 @@ CAI's capabilities are validated through rigorous peer-reviewed research demonst
 
 ## Motivation
 ### Why CAI?
-The cybersecurity landscape is undergoing a dramatic transformation as AI becomes increasingly integrated into security operations. **We predict that by 2028, AI-powered security testing tools will outnumber human pentesters**. This shift represents a fundamental change in how we approach cybersecurity challenges. *AI is not just another tool - it's becoming essential for addressing complex security vulnerabilities and staying ahead of sophisticated threats. As organizations face more advanced cyber attacks, AI-enhanced security testing will be crucial for maintaining robust defenses.*
+The cybersecurity landscape is undergoing a dramatic transformation as AI becomes increasingly integrated into security operations. **We predict that by 2028, AI-powered security testing tools will outnumber human pentesters**. This shift represents a fundamental change in how we approach cybersecurity challenges. *AI is not just another tool - it's becoming essential for addressing complex security vulnerabilities and staying ahead of sophisticated threats. As organizations face more advanced cyberattacks, AI-enhanced security testing will be crucial for maintaining robust defenses.*
 
 This work builds upon prior efforts[1] and similarly, we believe that democratizing access to advanced cybersecurity AI tools is vital for the entire security community. That's why we're releasing Cybersecurity AI (`CAI`) as an open source framework. Our goal is to empower security researchers, ethical hackers, and organizations to build and deploy powerful AI-driven security tools. By making these capabilities openly available, we aim to level the playing field and ensure that cutting-edge security AI technology isn't limited to well-funded private companies or state actors.
 

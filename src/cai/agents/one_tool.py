@@ -9,7 +9,7 @@ from cai.util import create_system_prompt_renderer
 from cai.agents.guardrails import get_security_guardrails
 
 # Get model from environment or use default
-model_name = os.getenv('CAI_MODEL', "alias0")
+model_name = os.getenv('CAI_MODEL', "alias1")
 
 # NOTE: This is needed when using LiteLLM Proxy Server
 #

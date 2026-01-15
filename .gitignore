@@ -170,3 +170,6 @@ venv*
 
 .claude
 data/
+
+# ignore dev files
+cai-*

@@ -44,7 +44,7 @@ reverse_engineering_agent = Agent(
                    like Ghidra, Binwalk, and various binary analysis utilities.""",
     tools=functions,
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
+        model=os.getenv('CAI_MODEL', "alias1"),
         openai_client=AsyncOpenAI(),
     )
 )

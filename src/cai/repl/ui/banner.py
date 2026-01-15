@@ -76,12 +76,19 @@ def get_supported_models_count():
 
             # Try to get Ollama models count
             try:
-                ollama_api_base = os.getenv(
-                    "OLLAMA_API_BASE",
-                    "http://host.docker.internal:8000/v1"
-                )
+                from cai.util import get_ollama_api_base
+                ollama_api_base = get_ollama_api_base()
+                
+                # Add authentication headers for Ollama Cloud if using OPENAI_BASE_URL
+                headers = {}
+                if "ollama.com" in ollama_api_base:
+                    api_key = os.getenv("OPENAI_API_KEY")
+                    if api_key:
+                        headers["Authorization"] = f"Bearer {api_key}"
+                
                 ollama_response = requests.get(
                     f"{ollama_api_base.replace('/v1', '')}/api/tags",
+                    headers=headers,
                     timeout=1
                 )
 
@@ -348,7 +355,7 @@ def display_quick_guide(console: Console):
     )
     
     # Get current environment variable values
-    current_model = os.getenv('CAI_MODEL', "alias0")
+    current_model = os.getenv('CAI_MODEL', "alias1")
     current_agent_type = os.getenv('CAI_AGENT_TYPE', "one_tool_agent")
     
     config_text = Text.assemble(
@@ -413,21 +420,21 @@ def display_quick_guide(console: Console):
         Text.assemble(
             ("🔒 Security-Focused AI Framework\n\n", "bold white"),
             "For optimal cybersecurity AI performance, use\n", 
-            ("alias0", "bold green"), 
+            ("alias1", "bold green"), 
             " - specifically designed for cybersecurity\n"
             "tasks with superior domain knowledge.\n\n",
-            ("alias0", "bold green"), 
+            ("alias1", "bold green"), 
             " outperforms general-purpose models in:\n",
             "• Vulnerability assessment\n",
             "• Penetration testing and bug bounty\n",
             "• Security analysis\n",
             "• Threat detection\n\n",
             "Learn more about ", 
-            ("alias0", "bold green"), 
+            ("alias1", "bold green"), 
             " and its privacy-first approach:\n",
-            ("https://news.aliasrobotics.com/alias0-a-privacy-first-cybersecurity-ai/", "blue underline")
+            ("https://news.aliasrobotics.com/alias1-a-privacy-first-cybersecurity-ai/", "blue underline")
         ),
-        title="[bold yellow]🛡️ Alias0 - best model for cybersecurity [/bold yellow]",
+        title="[bold yellow]🛡️ Alias1 - best model for cybersecurity [/bold yellow]",
         border_style="yellow",
         padding=(1, 2),
         title_align="center"

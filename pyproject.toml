@@ -1,6 +1,6 @@
 [project]
 name = "cai-framework"
-version = "0.5.5"
+version = "0.5.10"
 description = "Cybersecurity AI Framework"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -112,7 +112,9 @@ exclude = [
     ".cai/",
     "nohup.out",
     "ci/",
-    "tools/cut_the_rope/"
+    "tools/cut_the_rope/",
+    "media/",
+    "docs/media/"
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -137,7 +139,9 @@ exclude = [
     ".cai/",
     "nohup.out",
     "ci/",
-    "tools/cut_the_rope/"
+    "tools/cut_the_rope/",
+    "media/",
+    "docs/media/"
 ]
 
 [tool.hatch.build.targets.wheel.sources]
@@ -166,7 +170,9 @@ exclude = [
     ".cai/",
     "nohup.out",
     "ci/",
-    "tools/cut_the_rope/"
+    "tools/cut_the_rope/",
+    "media/",
+    "docs/media/"
 ]
 
 [tool.ruff]

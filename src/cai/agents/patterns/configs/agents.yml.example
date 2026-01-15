@@ -15,7 +15,7 @@ parallel_agents:
     unified_context: false
     
   - name: bug_bounter_agent
-    model: alias0
+    model: alias1
     prompt: "Search for bugs and create detailed reports"
     unified_context: false
 

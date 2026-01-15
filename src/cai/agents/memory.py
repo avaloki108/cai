@@ -86,7 +86,7 @@ from cai.sdk.agents import Agent, OpenAIChatCompletionsModel
 from cai.tools.misc.rag import add_to_memory_semantic, add_to_memory_episodic
 
 # Get model from environment or use default
-model = os.getenv('CAI_MODEL', "alias0")
+model = os.getenv('CAI_MODEL', "alias1")
 
 
 def get_previous_steps(query: str) -> str:

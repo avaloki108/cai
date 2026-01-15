@@ -649,7 +649,7 @@ class ParallelCommand(Command):
             console.print("[yellow]No parallel configurations to override[/yellow]")
             return False
 
-        global_model = os.getenv("CAI_MODEL", "alias0")
+        global_model = os.getenv("CAI_MODEL", "alias1")
         count = 0
 
         for config in PARALLEL_CONFIGS:

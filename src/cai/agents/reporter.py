@@ -31,7 +31,7 @@ reporting_agent = Agent(
     description="""Agent that generates reports in html.""",
     tools=functions,
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
+        model=os.getenv('CAI_MODEL', "alias1"),
         openai_client=AsyncOpenAI(),
     )
 )

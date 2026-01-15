@@ -20,7 +20,7 @@ Environment Variables
             within container (default: "true")
 
         CAI_MODEL: Model to use for agents
-            (default: "alias0")
+            (default: "alias1")
         CAI_DEBUG: Set debug output level (default: "1")
             - 0: Only tool outputs
             - 1: Verbose debug output
@@ -45,7 +45,7 @@ Environment Variables
             (default: "false")
         CAI_MEMORY_OFFLINE: Enable/disable offline memory
             (default: "false")
-        CAI_ENV_CONTEXT: Add enviroment context, dirs and
+        CAI_ENV_CONTEXT: Add environment context, dirs and
             current env available (default: "true")
         CAI_MEMORY_ONLINE_INTERVAL: Number of turns between
             online memory updates (default: "5")
@@ -79,36 +79,36 @@ Usage Examples:
 
     # Run against a CTF
     CTF_NAME="kiddoctf" CTF_CHALLENGE="02 linux ii" \
-        CAI_AGENT_TYPE="one_tool_agent" CAI_MODEL="alias0" \
+        CAI_AGENT_TYPE="one_tool_agent" CAI_MODEL="alias1" \
         CAI_TRACING="false" cai
 
     # Run a harder CTF
     CTF_NAME="hackableii" CAI_AGENT_TYPE="redteam_agent" \
-        CTF_INSIDE="False" CAI_MODEL="alias0" \
+        CTF_INSIDE="False" CAI_MODEL="alias1" \
         CAI_TRACING="false" cai
 
     # Run without a target in human-in-the-loop mode, generating a report
-    CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="alias0" \
+    CAI_TRACING=False CAI_REPORT=pentesting CAI_MODEL="alias1" \
         cai
 
     # Run with online episodic memory
     #   registers memory every 5 turns:
     #   limits the cost to 5 dollars
     CTF_NAME="hackableII" CAI_MEMORY="episodic" \
-        CAI_MODEL="alias0" CAI_MEMORY_ONLINE="True" \
+        CAI_MODEL="alias1" CAI_MEMORY_ONLINE="True" \
         CTF_INSIDE="False" CTF_HINTS="False"  \
         CAI_PRICE_LIMIT="5" cai
 
     # Run with custom long_term_memory interval
     # Executes memory long_term_memory every 3 turns:
     CTF_NAME="hackableII" CAI_MEMORY="episodic" \
-        CAI_MODEL="alias0" CAI_MEMORY_ONLINE_INTERVAL="3" \
+        CAI_MODEL="alias1" CAI_MEMORY_ONLINE_INTERVAL="3" \
         CAI_MEMORY_ONLINE="False" CTF_INSIDE="False" \
         CTF_HINTS="False" cai
         
     # Run with parallel agents (3 instances)
     CTF_NAME="hackableII" CAI_AGENT_TYPE="redteam_agent" \
-        CAI_MODEL="alias0" CAI_PARALLEL="3" cai
+        CAI_MODEL="alias1" CAI_PARALLEL="3" cai
 """
 
 # Load environment variables from .env file FIRST, before any imports
@@ -116,7 +116,9 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env file from current working directory with override
+# This ensures env vars from .env take precedence over system env vars
+load_dotenv(override=True)
 
 # Configure Python warnings BEFORE any other imports
 import warnings
@@ -141,6 +143,7 @@ if os.getenv("CAI_DEBUG", "1") != "2":
 
 import asyncio
 import logging
+import shlex
 import time
 
 # Configure comprehensive error filtering
@@ -448,7 +451,7 @@ def run_cai_cli(
     turn_count = 0
     idle_time = 0
     console = Console()
-    last_model = os.getenv("CAI_MODEL", "alias0")
+    last_model = os.getenv("CAI_MODEL", "alias1")
     last_agent_type = os.getenv("CAI_AGENT_TYPE", "one_tool_agent")
     parallel_count = int(os.getenv("CAI_PARALLEL", "1"))
     use_initial_prompt = initial_prompt is not None
@@ -556,7 +559,7 @@ def run_cai_cli(
             idle_start_time = time.time()
 
             # Check if model has changed and update if needed
-            current_model = os.getenv("CAI_MODEL", "alias0")
+            current_model = os.getenv("CAI_MODEL", "alias1")
             # Check for agent-specific model override
             agent_specific_model = os.getenv(f"CAI_{last_agent_type.upper()}_MODEL")
             if agent_specific_model:
@@ -1054,7 +1057,7 @@ def run_cai_cli(
                             custom_name = f"{agent_display_name} #{idx}"
                             
                             # Determine model
-                            model_to_use = config.model or os.getenv("CAI_MODEL", "alias0")
+                            model_to_use = config.model or os.getenv("CAI_MODEL", "alias1")
                             
                             # Create and store the instance
                             # No shared_message_history - each agent gets its own isolated copy
@@ -1113,7 +1116,7 @@ def run_cai_cli(
                                 custom_name = agent_display_name
                             
                             # Determine which model to use
-                            model_to_use = config.model or os.getenv("CAI_MODEL", "alias0")
+                            model_to_use = config.model or os.getenv("CAI_MODEL", "alias1")
                             
                             # Create agent instance with the determined model
                             # Each agent gets its own isolated history from PARALLEL_ISOLATION
@@ -1132,7 +1135,7 @@ def run_cai_cli(
                         AGENT_MANAGER.set_parallel_agent(agent_id, instance_agent, agent_display_name)
 
                         # Ensure the model is properly set for the agent and all handoff agents
-                        model_to_use = config.model or os.getenv("CAI_MODEL", "alias0")
+                        model_to_use = config.model or os.getenv("CAI_MODEL", "alias1")
                         if model_to_use:
                             update_agent_models_recursively(instance_agent, model_to_use)
 
@@ -1303,7 +1306,19 @@ def run_cai_cli(
 
             # Handle special commands
             if user_input.startswith("/") or user_input.startswith("$"):
-                parts = user_input.strip().split()
+                # Remove newlines from pasted input
+                cleaned_input = user_input.strip().replace('\n', '').replace('\r', '')
+
+                try:
+                    # Parse with shell-like quoting support
+                    parts = shlex.split(cleaned_input)
+                except ValueError:
+                    # Fallback to simple split on error
+                    parts = cleaned_input.split()
+
+                if not parts:
+                    continue
+
                 command = parts[0]
                 args = parts[1:] if len(parts) > 1 else None
 
@@ -1976,7 +1991,7 @@ def main():
             agent.model.suppress_final_output = False  # Changed to False to show all agent messages
 
     # Ensure the agent and all its handoff agents use the current model
-    current_model = os.getenv("CAI_MODEL", "alias0")
+    current_model = os.getenv("CAI_MODEL", "alias1")
     update_agent_models_recursively(agent, current_model)
 
     # Run the CLI with the selected agent and optional initial prompt

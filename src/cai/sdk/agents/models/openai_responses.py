@@ -356,7 +356,9 @@ class OpenAIResponsesModel(Model):
 
     def _get_client(self) -> AsyncOpenAI:
         if self._client is None:
-            self._client = AsyncOpenAI()
+            # Determine API key
+            api_key = os.getenv("ALIAS_API_KEY", os.getenv("OPENAI_API_KEY", "sk-alias-1234567890"))
+            self._client = AsyncOpenAI(api_key=api_key)
         return self._client
 
 

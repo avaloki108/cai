@@ -41,6 +41,9 @@ from cai.tools.web3_security import (  # pylint: disable=import-error # noqa: E5
 from cai.agents.guardrails import get_security_guardrails
 
 load_dotenv()
+
+# Determine API key
+api_key = os.getenv("ALIAS_API_KEY", os.getenv("OPENAI_API_KEY", "sk-alias-1234567890"))
 # Prompts
 bug_bounter_system_prompt = load_prompt_template("prompts/system_bug_bounter.md")
 # Define tools list based on available API keys
@@ -78,8 +81,8 @@ bug_bounter_agent = Agent(
     input_guardrails=input_guardrails,
     output_guardrails=output_guardrails,
     model=OpenAIChatCompletionsModel(
-        model=os.getenv('CAI_MODEL', "alias0"),
-        openai_client=AsyncOpenAI(),
+        model=os.getenv('CAI_MODEL', "alias1"),
+        openai_client=AsyncOpenAI(api_key=api_key),
     )
    
 )

@@ -43,7 +43,7 @@ def create_generic_agent_factory(
         
         if not model_name:
             # Third priority: global CAI_MODEL
-            model_name = os.environ.get("CAI_MODEL", "alias0")
+            model_name = os.environ.get("CAI_MODEL", "alias1")
             
             
         api_key = os.getenv("OPENAI_API_KEY", "sk-placeholder-key-for-local-models")
