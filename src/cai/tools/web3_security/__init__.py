@@ -2,7 +2,7 @@
 Web3 Security Tools Package
 
 This package contains integrations for various web3 security analysis tools
-including static analyzers, fuzzers, and vulnerability scanners.
+including static analyzers, fuzzers, symbolic executors, formal verifiers, and comprehensive auditors.
 
 Available tools:
 - Slither: Static analysis for Solidity
@@ -11,6 +11,11 @@ Available tools:
 - Echidna: Property-based fuzzing
 - Medusa: Coverage-guided fuzzing
 - Fuzz-utils: Fuzzing utilities and helpers
+- Gambit: Symbolic execution for vulnerability detection
+- Clorgetizer: Gas usage analysis and optimization
+- Certora Prover: Formal verification with mathematical proofs
+- Oyente Plus: Enhanced symbolic execution analysis
+- Auditor Framework: Comprehensive auditing platform
 """
 
 from .slither import slither_analyze, slither_check_upgradeability
@@ -24,6 +29,11 @@ from .fuzz_utils import (
     minimize_fuzz_corpus,
     analyze_fuzz_coverage
 )
+from .gambit import gambit_analyze, gambit_verify_property, gambit_explore_paths
+from .clorgetizer import clorgetizer_analyze, clorgetizer_compare_versions, clorgetizer_optimize
+from .certora_prover import certora_verify, certora_run_tests, certora_check_invariants
+from .oyente_plus import oyente_analyze, oyente_check_vulnerability, oyente_compare_contracts
+from .auditor_framework import auditor_run_audit, auditor_check_compliance, auditor_generate_report, auditor_scan_dependencies
 
 __all__ = [
     # Slither
@@ -49,4 +59,25 @@ __all__ = [
     'generate_fuzz_seeds',
     'minimize_fuzz_corpus',
     'analyze_fuzz_coverage',
+    # Gambit
+    'gambit_analyze',
+    'gambit_verify_property',
+    'gambit_explore_paths',
+    # Clorgetizer
+    'clorgetizer_analyze',
+    'clorgetizer_compare_versions',
+    'clorgetizer_optimize',
+    # Certora Prover
+    'certora_verify',
+    'certora_run_tests',
+    'certora_check_invariants',
+    # Oyente Plus
+    'oyente_analyze',
+    'oyente_check_vulnerability',
+    'oyente_compare_contracts',
+    # Auditor Framework
+    'auditor_run_audit',
+    'auditor_check_compliance',
+    'auditor_generate_report',
+    'auditor_scan_dependencies',
 ]

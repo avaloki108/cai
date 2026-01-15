@@ -17,7 +17,7 @@ model_list:
   - model_name: qwen2.5:14b
     litellm_params:
       model: ollama/qwen2.5:14b
-      api_base: http://localhost:8000
+      api_base: http://localhost:11434
       api_key: "os.environ/OLLAMA"
 
 litellm_settings: # module level litellm settings - https://github.com/BerriAI/litellm/blob/main/litellm/__init__.py

@@ -10,12 +10,17 @@ from typing import Dict, Optional
 
 # Default tool paths
 DEFAULT_TOOL_PATHS = {
-    'slither': '/home/dok/tools/slither/slither',
+    'slither': '/home/dok/tools/W3-AUDIT/slither/slither',
     'mythril': '/home/dok/tools/mythril2.0/myth',
     'securify': '/home/dok/tools/securify2.5/securify',
     'echidna': '/home/dok/tools/echidna/echidna',
     'medusa': '/home/dok/tools/medusa/medusa',
     'fuzz_utils_base': '/home/dok/tools/fuzz-utils',
+    'gambit': '/home/dok/tools/W3-AUDIT/gambit/gambit',
+    'clorgetizer': '/home/dok/tools/W3-AUDIT/clorgetizer/clorgetizer',
+    'certora_prover': '/home/dok/tools/W3-AUDIT/certora-prover/certoraRun',
+    'oyente_plus': '/home/dok/tools/W3-AUDIT/oyente-plus/oyente',
+    'auditor_framework': '/home/dok/tools/auditor-framework/auditor',
 }
 
 # Environment variable overrides
@@ -26,6 +31,11 @@ ENV_VAR_MAP = {
     'echidna': 'WEB3_ECHIDNA_PATH',
     'medusa': 'WEB3_MEDUSA_PATH',
     'fuzz_utils_base': 'WEB3_FUZZ_UTILS_PATH',
+    'gambit': 'WEB3_GAMBIT_PATH',
+    'clorgetizer': 'WEB3_CLORGETIZER_PATH',
+    'certora_prover': 'WEB3_CERTORA_PROVER_PATH',
+    'oyente_plus': 'WEB3_OYENTE_PLUS_PATH',
+    'auditor_framework': 'WEB3_AUDITOR_FRAMEWORK_PATH',
 }
 
 
@@ -98,3 +108,8 @@ SECURIFY_PATH = get_tool_path('securify')
 ECHIDNA_PATH = get_tool_path('echidna')
 MEDUSA_PATH = get_tool_path('medusa')
 FUZZ_UTILS_BASE_PATH = get_tool_path('fuzz_utils_base')
+GAMBIT_PATH = get_tool_path('gambit')
+CLORGETIZER_PATH = get_tool_path('clorgetizer')
+CERTORA_PROVER_PATH = get_tool_path('certora_prover')
+OYENTE_PLUS_PATH = get_tool_path('oyente_plus')
+AUDITOR_FRAMEWORK_PATH = get_tool_path('auditor_framework')

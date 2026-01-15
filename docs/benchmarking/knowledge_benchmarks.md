@@ -92,7 +92,7 @@ pip install cvss
 ALIAS_API_KEY="sk-your-caipro-key"  # For alias1
 OPENAI_API_KEY="sk-..."             # For OpenAI models
 ANTHROPIC_API_KEY="sk-ant-..."      # For Anthropic models
-OLLAMA_API_BASE="http://localhost:11434/v1"  # For local models
+OLLAMA_API_BASE="http://localhost:11434"  # For local models
 ```
 
 ### CyberMetric Evaluation

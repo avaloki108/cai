@@ -37,7 +37,7 @@ Some environment variables are required:
     
     Most common api base used are:
         OpenRouter: https://openrouter.ai/api/v1
-        Ollama: http://localhost:8000/v1
+        Ollama: http://localhost:11434
         OpenAI API: https://api.openai.com/v1)
         DeepSeek: https://api.deepseek.com/v1
 

@@ -23,9 +23,9 @@
     - python3 benchmarks/eval.py --model $MODEL_NAME --dataset_file $BENCHMARK_FILE --eval $BENCHMARK_NAME --backend $BACKEND
     - pwd
     - ls -la benchmarks/outputs/$BENCHMARK_NAME/
-    - curl http://host.docker.internal:8000/api/tags # http://localhost:8000/api/tags 
+    - curl http://host.docker.internal:11434/api/tags # http://localhost:11434/api/tags
   variables:
-    OLLAMA_API_BASE: "http://host.docker.internal:8000" # http://localhost:8000
+    OLLAMA_API_BASE: "http://host.docker.internal:11434" # http://localhost:11434
     OPENROUTER_API_BASE: "https://openrouter.ai/api/v1"
     OPENAI_API_BASE: "https://api.openai.com/v1"
   artifacts:
@@ -48,13 +48,13 @@ benchmarks-test-cybermetric-ollama:
     BENCHMARK_FILE: "benchmarks/utils/cybermetric_dataset/CyberMetric-2-v1.json"
     BENCHMARK_NAME: "cybermetric"
     BACKEND: "ollama"
-    OLLAMA_API_BASE: "http://localhost:8000"
+    OLLAMA_API_BASE: "http://localhost:11434"
 
 
 # # benchmarks-test-seceval:
 # #   <<: *run_benchmarks
 # #   variables:
-# #     OLLAMA_API_BASE: "http://localhost:8000"
+# #     OLLAMA_API_BASE: "http://localhost:11434"
 # #     OPENROUTER_API_BASE: "https://openrouter.ai/api/v1"
 # #     OPENAI_API_KEY: "fake-api-key"
 # #   script:

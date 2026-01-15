@@ -156,14 +156,132 @@ result = analyze_fuzz_coverage("./coverage-data")
 result = fuzz_utils_run("mutator", "--input test.json --output mutated/")
 ```
 
+### 7. Gambit - Symbolic Execution
+**Location:** `/home/dok/tools/W3-AUDIT/gambit/`
+
+Gambit performs symbolic execution to explore contract behavior and find complex vulnerabilities.
+
+**Functions:**
+- `gambit_analyze(target, args)` - Run symbolic execution analysis
+- `gambit_verify_property(target, property_file, args)` - Verify specific properties
+- `gambit_explore_paths(target, max_paths, args)` - Explore execution paths
+
+**Example Usage:**
+```python
+# Basic analysis
+result = gambit_analyze("contract.sol")
+
+# Verify property
+result = gambit_verify_property("contract.sol", "property.spec")
+
+# Explore paths
+result = gambit_explore_paths("contract.sol", 200)
+```
+
+### 8. Clorgetizer - Gas Analysis
+**Location:** `/home/dok/tools/W3-AUDIT/clorgetizer/`
+
+Clorgetizer analyzes gas usage, identifies expensive operations, and suggests optimizations.
+
+**Functions:**
+- `clorgetizer_analyze(target, args)` - Run gas analysis
+- `clorgetizer_compare_versions(old_version, new_version, args)` - Compare gas usage
+- `clorgetizer_optimize(target, args)` - Generate optimization suggestions
+
+**Example Usage:**
+```python
+# Gas analysis
+result = clorgetizer_analyze("contract.sol")
+
+# Compare versions
+result = clorgetizer_compare_versions("v1.sol", "v2.sol")
+
+# Get optimizations
+result = clorgetizer_optimize("contract.sol")
+```
+
+### 9. Certora Prover - Formal Verification
+**Location:** `/home/dok/tools/W3-AUDIT/certora-prover/`
+
+Certora Prover uses formal methods to mathematically prove contract properties.
+
+**Functions:**
+- `certora_verify(target, spec_file, args)` - Run formal verification
+- `certora_run_tests(target, test_file, args)` - Run test scenarios
+- `certora_check_invariants(target, invariant_file, args)` - Check invariants
+
+**Example Usage:**
+```python
+# Formal verification
+result = certora_verify("contract.sol", "spec.spec")
+
+# Run tests
+result = certora_run_tests("contract.sol", "tests.spec")
+
+# Check invariants
+result = certora_check_invariants("contract.sol", "invariants.spec")
+```
+
+### 10. Oyente Plus - Symbolic Execution
+**Location:** `/home/dok/tools/W3-AUDIT/oyente-plus/`
+
+Oyente Plus performs symbolic execution to detect vulnerabilities like reentrancy and overflow.
+
+**Functions:**
+- `oyente_analyze(target, args)` - Run symbolic execution analysis
+- `oyente_check_vulnerability(target, vuln_type, args)` - Check specific vulnerabilities
+- `oyente_compare_contracts(contract1, contract2, args)` - Compare contracts
+
+**Example Usage:**
+```python
+# Basic analysis
+result = oyente_analyze("contract.sol")
+
+# Check reentrancy
+result = oyente_check_vulnerability("contract.sol", "reentrancy")
+
+# Compare contracts
+result = oyente_compare_contracts("old.sol", "new.sol")
+```
+
+### 11. Auditor Framework - Comprehensive Auditing
+**Location:** `/home/dok/tools/auditor-framework/`
+
+Comprehensive auditing framework providing unified analysis across multiple techniques.
+
+**Functions:**
+- `auditor_run_audit(target, audit_type, args)` - Run comprehensive audit
+- `auditor_check_compliance(target, standard, args)` - Check compliance
+- `auditor_generate_report(audit_data, format_type, args)` - Generate reports
+- `auditor_scan_dependencies(target, args)` - Scan dependencies
+
+**Example Usage:**
+```python
+# Full audit
+result = auditor_run_audit("contract.sol", "full")
+
+# Check ERC20 compliance
+result = auditor_check_compliance("token.sol", "erc20")
+
+# Generate report
+result = auditor_generate_report("./audit-data", "html")
+
+# Scan dependencies
+result = auditor_scan_dependencies("contract.sol")
+```
+
 ## Integration with Bug Bounty Agent
 
 All tools are automatically available to the Bug Bounty Agent in CAI. The agent can:
 
-1. **Static Analysis**: Use Slither, Mythril, and Securify to detect known vulnerabilities
-2. **Dynamic Testing**: Deploy Echidna and Medusa for fuzzing campaigns
-3. **Corpus Management**: Use fuzz-utils to optimize fuzzing efficiency
-4. **Multi-Tool Workflow**: Combine tools for comprehensive security assessment
+1. **Static Analysis**: Use Slither, Mythril, Securify, and Oyente Plus to detect known vulnerabilities
+2. **Formal Verification**: Apply Certora Prover for mathematical proof of contract properties
+3. **Symbolic Execution**: Leverage Gambit and Oyente Plus for deep behavioral analysis
+4. **Gas Optimization**: Use Clorgetizer to identify expensive operations and optimization opportunities
+5. **Dynamic Testing**: Deploy Echidna and Medusa for comprehensive fuzzing campaigns
+6. **Corpus Management**: Use fuzz-utils to optimize fuzzing efficiency
+7. **Comprehensive Auditing**: Run full audits with the Auditor Framework
+8. **Multi-Tool Workflow**: Combine all tools for thorough, multi-layered security assessment
 
 ## Typical Workflow
 
@@ -174,30 +292,47 @@ slither_results = slither_analyze("target-contract.sol", "--print human-summary"
 # 2. Deep analysis with Mythril
 mythril_results = mythril_analyze("target-contract.sol", "-o json")
 
-# 3. Compliance checking
-compliance = securify_compliance_check("target-contract.sol", "erc20")
+# 3. Symbolic execution with Oyente Plus
+oyente_results = oyente_analyze("target-contract.sol", "--json")
 
-# 4. Fuzzing campaign with Echidna
+# 4. Formal verification with Certora
+certora_results = certora_verify("target-contract.sol", "security.spec")
+
+# 5. Gas analysis with Clorgetizer
+gas_analysis = clorgetizer_analyze("target-contract.sol")
+
+# 6. Fuzzing campaign with Echidna
 echidna_results = echidna_fuzz("target-contract.sol", "", "--test-limit 50000")
 
-# 5. Parallel fuzzing with Medusa
+# 7. Parallel fuzzing with Medusa
 medusa_results = medusa_fuzz("./project", "--workers 20 --timeout 600")
 
-# 6. Coverage analysis
+# 8. Symbolic execution with Gambit
+gambit_results = gambit_analyze("target-contract.sol", "--timeout 300")
+
+# 9. Comprehensive audit with Auditor Framework
+audit_report = auditor_run_audit("target-contract.sol", "full", "--format json")
+
+# 10. Coverage analysis
 coverage = echidna_coverage("target-contract.sol")
 ```
 
 ## Tool Paths Configuration
 
 All tools are expected to be installed at:
-- Slither: `/home/dok/tools/slither/`
+- Slither: `/home/dok/tools/W3-AUDIT/slither/`
 - Mythril: `/home/dok/tools/mythril2.0/`
 - Securify: `/home/dok/tools/securify2.5/`
 - Echidna: `/home/dok/tools/echidna/`
 - Medusa: `/home/dok/tools/medusa/`
 - Fuzz-utils: `/home/dok/tools/fuzz-utils/`
+- Gambit: `/home/dok/tools/W3-AUDIT/gambit/`
+- Clorgetizer: `/home/dok/tools/W3-AUDIT/clorgetizer/`
+- Certora Prover: `/home/dok/tools/W3-AUDIT/certora-prover/`
+- Oyente Plus: `/home/dok/tools/W3-AUDIT/oyente-plus/`
+- Auditor Framework: `/home/dok/tools/auditor-framework/`
 
-If your tools are installed in different locations, update the paths in the respective tool files.
+If your tools are installed in different locations, update the paths in the respective tool files or set environment variables.
 
 ## Notes
 
@@ -223,3 +358,7 @@ The bug bounty agent (`bug_bounter.py`) now includes all these tools by default,
 - [Securify Documentation](https://github.com/eth-sri/securify2)
 - [Echidna Documentation](https://github.com/crytic/echidna)
 - [Medusa Documentation](https://github.com/crytic/medusa)
+- [Gambit Documentation](https://github.com/crytic/gambit)
+- [Clorgetizer Documentation](https://github.com/crytic/clorgetizer)
+- [Certora Prover Documentation](https://docs.certora.com/)
+- [Oyente Documentation](https://github.com/enzymefinance/oyente)

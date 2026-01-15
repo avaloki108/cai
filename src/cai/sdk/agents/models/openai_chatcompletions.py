@@ -3361,8 +3361,12 @@ class OpenAIChatCompletionsModel(Model):
         if "extra_headers" in kwargs:
             ollama_supported_params["extra_headers"] = kwargs["extra_headers"]
 
-        # Add tools for compatibility with Qwen
-        if "tools" in kwargs and kwargs.get("tools") and kwargs.get("tools") is not NOT_GIVEN:
+        # Check if this is a Qwen model
+        model_str = str(self.model).lower()
+        is_qwen = "qwen" in model_str
+
+        # Add tools only for Qwen models (which support them)
+        if is_qwen and "tools" in kwargs and kwargs.get("tools") and kwargs.get("tools") is not NOT_GIVEN:
             ollama_supported_params["tools"] = kwargs.get("tools")
 
         # Remove None values and filter out unsupported parameters
@@ -3372,9 +3376,6 @@ class OpenAIChatCompletionsModel(Model):
             if v is not None and k not in ["response_format", "store"]
         }
 
-        # Check if this is a Qwen model
-        model_str = str(self.model).lower()
-        is_qwen = "qwen" in model_str
         api_base = get_ollama_api_base()
 
         if stream:
@@ -3393,16 +3394,32 @@ class OpenAIChatCompletionsModel(Model):
                 parallel_tool_calls=parallel_tool_calls or False,
             )
             # Get streaming response
+            # Use "ollama" provider directly to avoid API key authentication issues
+            # Format model name as "ollama/model_name" for proper provider detection
+            model_name = str(self.model)
+            if not model_name.startswith("ollama/"):
+                model_name = f"ollama/{model_name}"
+            ollama_kwargs["model"] = model_name
+            
             stream_obj = await litellm.acompletion(
-                **ollama_kwargs, api_base=api_base, custom_llm_provider="openai"
+                **ollama_kwargs, 
+                api_base=api_base
+                # Don't pass api_key or custom_llm_provider - let litellm detect Ollama from model name
             )
             return response, stream_obj
         else:
             # Get completion response
+            # Use "ollama" provider directly to avoid API key authentication issues
+            # Format model name as "ollama/model_name" for proper provider detection
+            model_name = str(self.model)
+            if not model_name.startswith("ollama/"):
+                model_name = f"ollama/{model_name}"
+            ollama_kwargs["model"] = model_name
+            
             return await litellm.acompletion(
                 **ollama_kwargs,
-                api_base=api_base,
-                custom_llm_provider="openai",
+                api_base=api_base
+                # Don't pass api_key or custom_llm_provider - let litellm detect Ollama from model name
             )
 
     def _get_model_max_tokens(self, model_name: str) -> int:

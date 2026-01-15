@@ -58,7 +58,7 @@ OPENROUTER_API_KEY="sk-or-..."
 OPENROUTER_API_BASE="https://openrouter.ai/api/v1"
 
 # For Ollama (local models)
-OLLAMA_API_BASE="http://localhost:11434/v1"
+OLLAMA_API_BASE="http://localhost:11434"
 ```
 
 ### 3. Verify Setup

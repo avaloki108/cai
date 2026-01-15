@@ -744,8 +744,8 @@ install_pretty()
 
 
 def get_ollama_api_base():
-    """Get the Ollama API base URL from environment variable or default to localhost:8000."""
-    return os.environ.get("OLLAMA_API_BASE", "http://localhost:8000/v1")
+    """Get the Ollama API base URL from environment variable or default to localhost:11434."""
+    return os.environ.get("OLLAMA_API_BASE", "http://localhost:11434")
 
 
 def load_prompt_template(template_path):

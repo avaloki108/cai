@@ -334,7 +334,7 @@ CAI does NOT provide API keys for any model by default. Configure your own keys 
 OPENAI_API_KEY="sk-..."              # Required (can use "sk-123" as placeholder)
 ANTHROPIC_API_KEY="sk-ant-..."       # For Claude models
 ALIAS_API_KEY="sk-..."               # For alias1 (CAI PRO)
-OLLAMA_API_BASE="http://localhost:11434/v1"  # For local models
+OLLAMA_API_BASE="http://localhost:11434"  # For local models
 C99_API_KEY="your-api-key"           # For C99.nl subdomain discovery tool
 ```
 

@@ -1634,7 +1634,117 @@ def run_cai_cli(
                 else:
                     # Use non-streamed response
                     try:
-                        response = asyncio.run(Runner.run(agent, conversation_input))
+                        # Check if we're already in an event loop
+                        try:
+                            loop = asyncio.get_running_loop()
+                            # If we're in a loop, we need to use a different approach
+                            import concurrent.futures
+                            
+                            def run_in_thread():
+                                new_loop = asyncio.new_event_loop()
+                                asyncio.set_event_loop(new_loop)
+                                try:
+                                    return new_loop.run_until_complete(Runner.run(agent, conversation_input))
+                                finally:
+                                    if not new_loop.is_closed():
+                                        new_loop.close()
+                            
+                            with concurrent.futures.ThreadPoolExecutor() as executor:
+                                future = executor.submit(run_in_thread)
+                                try:
+                                    response = future.result(timeout=600)  # 10 minute timeout
+                                except concurrent.futures.TimeoutError:
+                                    console.print("[red]Agent execution timed out after 10 minutes. This may indicate a hanging API call or network issue.[/red]")
+                                    raise
+                                except Exception as thread_error:
+                                    # Propagate exceptions from thread execution
+                                    raise thread_error
+                        except RuntimeError:
+                            # No running loop, we can use asyncio.run
+                            try:
+                                response = asyncio.run(Runner.run(agent, conversation_input))
+                            except RuntimeError as e:
+                                # Handle event loop issues gracefully
+                                if "This event loop is already running" in str(e) or "Cannot close a running event loop" in str(e):
+                                    # Try to recover by creating a new event loop
+                                    import sys
+                                    if sys.platform.startswith('win'):
+                                        # Windows specific event loop policy
+                                        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+                                    else:
+                                        # Unix/Linux/Mac
+                                        asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+                                    
+                                    # Create a fresh event loop
+                                    new_loop = asyncio.new_event_loop()
+                                    asyncio.set_event_loop(new_loop)
+                                    try:
+                                        response = new_loop.run_until_complete(Runner.run(agent, conversation_input))
+                                    finally:
+                                        if not new_loop.is_closed():
+                                            new_loop.close()
+                                else:
+                                    raise
+                    except Exception as api_error:
+                        # Check if this is an API connection error that should be shown to the user
+                        error_str = str(api_error)
+                        error_type = type(api_error).__name__
+                        error_module = type(api_error).__module__
+                        
+                        # Direct check for litellm APIError
+                        try:
+                            import litellm
+                            is_litellm_error = isinstance(api_error, litellm.exceptions.APIError)
+                        except (ImportError, AttributeError):
+                            is_litellm_error = False
+                        
+                        # Check for connection/API errors (including litellm exceptions)
+                        # Also check the exception chain for wrapped errors
+                        error_repr = repr(api_error).lower()
+                        error_str_lower = error_str.lower()
+                        
+                        # More comprehensive check - look for connection/API related keywords
+                        is_connection_error = (
+                            is_litellm_error or
+                            "connection error" in error_str_lower or
+                            "connection" in error_str_lower and "error" in error_str_lower or
+                            "apierror" in error_type.lower() or
+                            "connection" in error_type.lower() or
+                            "timeout" in error_str_lower or
+                            "network" in error_str_lower or
+                            "litellm" in error_module.lower() or
+                            "litellm" in error_repr or
+                            "litellm" in error_str_lower or
+                            "openai" in error_module.lower() or
+                            "openai" in error_repr or
+                            "openai" in error_str_lower or
+                            "authentication" in error_str_lower or
+                            "rate limit" in error_str_lower or
+                            "unreachable" in error_str_lower or
+                            "refused" in error_str_lower
+                        )
+                        
+                        if is_connection_error:
+                            # Show connection errors to the user even in normal mode
+                            console.print(f"\n[bold red]❌ Connection Error[/bold red]")
+                            # Extract the main error message
+                            main_error = error_str.split('\n')[0] if '\n' in error_str else error_str
+                            console.print(f"[red]{main_error}[/red]")
+                            console.print(f"[yellow]This may be due to:[/yellow]")
+                            console.print(f"  • Network connectivity issues")
+                            console.print(f"  • API service being unavailable")
+                            console.print(f"  • Incorrect API configuration")
+                            console.print(f"[dim]Check your API keys and network connection. You can continue with a new request.[/dim]\n")
+                            
+                            # Log the full error for debugging
+                            logger = logging.getLogger(__name__)
+                            logger.error(f"API connection error: {str(api_error)}", exc_info=True)
+                            
+                            # Continue the loop so user can try again
+                            continue
+                        else:
+                            # Re-raise other exceptions to be handled by outer handler
+                            raise
                     except InputGuardrailTripwireTriggered as e:
                         # Display a user-friendly warning for input guardrails
                         reason = "Potential security threat detected in input"

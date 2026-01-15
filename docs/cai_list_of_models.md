@@ -97,7 +97,7 @@ export CAI_MODEL="deepseek-chat"
 
 **Configuration:**
 ```bash
-export OLLAMA_API_BASE="http://localhost:11434/v1"
+export OLLAMA_API_BASE="http://localhost:11434"
 export CAI_MODEL="ollama/qwen2.5:72b"
 ```
 

@@ -242,7 +242,7 @@ class QuickstartCommand(Command):
                 "1. Install: [yellow]curl -fsSL https://ollama.com/install.sh | sh[/yellow]\n"
                 "2. Pull a model: [yellow]ollama pull llama3.1[/yellow]\n"
                 "3. Set in .env: "
-                "[yellow]OLLAMA_API_BASE='http://127.0.0.1:11434/v1'[/yellow]\n"
+                "[yellow]OLLAMA_API_BASE='http://127.0.0.1:11434'[/yellow]\n"
                 "4. Use in CAI: [yellow]/model llama3.1[/yellow]",
                 border_style="cyan",
             )
