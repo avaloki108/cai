@@ -190,6 +190,12 @@ class ComprehensiveErrorFilter(logging.Filter):
             "output_tokens_details",
             "field required",
             "validation error for responseapiusage",
+            "responseapiusage",
+            "response_api_usage",
+            "responseapiprice",
+            # LiteLLM usage tracking warnings
+            "error when formatting litellm response",
+            "litellm logging error",
         ]
         
         # Check if any suppress pattern matches
@@ -317,7 +323,7 @@ from cai.repl.ui.toolbar import get_toolbar_with_refresh
 # CAI SDK imports
 from cai.sdk.agents import Agent, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
 from cai.sdk.agents.items import ToolCallOutputItem
-from cai.sdk.agents.exceptions import OutputGuardrailTripwireTriggered, InputGuardrailTripwireTriggered
+from cai.sdk.agents.exceptions import OutputGuardrailTripwireTriggered, InputGuardrailTripwireTriggered, ModelBehaviorError
 from cai.sdk.agents.models.openai_chatcompletions import (
     get_agent_message_history,
     get_all_agent_histories,
@@ -1591,6 +1597,14 @@ def run_cai_cli(
 
                     try:
                         asyncio.run(process_streamed_response(agent, conversation_input))
+                    except ModelBehaviorError as e:
+                        # Display a user-friendly warning for unexpected model behavior (e.g., unknown tool)
+                        tool_list = ", ".join([t.name for t in getattr(agent, "tools", [])]) or "(none)"
+                        print(f"\n\033[91m⚠️  MODEL BEHAVIOR ERROR\033[0m")
+                        print(f"\033[91mReason: {e.message}\033[0m")
+                        print(f"\033[93mAvailable tools for this agent: {tool_list}\033[0m")
+                        print(f"\033[96mYou can retry the request or rephrase it to use known tools.\033[0m\n")
+                        continue
                     except OutputGuardrailTripwireTriggered as e:
                         # Display a user-friendly warning instead of crashing (streaming mode)
                         guardrail_name = e.guardrail_result.guardrail.get_name()
@@ -1700,6 +1714,14 @@ def run_cai_cli(
                                             new_loop.close()
                                 else:
                                     raise
+                    except ModelBehaviorError as e:
+                        # Display a user-friendly warning for unexpected model behavior (e.g., unknown tool)
+                        tool_list = ", ".join([t.name for t in getattr(agent, "tools", [])]) or "(none)"
+                        print(f"\n\033[91m⚠️  MODEL BEHAVIOR ERROR\033[0m")
+                        print(f"\033[91mReason: {e.message}\033[0m")
+                        print(f"\033[93mAvailable tools for this agent: {tool_list}\033[0m")
+                        print(f"\033[96mYou can retry the request or rephrase it to use known tools.\033[0m\n")
+                        continue
                     except Exception as api_error:
                         # Check if this is an API connection error that should be shown to the user
                         error_str = str(api_error)

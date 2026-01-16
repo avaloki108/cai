@@ -34,6 +34,8 @@ from .clorgetizer import clorgetizer_analyze, clorgetizer_compare_versions, clor
 from .certora_prover import certora_verify, certora_run_tests, certora_check_invariants
 from .oyente_plus import oyente_analyze, oyente_check_vulnerability, oyente_compare_contracts
 from .auditor_framework import auditor_run_audit, auditor_check_compliance, auditor_generate_report, auditor_scan_dependencies
+from .validate_findings import validate_finding, filter_false_positives
+from .scribble import scribble_run
 
 __all__ = [
     # Slither
@@ -80,4 +82,9 @@ __all__ = [
     'auditor_check_compliance',
     'auditor_generate_report',
     'auditor_scan_dependencies',
+    # Validation
+    'validate_finding',
+    'filter_false_positives',
+    # Scribble
+    'scribble_run',
 ]

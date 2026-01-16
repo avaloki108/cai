@@ -100,6 +100,20 @@ def get_predefined_model_categories() -> Dict[str, List[Dict[str, str]]]:
                 "description": "DeepSeek's specialized reasoning model"
             }
         ],
+        "Mistral (Devstral)": [
+            {
+                "name": "devstral-small-latest",
+                "description": "Devstral Small (latest) - Mistral coding model"
+            },
+            {
+                "name": "devstral-medium-latest",
+                "description": "Devstral Medium (latest) - stronger coding/reasoning"
+            },
+            {
+                "name": "devstral-2512",
+                "description": "Devstral 2 (versioned) - most capable Devstral release"
+            }
+        ],
         "Ollama Cloud": [
             {
                 "name": "ollama_cloud/gpt-oss:120b",
@@ -144,6 +158,7 @@ def get_all_predefined_models() -> List[Dict[str, Any]]:
         "Anthropic Claude": "Anthropic",
         "OpenAI": "OpenAI", 
         "DeepSeek": "DeepSeek",
+        "Mistral (Devstral)": "Mistral",
         "Ollama Cloud": "Ollama Cloud"
     }
     

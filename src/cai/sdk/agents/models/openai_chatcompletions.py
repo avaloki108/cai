@@ -2789,6 +2789,34 @@ class OpenAIChatCompletionsModel(Model):
             elif provider == "gemini":
                 kwargs.pop("parallel_tool_calls", None)
                 # Add any specific gemini settings if needed
+            elif provider == "mistral":
+                # Mistral API (e.g., mistral/... and Devstral family)
+                kwargs["custom_llm_provider"] = "mistral"
+                
+                mistral_api_key = os.getenv("MISTRAL_API_KEY") or os.getenv("MISTRALAI_API_KEY")
+                mistral_api_base = (
+                    os.getenv("MISTRAL_API_BASE")
+                    or os.getenv("MISTRAL_BASE_URL")
+                    or "https://api.mistral.ai/v1"
+                )
+
+                if mistral_api_key:
+                    kwargs["api_key"] = mistral_api_key
+                if mistral_api_base:
+                    kwargs["api_base"] = mistral_api_base
+
+                # Mistral does not support all OpenAI-only params
+                litellm.drop_params = True
+                kwargs.pop("store", None)
+                kwargs.pop("parallel_tool_calls", None)
+                # Remove tool_choice if no tools are specified
+                if not converted_tools:
+                    kwargs.pop("tool_choice", None)
+                
+                # Remove the provider prefix from model name for Mistral API
+                # e.g., "mistral/devstral-2512" -> "devstral-2512"
+                if "/" in str(kwargs["model"]):
+                    kwargs["model"] = str(kwargs["model"]).split("/", 1)[1]
         else:
             # Handle models without provider prefix
             if "claude" in model_str or "anthropic" in model_str:
@@ -2830,6 +2858,28 @@ class OpenAIChatCompletionsModel(Model):
                         )
             elif "gemini" in model_str:
                 kwargs.pop("parallel_tool_calls", None)
+            elif "devstral" in model_str and ":" not in model_str:
+                # Devstral models are served by Mistral; allow shorthand like "devstral-small-latest"
+                kwargs["custom_llm_provider"] = "mistral"
+
+                mistral_api_key = os.getenv("MISTRAL_API_KEY") or os.getenv("MISTRALAI_API_KEY")
+                mistral_api_base = (
+                    os.getenv("MISTRAL_API_BASE")
+                    or os.getenv("MISTRAL_BASE_URL")
+                    or "https://api.mistral.ai/v1"
+                )
+
+                if mistral_api_key:
+                    kwargs["api_key"] = mistral_api_key
+                if mistral_api_base:
+                    kwargs["api_base"] = mistral_api_base
+
+                litellm.drop_params = True
+                kwargs.pop("store", None)
+                kwargs.pop("parallel_tool_calls", None)
+                # Remove tool_choice if no tools are specified
+                if not converted_tools:
+                    kwargs.pop("tool_choice", None)
             elif "qwen" in model_str or ":" in model_str:
                 # Handle Ollama-served models with custom formats (e.g., alias1)
                 # These typically need the Ollama provider
@@ -2907,9 +2957,15 @@ class OpenAIChatCompletionsModel(Model):
                     f"Verify OLLAMA_API_KEY and OLLAMA_API_BASE are configured correctly."
                 ) from e
         
+        # Check if this is a Mistral model (should use OpenAI-compatible path, not Ollama)
+        is_mistral = (
+            "mistral" in model_str and "/" in model_str and model_str.split("/")[0] == "mistral"
+        ) or ("devstral" in model_str and ":" not in model_str)
+        
         while retry_count < max_retries:
             try:
-                if self.is_ollama:
+                # Mistral models should always use the OpenAI-compatible path, not Ollama
+                if self.is_ollama and not is_mistral:
                     return await self._fetch_response_litellm_ollama(
                         kwargs, model_settings, tool_choice, stream, parallel_tool_calls
                     )

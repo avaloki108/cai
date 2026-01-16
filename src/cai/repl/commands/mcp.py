@@ -83,8 +83,9 @@ console = Console()
 # Global registry for persistent MCP connections
 _GLOBAL_MCP_SERVERS: Dict[str, MCPServer] = {}
 
-# Per-server locks to serialize tool invocations for persistent connections
-_SERVER_INVOCATION_LOCKS: Dict[str, asyncio.Lock] = {}
+# Per-server, per-event-loop locks to serialize tool invocations for persistent connections
+# Structure: {server_name: {event_loop_id: asyncio.Lock}}
+_SERVER_INVOCATION_LOCKS: Dict[str, Dict[int, asyncio.Lock]] = {}
 
 # Global registry for agent-MCP associations
 # Maps agent name to list of MCP server names
@@ -169,9 +170,11 @@ class GlobalMCPUtil(MCPUtil):
                                 f"MCP server '{server_name}' is unavailable. Use /mcp status to verify it is loaded."
                             )
 
-                        lock = _SERVER_INVOCATION_LOCKS.setdefault(
-                            server_name, asyncio.Lock()
-                        )
+                        # Get or create a lock for this event loop
+                        # This prevents event loop binding issues when the same lock is used across different loops
+                        current_loop_id = id(asyncio.get_running_loop())
+                        server_locks = _SERVER_INVOCATION_LOCKS.setdefault(server_name, {})
+                        lock = server_locks.setdefault(current_loop_id, asyncio.Lock())
 
                         async with lock:
                             while retry_count < max_retries:

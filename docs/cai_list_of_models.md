@@ -88,6 +88,21 @@ export DEEPSEEK_API_KEY="sk-..."
 export CAI_MODEL="deepseek-chat"
 ```
 
+#### Mistral (Devstral)
+- **Devstral Small** - Fast, strong coding model
+- **Devstral Medium** - Higher capability for complex coding/reasoning
+
+**Configuration:**
+```bash
+export MISTRAL_API_KEY="sk-..."
+export CAI_MODEL="devstral-small-latest"  # or devstral-medium-latest, devstral-2512
+```
+
+You can also use the explicit provider prefix format:
+```bash
+export CAI_MODEL="mistral/devstral-small-latest"
+```
+
 #### Ollama (Local Models)
 - **Qwen2.5 72B** - High performance
 - **Qwen2.5 14B** - Balanced capability

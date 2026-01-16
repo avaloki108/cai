@@ -21,6 +21,7 @@ DEFAULT_TOOL_PATHS = {
     'certora_prover': '/home/dok/tools/W3-AUDIT/certora-prover/certoraRun',
     'oyente_plus': '/home/dok/tools/W3-AUDIT/oyente-plus/oyente',
     'auditor_framework': '/home/dok/tools/auditor-framework/auditor',
+    'scribble': 'scribble',
 }
 
 # Environment variable overrides
@@ -36,6 +37,7 @@ ENV_VAR_MAP = {
     'certora_prover': 'WEB3_CERTORA_PROVER_PATH',
     'oyente_plus': 'WEB3_OYENTE_PLUS_PATH',
     'auditor_framework': 'WEB3_AUDITOR_FRAMEWORK_PATH',
+    'scribble': 'WEB3_SCRIBBLE_PATH',
 }
 
 
@@ -113,3 +115,4 @@ CLORGETIZER_PATH = get_tool_path('clorgetizer')
 CERTORA_PROVER_PATH = get_tool_path('certora_prover')
 OYENTE_PLUS_PATH = get_tool_path('oyente_plus')
 AUDITOR_FRAMEWORK_PATH = get_tool_path('auditor_framework')
+SCRIBBLE_PATH = get_tool_path('scribble')
