@@ -109,18 +109,26 @@ from cai.tools.web3_security.enhancements import (
     aggregate_tool_results,
     correlate_findings,
     generate_strategic_digest,
+    # Repo Context
+    detect_web3_repo_context,
 )
 
 from cai.agents.guardrails import get_security_guardrails
 
 load_dotenv()
 
-# API key configuration - fail closed if not set
-api_key = os.getenv("ALIAS_API_KEY") or os.getenv("OPENAI_API_KEY")
+# API key configuration - allow non-OpenAI providers
+api_key = (
+    os.getenv("ALIAS_API_KEY")
+    or os.getenv("OPENAI_API_KEY")
+    or os.getenv("MISTRAL_API_KEY")
+    or os.getenv("MISTRALAI_API_KEY")
+    or os.getenv("ZAI_API_KEY")
+)
 if not api_key:
     raise RuntimeError(
         "Web3 Bug Bounty Agent requires an API key. "
-        "Set either ALIAS_API_KEY or OPENAI_API_KEY environment variable."
+        "Set ALIAS_API_KEY, OPENAI_API_KEY, MISTRAL_API_KEY, or ZAI_API_KEY."
     )
 
 # Load specialized Web3 bug bounty prompt
@@ -227,6 +235,8 @@ enhancement_tools = [
     aggregate_tool_results,
     correlate_findings,
     generate_strategic_digest,
+    # Repo context
+    detect_web3_repo_context,
 ]
 
 # Combine all tools

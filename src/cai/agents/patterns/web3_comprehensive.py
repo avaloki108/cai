@@ -1,4 +1,448 @@
 """
+Web3 game-theoretic audit patterns.
+
+Main heavy pattern enforces sensors -> reasoning core -> validation -> reporting.
+FP filter pattern distills noisy outputs into high-confidence issues.
+"""
+
+from cai.repl.commands.parallel import ParallelConfig
+
+# =============================================================================
+# Pattern 1: Web3 Main Heavy (Game-Theoretic)
+# =============================================================================
+web3_main_heavy_pattern = {
+    "name": "web3_main_heavy_pattern",
+    "type": "parallel",
+    "description": (
+        "Main Web3 audit: sensors -> game-theoretic reasoning -> validation -> reporting. "
+        "Uses attack-graph correlation and exploit scoring as the selection policy."
+    ),
+    "unified_context": False,
+    "configs": [
+        # Discovery agent - sensors only (no scoring)
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Discovery (Sensors Only). Use the MAIN PROMPT for target/scope. "
+                "Run static analysis with slither_analyze (--detect all --json) and "
+                "symbolic execution with mythril_analyze (-o json). "
+                "Focus on: reentrancy, access control, upgradeability, initialization, oracle issues. "
+                "Output ONLY structured JSON findings with location, severity, and evidence. "
+                "Do NOT score, rank, or hypothesize exploit chains."
+            ),
+        ),
+        # Game-theoretic reasoning core (mandatory)
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Game-Theoretic Reasoning Core (G-CTR). Input: aggregated findings from discovery. "
+                "Mandatory steps: "
+                "1) aggregate_tool_results() "
+                "2) correlate_findings() "
+                "3) build_attack_graph() "
+                "4) find_exploit_paths() "
+                "5) score_exploit_viability() / rank_findings_by_exploitability() "
+                "6) generate_strategic_digest(). "
+                "Use score_path_payoff() only as a diagnostic signal. "
+                "If the user specifies FOCUS/DEPTH/PROTOCOL_TYPE flags, honor them. "
+                "Output: top 3-5 exploit hypotheses with reasoning, prerequisites, and target contracts."
+            ),
+        ),
+        # Validation agent - targeted PoC
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: Validation + PoC. Validate ONLY the top hypotheses from the G-CTR lane. "
+                "Attempt reproduction with Foundry/Hardhat. "
+                "If fuzzing is needed, run it only for selected hypotheses. "
+                "Mark each as CONFIRMED / FALSE_POSITIVE / NEEDS_MORE_INFO. "
+                "Escalate validation level when PoCs succeed."
+            ),
+        ),
+        # Reporting agent - consolidated output
+        ParallelConfig(
+            "reporting_agent",
+            prompt=(
+                "ROLE: Reporting. Use the strategic digest + validation results. "
+                "Report ONLY confirmed or near-confirmed issues. "
+                "Include exploit chains, impact, PoC steps, and remediation guidance."
+            ),
+        ),
+    ],
+}
+
+# =============================================================================
+# Pattern 2: Web3 FP Filter (Triage)
+# =============================================================================
+web3_fp_filter_pattern = {
+    "name": "web3_fp_filter_pattern",
+    "type": "parallel",
+    "description": (
+        "False-positive triage + de-dup + scoring for noisy Web3 outputs."
+    ),
+    "unified_context": False,
+    "configs": [
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: FP Triage. Reproduce quickly, downgrade or kill false positives. "
+                "Output per issue: CONFIRMED / NEEDS_MORE_INFO / FALSE_POSITIVE."
+            ),
+        ),
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Correlation + Scoring. Aggregate noisy output and distill it. "
+                "Run aggregate_tool_results(), correlate_findings(), build_attack_graph(), "
+                "find_exploit_paths(), score_exploit_viability(), rank_findings_by_exploitability(), "
+                "generate_strategic_digest(). "
+                "Use score_path_payoff() only as a diagnostic signal. "
+                "Output: small, high-confidence set with rationale."
+            ),
+        ),
+        ParallelConfig(
+            "reporting_agent",
+            prompt=(
+                "ROLE: Clean Reporting. Include only CONFIRMED and high-likelihood NEEDS_MORE_INFO. "
+                "Provide reproduction steps, impact, and remediation. De-duplicate across tools."
+            ),
+        ),
+    ],
+}
+"""
+Web3 game-theoretic audit patterns.
+
+Main heavy pattern enforces sensors -> reasoning core -> validation -> reporting.
+FP filter pattern distills noisy outputs into high-confidence issues.
+"""
+
+from cai.repl.commands.parallel import ParallelConfig
+
+# =============================================================================
+# Pattern 1: Web3 Main Heavy (Game-Theoretic)
+# =============================================================================
+web3_main_heavy_pattern = {
+    "name": "web3_main_heavy_pattern",
+    "type": "parallel",
+    "description": (
+        "Main Web3 audit: sensors -> game-theoretic reasoning -> validation -> reporting. "
+        "Uses attack-graph correlation and exploit scoring as the selection policy."
+    ),
+    "unified_context": False,
+    "configs": [
+        # Discovery agent - sensors only (no scoring)
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Discovery (Sensors Only). Use the MAIN PROMPT for target/scope. "
+                "Run static analysis with slither_analyze (--detect all --json) and "
+                "symbolic execution with mythril_analyze (-o json). "
+                "Focus on: reentrancy, access control, upgradeability, initialization, oracle issues. "
+                "Output ONLY structured JSON findings with location, severity, and evidence. "
+                "Do NOT score, rank, or hypothesize exploit chains."
+            ),
+        ),
+        # Game-theoretic reasoning core (mandatory)
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Game-Theoretic Reasoning Core (G-CTR). Input: aggregated findings from discovery. "
+                "Mandatory steps: "
+                "1) aggregate_tool_results() "
+                "2) correlate_findings() "
+                "3) build_attack_graph() "
+                "4) find_exploit_paths() "
+                "5) score_exploit_viability() / rank_findings_by_exploitability() "
+                "6) generate_strategic_digest(). "
+                "Use score_path_payoff() only as a diagnostic signal. "
+                "If the user specifies FOCUS/DEPTH/PROTOCOL_TYPE flags, honor them. "
+                "Output: top 3-5 exploit hypotheses with reasoning, prerequisites, and target contracts."
+            ),
+        ),
+        # Validation agent - targeted PoC
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: Validation + PoC. Validate ONLY the top hypotheses from the G-CTR lane. "
+                "Attempt reproduction with Foundry/Hardhat. "
+                "If fuzzing is needed, run it only for selected hypotheses. "
+                "Mark each as CONFIRMED / FALSE_POSITIVE / NEEDS_MORE_INFO. "
+                "Escalate validation level when PoCs succeed."
+            ),
+        ),
+        # Reporting agent - consolidated output
+        ParallelConfig(
+            "reporting_agent",
+            prompt=(
+                "ROLE: Reporting. Use the strategic digest + validation results. "
+                "Report ONLY confirmed or near-confirmed issues. "
+                "Include exploit chains, impact, PoC steps, and remediation guidance."
+            ),
+        ),
+    ],
+}
+
+# =============================================================================
+# Pattern 2: Web3 FP Filter (Triage)
+# =============================================================================
+web3_fp_filter_pattern = {
+    "name": "web3_fp_filter_pattern",
+    "type": "parallel",
+    "description": (
+        "False-positive triage + de-dup + scoring for noisy Web3 outputs."
+    ),
+    "unified_context": False,
+    "configs": [
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: FP Triage. Reproduce quickly, downgrade or kill false positives. "
+                "Output per issue: CONFIRMED / NEEDS_MORE_INFO / FALSE_POSITIVE."
+            ),
+        ),
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Correlation + Scoring. Aggregate noisy output and distill it. "
+                "Run aggregate_tool_results(), correlate_findings(), build_attack_graph(), "
+                "find_exploit_paths(), score_exploit_viability(), rank_findings_by_exploitability(), "
+                "generate_strategic_digest(). "
+                "Use score_path_payoff() only as a diagnostic signal. "
+                "Output: small, high-confidence set with rationale."
+            ),
+        ),
+        ParallelConfig(
+            "reporting_agent",
+            prompt=(
+                "ROLE: Clean Reporting. Include only CONFIRMED and high-likelihood NEEDS_MORE_INFO. "
+                "Provide reproduction steps, impact, and remediation. De-duplicate across tools."
+            ),
+        ),
+    ],
+}
+"""
+Web3 game-theoretic audit patterns.
+
+Main heavy pattern enforces sensors -> reasoning core -> validation -> reporting.
+FP filter pattern distills noisy outputs into high-confidence issues.
+"""
+
+from cai.repl.commands.parallel import ParallelConfig
+
+# =============================================================================
+# Pattern 1: Web3 Main Heavy (Game-Theoretic)
+# =============================================================================
+web3_main_heavy_pattern = {
+    "name": "web3_main_heavy_pattern",
+    "type": "parallel",
+    "description": (
+        "Main Web3 audit: sensors -> game-theoretic reasoning -> validation -> reporting. "
+        "Uses attack-graph correlation and exploit scoring as the selection policy."
+    ),
+    "unified_context": False,
+    "configs": [
+        # Discovery agent - sensors only (no scoring)
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Discovery (Sensors Only). Use the MAIN PROMPT for target/scope. "
+                "Run static analysis with slither_analyze (--detect all --json) and "
+                "symbolic execution with mythril_analyze (-o json). "
+                "Focus on: reentrancy, access control, upgradeability, initialization, oracle issues. "
+                "Output ONLY structured JSON findings with location, severity, and evidence. "
+                "Do NOT score, rank, or hypothesize exploit chains."
+            ),
+        ),
+        # Game-theoretic reasoning core (mandatory)
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Game-Theoretic Reasoning Core (G-CTR). Input: aggregated findings from discovery. "
+                "Mandatory steps: "
+                "1) aggregate_tool_results() "
+                "2) correlate_findings() "
+                "3) build_attack_graph() "
+                "4) find_exploit_paths() "
+                "5) score_exploit_viability() / rank_findings_by_exploitability() "
+                "6) generate_strategic_digest(). "
+                "Use score_path_payoff() only as a diagnostic signal. "
+                "If the user specifies FOCUS/DEPTH/PROTOCOL_TYPE flags, honor them. "
+                "Output: top 3-5 exploit hypotheses with reasoning, prerequisites, and target contracts."
+            ),
+        ),
+        # Validation agent - targeted PoC
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: Validation + PoC. Validate ONLY the top hypotheses from the G-CTR lane. "
+                "Attempt reproduction with Foundry/Hardhat. "
+                "If fuzzing is needed, run it only for selected hypotheses. "
+                "Mark each as CONFIRMED / FALSE_POSITIVE / NEEDS_MORE_INFO. "
+                "Escalate validation level when PoCs succeed."
+            ),
+        ),
+        # Reporting agent - consolidated output
+        ParallelConfig(
+            "reporting_agent",
+            prompt=(
+                "ROLE: Reporting. Use the strategic digest + validation results. "
+                "Report ONLY confirmed or near-confirmed issues. "
+                "Include exploit chains, impact, PoC steps, and remediation guidance."
+            ),
+        ),
+    ],
+}
+
+# =============================================================================
+# Pattern 2: Web3 FP Filter (Triage)
+# =============================================================================
+web3_fp_filter_pattern = {
+    "name": "web3_fp_filter_pattern",
+    "type": "parallel",
+    "description": (
+        "False-positive triage + de-dup + scoring for noisy Web3 outputs."
+    ),
+    "unified_context": False,
+    "configs": [
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: FP Triage. Reproduce quickly, downgrade or kill false positives. "
+                "Output per issue: CONFIRMED / NEEDS_MORE_INFO / FALSE_POSITIVE."
+            ),
+        ),
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Correlation + Scoring. Aggregate noisy output and distill it. "
+                "Run aggregate_tool_results(), correlate_findings(), build_attack_graph(), "
+                "find_exploit_paths(), score_exploit_viability(), rank_findings_by_exploitability(), "
+                "generate_strategic_digest(). "
+                "Use score_path_payoff() only as a diagnostic signal. "
+                "Output: small, high-confidence set with rationale."
+            ),
+        ),
+        ParallelConfig(
+            "reporting_agent",
+            prompt=(
+                "ROLE: Clean Reporting. Include only CONFIRMED and high-likelihood NEEDS_MORE_INFO. "
+                "Provide reproduction steps, impact, and remediation. De-duplicate across tools."
+            ),
+        ),
+    ],
+}
+"""
+Web3 game-theoretic audit patterns.
+
+Main heavy pattern enforces sensors -> reasoning core -> validation -> reporting.
+FP filter pattern distills noisy outputs into high-confidence issues.
+"""
+
+from cai.repl.commands.parallel import ParallelConfig
+
+# =============================================================================
+# Pattern 1: Web3 Main Heavy (Game-Theoretic)
+# =============================================================================
+web3_main_heavy_pattern = {
+    "name": "web3_main_heavy_pattern",
+    "type": "parallel",
+    "description": (
+        "Main Web3 audit: sensors -> game-theoretic reasoning -> validation -> reporting. "
+        "Uses attack-graph correlation and exploit scoring as the selection policy."
+    ),
+    "unified_context": False,
+    "configs": [
+        # Discovery agent - sensors only (no scoring)
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Discovery (Sensors Only). Use the MAIN PROMPT for target/scope. "
+                "Run static analysis with slither_analyze (--detect all --json) and "
+                "symbolic execution with mythril_analyze (-o json). "
+                "Focus on: reentrancy, access control, upgradeability, initialization, oracle issues. "
+                "Output ONLY structured JSON findings with location, severity, and evidence. "
+                "Do NOT score, rank, or hypothesize exploit chains."
+            ),
+        ),
+        # Game-theoretic reasoning core (mandatory)
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Game-Theoretic Reasoning Core (G-CTR). Input: aggregated findings from discovery. "
+                "Mandatory steps: "
+                "1) aggregate_tool_results() "
+                "2) correlate_findings() "
+                "3) build_attack_graph() "
+                "4) find_exploit_paths() "
+                "5) score_exploit_viability() / rank_findings_by_exploitability() "
+                "6) generate_strategic_digest(). "
+                "Use score_path_payoff() only as a diagnostic signal. "
+                "If the user specifies FOCUS/DEPTH/PROTOCOL_TYPE flags, honor them. "
+                "Output: top 3-5 exploit hypotheses with reasoning, prerequisites, and target contracts."
+            ),
+        ),
+        # Validation agent - targeted PoC
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: Validation + PoC. Validate ONLY the top hypotheses from the G-CTR lane. "
+                "Attempt reproduction with Foundry/Hardhat. "
+                "If fuzzing is needed, run it only for selected hypotheses. "
+                "Mark each as CONFIRMED / FALSE_POSITIVE / NEEDS_MORE_INFO. "
+                "Escalate validation level when PoCs succeed."
+            ),
+        ),
+        # Reporting agent - consolidated output
+        ParallelConfig(
+            "reporting_agent",
+            prompt=(
+                "ROLE: Reporting. Use the strategic digest + validation results. "
+                "Report ONLY confirmed or near-confirmed issues. "
+                "Include exploit chains, impact, PoC steps, and remediation guidance."
+            ),
+        ),
+    ],
+}
+
+# =============================================================================
+# Pattern 2: Web3 FP Filter (Triage)
+# =============================================================================
+web3_fp_filter_pattern = {
+    "name": "web3_fp_filter_pattern",
+    "type": "parallel",
+    "description": (
+        "False-positive triage + de-dup + scoring for noisy Web3 outputs."
+    ),
+    "unified_context": False,
+    "configs": [
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: FP Triage. Reproduce quickly, downgrade or kill false positives. "
+                "Output per issue: CONFIRMED / NEEDS_MORE_INFO / FALSE_POSITIVE."
+            ),
+        ),
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Correlation + Scoring. Aggregate noisy output and distill it. "
+                "Run aggregate_tool_results(), correlate_findings(), build_attack_graph(), "
+                "find_exploit_paths(), score_exploit_viability(), rank_findings_by_exploitability(), "
+                "generate_strategic_digest(). "
+                "Use score_path_payoff() only as a diagnostic signal. "
+                "Output: small, high-confidence set with rationale."
+            ),
+        ),
+        ParallelConfig(
+            "reporting_agent",
+            prompt=(
+                "ROLE: Clean Reporting. Include only CONFIRMED and high-likelihood NEEDS_MORE_INFO. "
+                "Provide reproduction steps, impact, and remediation. De-duplicate across tools."
+            ),
+        ),
+    ],
+}
+"""
 Web3 Comprehensive Auditing Patterns
 
 Multi-agent patterns optimized for thorough web3 security audits.
@@ -304,3 +748,14 @@ web3_attack_graph_pattern = {
         ),
     ],
 }
+
+# Cleanup legacy patterns so only the new exports remain.
+for _name in (
+    "web3_comprehensive_pattern",
+    "web3_quick_scan_pattern",
+    "web3_deep_dive_pattern",
+    "web3_defi_pattern",
+    "web3_attack_graph_pattern",
+):
+    globals().pop(_name, None)
+

@@ -13,6 +13,10 @@ from cai.tools.reconnaissance.exec_code import (  # pylint: disable=import-error
     execute_code
 )
 
+from cai.tools.web3_security.enhancements import (  # pylint: disable=import-error # noqa: E501
+    detect_web3_repo_context
+)
+
 load_dotenv()
 # Prompts
 reporting_agent_system_prompt = load_prompt_template("prompts/system_reporting_agent.md")
@@ -21,6 +25,7 @@ reporting_agent_system_prompt = load_prompt_template("prompts/system_reporting_a
 functions = [
     generic_linux_command,
     execute_code,
+    detect_web3_repo_context,
 ]
 
 

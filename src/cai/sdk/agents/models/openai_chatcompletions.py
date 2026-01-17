@@ -2817,6 +2817,23 @@ class OpenAIChatCompletionsModel(Model):
                 # e.g., "mistral/devstral-2512" -> "devstral-2512"
                 if "/" in str(kwargs["model"]):
                     kwargs["model"] = str(kwargs["model"]).split("/", 1)[1]
+            elif provider == "zai":
+                # Z.AI OpenAI-compatible API (e.g., zai/glm-4.7)
+                kwargs["custom_llm_provider"] = "openai"
+                zai_api_key = os.getenv("ZAI_API_KEY")
+                zai_api_base = (
+                    os.getenv("ZAI_API_BASE")
+                    or os.getenv("ZAI_BASE_URL")
+                    or "https://api.z.ai/api/paas/v4"
+                )
+                if zai_api_key:
+                    kwargs["api_key"] = zai_api_key
+                if zai_api_base:
+                    kwargs["api_base"] = zai_api_base
+                # Remove the provider prefix from model name
+                # e.g., "zai/glm-4.7" -> "glm-4.7"
+                if "/" in str(kwargs["model"]):
+                    kwargs["model"] = str(kwargs["model"]).split("/", 1)[1]
         else:
             # Handle models without provider prefix
             if "claude" in model_str or "anthropic" in model_str:
@@ -2957,15 +2974,19 @@ class OpenAIChatCompletionsModel(Model):
                     f"Verify OLLAMA_API_KEY and OLLAMA_API_BASE are configured correctly."
                 ) from e
         
-        # Check if this is a Mistral model (should use OpenAI-compatible path, not Ollama)
+        # Check if this is an explicit non-Ollama provider (force OpenAI-compatible path)
+        explicit_provider = model_str.split("/", 1)[0] if "/" in model_str else None
         is_mistral = (
-            "mistral" in model_str and "/" in model_str and model_str.split("/")[0] == "mistral"
-        ) or ("devstral" in model_str and ":" not in model_str)
+            explicit_provider == "mistral"
+            or ("devstral" in model_str and ":" not in model_str)
+        )
+        is_zai = explicit_provider == "zai"
+        force_openai_path = is_mistral or is_zai
         
         while retry_count < max_retries:
             try:
-                # Mistral models should always use the OpenAI-compatible path, not Ollama
-                if self.is_ollama and not is_mistral:
+                # Use Ollama only when explicitly selected or no provider prefix is given
+                if self.is_ollama and not force_openai_path and explicit_provider in (None, "ollama", "ollama_cloud"):
                     return await self._fetch_response_litellm_ollama(
                         kwargs, model_settings, tool_choice, stream, parallel_tool_calls
                     )

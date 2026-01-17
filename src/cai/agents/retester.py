@@ -14,6 +14,10 @@ from cai.tools.reconnaissance.exec_code import (  # pylint: disable=import-error
     execute_code
 )
 
+from cai.tools.web3_security.enhancements import (  # pylint: disable=import-error # noqa: E501
+    detect_web3_repo_context
+)
+
 
 load_dotenv()
 
@@ -25,7 +29,8 @@ retester_system_prompt = load_prompt_template("prompts/system_triage_agent.md")
 
 tools = [
     generic_linux_command,
-    execute_code
+    execute_code,
+    detect_web3_repo_context,
 ]
 
 if os.getenv('GOOGLE_SEARCH_API_KEY') and os.getenv('GOOGLE_SEARCH_CX'):

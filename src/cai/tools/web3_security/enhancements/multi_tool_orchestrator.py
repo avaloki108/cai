@@ -298,14 +298,18 @@ def aggregate_tool_results(results: str, ctf=None) -> str:
 @function_tool
 def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=None) -> str:
     """
-    Find related findings across different tools.
+    Find related findings across different tools using real similarity scoring.
     
     Identifies when multiple tools flag the same issue, which
     increases confidence in the finding's validity.
     
+    Uses weighted similarity (category, type, description, location) to ensure
+    correlation_threshold is meaningful - not just location matching.
+    
     Args:
         findings: JSON string of aggregated findings from aggregate_tool_results().
         correlation_threshold: Minimum similarity for correlation (0-1).
+                              Default 0.7 means findings must be 70% similar.
     
     Returns:
         JSON string with correlated finding groups and confidence boost.
@@ -339,19 +343,44 @@ def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=No
         correlations = []
         
         # Location-based correlations (same location, different tools)
+        # NOW WITH REAL SIMILARITY CHECK
         for location, group in location_groups.items():
             if len(group) > 1:
                 tools = list(set(f.get("tool", "unknown") for f in group))
                 if len(tools) > 1:  # Multiple tools found same location
-                    # Calculate confidence boost
-                    confidence_boost = min(0.3 * (len(tools) - 1), 0.9)
+                    # =========================================================
+                    # NEW: Ensure findings are truly the "same" issue using
+                    # similarity scoring, not just same line/function
+                    # =========================================================
+                    sim_ok = False
+                    max_similarity = 0.0
+                    
+                    for i in range(len(group)):
+                        for j in range(i + 1, len(group)):
+                            similarity = _finding_similarity(group[i], group[j])
+                            max_similarity = max(max_similarity, similarity)
+                            if similarity >= correlation_threshold:
+                                sim_ok = True
+                                break
+                        if sim_ok:
+                            break
+                    
+                    # Skip if findings don't meet similarity threshold
+                    if not sim_ok:
+                        continue
+                    
+                    # Calculate confidence boost (scaled by similarity)
+                    base_boost = min(0.3 * (len(tools) - 1), 0.9)
+                    confidence_boost = base_boost * max_similarity
                     
                     correlations.append({
                         "type": "location_correlation",
                         "location": location,
                         "finding_count": len(group),
                         "tools": tools,
-                        "confidence_boost": confidence_boost,
+                        "similarity_score": round(max_similarity, 3),
+                        "correlation_threshold_used": correlation_threshold,
+                        "confidence_boost": round(confidence_boost, 3),
                         "findings": [f["id"] for f in group],
                         "max_severity": max(
                             (f.get("severity", "LOW") for f in group),
@@ -374,14 +403,16 @@ def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=No
                         "findings": [f["id"] for f in group][:10],
                     })
         
-        # Calculate enhanced findings
+        # Calculate enhanced findings with improved confidence
         enhanced_findings = []
         correlation_map = {}
         
         for corr in correlations:
             if corr["type"] == "location_correlation":
                 for fid in corr["findings"]:
-                    correlation_map[fid] = corr["confidence_boost"]
+                    # Store the higher boost if multiple correlations
+                    existing = correlation_map.get(fid, 0)
+                    correlation_map[fid] = max(existing, corr["confidence_boost"])
         
         for finding in all_findings:
             enhanced = finding.copy()
@@ -390,14 +421,14 @@ def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=No
             if fid in correlation_map:
                 enhanced["correlated"] = True
                 enhanced["confidence_boost"] = correlation_map[fid]
-                enhanced["effective_confidence"] = min(
-                    1.0,
-                    (0.5 if finding.get("confidence", "medium") == "medium" else 
-                     0.3 if finding.get("confidence", "medium") == "low" else 0.7) + correlation_map[fid]
-                )
+                # Use improved confidence calculation
+                base = _base_confidence(finding.get("confidence", "medium"))
+                enhanced["effective_confidence"] = min(1.0, base + correlation_map[fid])
+                enhanced["base_confidence"] = round(base, 3)
             else:
                 enhanced["correlated"] = False
                 enhanced["confidence_boost"] = 0
+                enhanced["effective_confidence"] = _base_confidence(finding.get("confidence", "medium"))
             
             enhanced_findings.append(enhanced)
         
@@ -409,6 +440,7 @@ def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=No
                 "location_correlations": len([c for c in correlations if c["type"] == "location_correlation"]),
                 "category_patterns": len([c for c in correlations if c["type"] == "category_pattern"]),
                 "findings_with_correlation": len([f for f in enhanced_findings if f.get("correlated")]),
+                "correlation_threshold": correlation_threshold,
             },
         }, indent=2)
     
@@ -528,12 +560,35 @@ def generate_strategic_digest(aggregated_results: str, ctf=None) -> str:
                 "effort_allocation": "30%",
             })
         
-        if attack_surface:
+        # =================================================================
+        # NEW: If no correlated findings, recommend cross-validation
+        # This keeps the agent tight in repo mode instead of expanding scope
+        # =================================================================
+        if not correlated and high:
+            workflow.append({
+                "step": len(workflow) + 1,
+                "action": "VALIDATE: Run alternative tool on top 3 high-severity findings",
+                "focus": list(set(f.get("category") for f in high[:3])),
+                "effort_allocation": "25%",
+                "reason": "No multi-tool correlation - need validation before trusting",
+            })
+        
+        if attack_surface and correlated:
+            # Only explore attack surfaces if we have correlated findings
             workflow.append({
                 "step": len(workflow) + 1,
                 "action": "Explore top attack surfaces",
                 "focus": [a["category"] for a in attack_surface[:3]],
                 "effort_allocation": "20%",
+            })
+        elif attack_surface and not correlated:
+            # More conservative if no correlation
+            workflow.append({
+                "step": len(workflow) + 1,
+                "action": "Selective exploration of highest-risk attack surfaces only",
+                "focus": [a["category"] for a in attack_surface[:2] if a.get("risk_level") == "HIGH"],
+                "effort_allocation": "15%",
+                "reason": "Limited exploration due to lack of correlation",
             })
         
         workflow.append({
@@ -576,6 +631,13 @@ def generate_strategic_digest(aggregated_results: str, ctf=None) -> str:
                 "next_step": priority_actions[0]["action"] if priority_actions else "COMPREHENSIVE_REVIEW",
                 "focus_category": priority_actions[0]["category"] if priority_actions else attack_surface[0]["category"] if attack_surface else "general",
                 "time_box_suggestion": "Focus 40% of effort on top 3 priority actions",
+                # New: correlation-aware guidance
+                "correlation_status": "VALIDATED" if correlated else "NEEDS_VALIDATION",
+                "validation_guidance": (
+                    "Findings have multi-tool correlation - proceed with confidence"
+                    if correlated else
+                    "NO CORRELATION: Validate top 3 high-severity findings with different tool before expanding scope"
+                ),
             },
         }, indent=2)
     

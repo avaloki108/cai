@@ -1,0 +1,20 @@
+parallel_agents:
+  - name: retester_agent
+    prompt: "ROLE: Repo-first bootstrap. Target repo: /home/dok/thelist/3huma/repo/huma-contracts-v2. Always run commands from that directory. Detect framework (Foundry/Hardhat), run minimal install/build/test commands, and report any failures. Keep commands fast and scoped. Output: commands run + results + next steps."
+    unified_context: false
+
+  - name: web3_bug_bounty_agent
+    prompt: "ROLE: Repo Context Builder. Target repo: /home/dok/thelist/3huma/repo/huma-contracts-v2. Run detect_web3_repo_context('/home/dok/thelist/3huma/repo/huma-contracts-v2') and output the JSON verbatim. Then summarize architecture: proxies, oracles, upgradeability, critical contracts, and key invariants."
+    unified_context: false
+
+  - name: web3_bug_bounty_agent
+    prompt: "ROLE: Static Analysis. Target repo: /home/dok/thelist/3huma/repo/huma-contracts-v2. Run slither_analyze(target='/home/dok/thelist/3huma/repo/huma-contracts-v2', args='--detect reentrancy-eth,reentrancy-no-eth,arbitrary-send-eth,controlled-delegatecall,unprotected-upgrade,unchecked-transfer --json /home/dok/thelist/3huma/artifacts/slither-critical.json --exclude-informational --filter-paths \"test|mock\"'). Summarize only high-confidence issues with file paths and functions."
+    unified_context: false
+
+  - name: web3_bug_bounty_agent
+    prompt: "ROLE: Game-theoretic reasoning. Target repo: /home/dok/thelist/3huma/repo/huma-contracts-v2. Manually analyze Pool/TrancheVault/CreditLine/CreditManager flows for economically viable exploit paths (flashloan, donation, rounding, fee manipulation). Provide prerequisites, attacker payoff, and likely mitigation."
+    unified_context: false
+
+  - name: retester_agent
+    prompt: "ROLE: Validation. Target repo: /home/dok/thelist/3huma/repo/huma-contracts-v2. Attempt to validate the most likely exploit ideas with lightweight scripts or targeted tests. If reproduction is not possible, label NEEDS_MORE_INFO and specify what is missing."
+    unified_context: false

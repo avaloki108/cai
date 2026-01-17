@@ -22,6 +22,7 @@ Enhancement Tools (Game-Theoretic Reasoning Layer):
 - Cross-Contract: Analyze inter-contract interactions and invariants
 - Exploit Scorer: Game-theoretic scoring of exploit viability
 - Multi-Tool Orchestrator: Aggregate and correlate multi-tool findings
+- Repo Context: Detect repo context and set safe defaults
 """
 
 from .slither import slither_analyze, slither_check_upgradeability
@@ -61,6 +62,8 @@ from .enhancements import (
     aggregate_tool_results,
     correlate_findings,
     generate_strategic_digest,
+    # Repo Context
+    detect_web3_repo_context,
 )
 
 __all__ = [
@@ -129,4 +132,6 @@ __all__ = [
     'aggregate_tool_results',
     'correlate_findings',
     'generate_strategic_digest',
+    # Enhancement Tools - Repo Context
+    'detect_web3_repo_context',
 ]

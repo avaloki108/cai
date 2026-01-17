@@ -13,6 +13,7 @@ Available modules:
 - cross_contract: Analyze inter-contract interactions and economic invariants
 - exploit_scorer: Game-theoretic scoring of exploit viability
 - multi_tool_orchestrator: Aggregate and correlate findings from multiple tools
+- repo_context: Detect repo context and set safe defaults
 """
 
 from .attack_graph import (
@@ -39,6 +40,10 @@ from .multi_tool_orchestrator import (
     generate_strategic_digest,
 )
 
+from .repo_context import (
+    detect_web3_repo_context,
+)
+
 __all__ = [
     # Attack Graph
     'build_attack_graph',
@@ -56,4 +61,7 @@ __all__ = [
     'aggregate_tool_results',
     'correlate_findings',
     'generate_strategic_digest',
+    # Repo Context
+    'detect_web3_repo_context',
 ]
+
