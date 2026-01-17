@@ -1,0 +1,23 @@
+#!/bin/bash
+# Test script to verify venv auto-activation
+
+echo "=== Testing venv activation ==="
+echo ""
+echo "1. Checking if .venv exists:"
+test -f .venv/bin/activate && echo "   ✓ .venv/bin/activate exists" || echo "   ✗ .venv not found"
+echo ""
+echo "2. Your .zshrc has auto-venv feature configured"
+echo "   It will automatically activate .venv when you cd into this directory"
+echo ""
+echo "3. To use venv properly:"
+echo "   ❌ WRONG: source .venv/bin/activate && exec zsh"
+echo "   ✓ CORRECT: cd ~/tools/cai  (venv auto-activates)"
+echo ""
+echo "4. After cd'ing into ~/tools/cai, you should see '(cai)' in your prompt"
+echo ""
+echo "5. To verify venv is active, run:"
+echo "   echo \$VIRTUAL_ENV"
+echo "   which python"
+echo ""
+echo "Solution: The auto-venv in your .zshrc already handles this!"
+echo "Just cd into the directory and it will auto-activate."

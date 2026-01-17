@@ -1994,6 +1994,31 @@ def main():
     # Get agent type from environment variables or use default
     agent_type = os.getenv("CAI_AGENT_TYPE", "one_tool_agent")
 
+    # If CAI_AGENT_TYPE points at a PARALLEL pattern (e.g. "offsec_pattern"),
+    # apply it to the parallel execution system and switch to a runnable base
+    # agent to avoid treating the pattern pseudo-agent as a real Agent.
+    try:
+        from cai.agents.patterns import get_pattern
+        from cai.agents.patterns.pattern import PatternType
+        from cai.agents.patterns.utils import apply_pattern_to_parallel_command, validate_pattern_agents
+
+        pattern = get_pattern(agent_type)
+        if pattern and getattr(pattern, "type", None) == PatternType.PARALLEL:
+            missing_agents = validate_pattern_agents(pattern)
+            if missing_agents:
+                print(color(f"Warning: parallel pattern '{agent_type}' has missing agents: {', '.join(missing_agents)}", color="yellow"))
+
+            apply_pattern_to_parallel_command(pattern)
+            os.environ["CAI_PATTERN_DESCRIPTION"] = pattern.description or ""
+
+            # Ensure we don't crash by trying to run the pattern as a single agent.
+            # Keep parallel configs active; use a safe base agent for the main loop.
+            agent_type = "one_tool_agent"
+            os.environ["CAI_AGENT_TYPE"] = agent_type
+    except Exception:
+        # Avoid disrupting startup if pattern system is unavailable
+        pass
+
     # Get the agent instance by name with default ID P1
     agent = get_agent_by_name(agent_type, agent_id="P1")
     

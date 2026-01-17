@@ -233,6 +233,17 @@ def get_agent_by_name(agent_name: str, custom_name: str = None, model_override: 
 
     # Get the agent instance (singleton)
     agent = available_agents[agent_name_lower]
+    
+    # Check if this is a PatternAgent pseudo-object (for display purposes)
+    # If it's a swarm pattern, extract and use the entry agent instead
+    if hasattr(agent, '_pattern'):
+        pattern = agent._pattern
+        # Check if it's a swarm pattern with an entry agent
+        if hasattr(pattern, 'type') and hasattr(pattern, 'entry_agent'):
+            from cai.agents.patterns.pattern import PatternType
+            if pattern.type == PatternType.SWARM and pattern.entry_agent:
+                # Use the entry agent instead of the PatternAgent wrapper
+                agent = pattern.entry_agent
 
     # For singleton agents, try to create a copy with a fresh model instance
     if hasattr(agent, "model") and hasattr(agent.model, "__class__"):
