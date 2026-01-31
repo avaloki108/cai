@@ -64,7 +64,8 @@ web3_main_heavy_pattern = {
             "reporting_agent",
             prompt=(
                 "ROLE: Reporting. Use the strategic digest + validation results. "
-                "Report ONLY confirmed or near-confirmed issues. "
+                "Run council_filter_findings() and report ONLY council-validated permissionless issues. "
+                "Place missing proof/permissionless items in a Needs Evidence section. "
                 "Include exploit chains, impact, PoC steps, and remediation guidance."
             ),
         ),
@@ -175,7 +176,8 @@ web3_main_heavy_pattern = {
             "reporting_agent",
             prompt=(
                 "ROLE: Reporting. Use the strategic digest + validation results. "
-                "Report ONLY confirmed or near-confirmed issues. "
+                "Run council_filter_findings() and report ONLY council-validated permissionless issues. "
+                "Place missing proof/permissionless items in a Needs Evidence section. "
                 "Include exploit chains, impact, PoC steps, and remediation guidance."
             ),
         ),
@@ -286,7 +288,8 @@ web3_main_heavy_pattern = {
             "reporting_agent",
             prompt=(
                 "ROLE: Reporting. Use the strategic digest + validation results. "
-                "Report ONLY confirmed or near-confirmed issues. "
+                "Run council_filter_findings() and report ONLY council-validated permissionless issues. "
+                "Place missing proof/permissionless items in a Needs Evidence section. "
                 "Include exploit chains, impact, PoC steps, and remediation guidance."
             ),
         ),
@@ -397,7 +400,8 @@ web3_main_heavy_pattern = {
             "reporting_agent",
             prompt=(
                 "ROLE: Reporting. Use the strategic digest + validation results. "
-                "Report ONLY confirmed or near-confirmed issues. "
+                "Run council_filter_findings() and report ONLY council-validated permissionless issues. "
+                "Place missing proof/permissionless items in a Needs Evidence section. "
                 "Include exploit chains, impact, PoC steps, and remediation guidance."
             ),
         ),
@@ -436,8 +440,9 @@ web3_fp_filter_pattern = {
         ParallelConfig(
             "reporting_agent",
             prompt=(
-                "ROLE: Clean Reporting. Include only CONFIRMED and high-likelihood NEEDS_MORE_INFO. "
-                "Provide reproduction steps, impact, and remediation. De-duplicate across tools."
+                "ROLE: Clean Reporting. Include only council-validated permissionless findings. "
+                "Provide reproduction steps, impact, and remediation. De-duplicate across tools. "
+                "Add a Needs Evidence section for missing proof/permissionless details."
             ),
         ),
     ],
@@ -517,8 +522,9 @@ web3_comprehensive_pattern = {
                 "1. Use aggregate_tool_results() to combine outputs. "
                 "2. Use correlate_findings() to identify multi-tool confirmations. "
                 "3. Use generate_strategic_digest() for prioritized action plan. "
+                "4. Run council_filter_findings() to enforce permissionless + evidence gates. "
                 "Output: Final report with severity rankings, exploit chains, "
-                "economic impact estimates, and remediation recommendations."
+                "economic impact estimates, remediation recommendations, and a Needs Evidence section."
             ),
         ),
     ],

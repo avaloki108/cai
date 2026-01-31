@@ -11,7 +11,7 @@ from cai.sdk.agents import function_tool
 collection_name = os.getenv('CAI_MEMORY_COLLECTION', "default")
 
 @function_tool
-def query_memory(query: str, top_k: int = 3, **kwargs) -> str:  # pylint: disable=unused-argument,line-too-long # noqa: E501
+def query_memory(query: str, top_k: int = 3) -> str:  # pylint: disable=line-too-long # noqa: E501
     """
     Query memory to retrieve relevant context. From Previous CTFs executions.
 
@@ -33,17 +33,16 @@ def query_memory(query: str, top_k: int = 3, **kwargs) -> str:  # pylint: disabl
             limit=top_k,
         )
 
-        # If no results, fall back to retrieving all documents
         if not results:
             return "No documents found in memory."
 
         return results
 
-    except Exception:  # pylint: disable=broad-exception-caught
-        return results
+    except Exception as exc:  # pylint: disable=broad-exception-caught
+        return f"Error querying memory: {str(exc)}"
 
 @function_tool
-def add_to_memory_episodic(texts: str, step: int = 0, **kwargs) -> str:  # pylint: disable=unused-argument,line-too-long # noqa: E501
+def add_to_memory_episodic(texts: str, step: int = 0) -> str:  # pylint: disable=line-too-long # noqa: E501
     """
     This is a persistent memory to add relevant context to our memory.
     Use this function to add relevant context to the memory.
@@ -76,7 +75,7 @@ def add_to_memory_episodic(texts: str, step: int = 0, **kwargs) -> str:  # pylin
         return f"Error adding documents to vector database: {str(e)}"
 
 @function_tool
-def add_to_memory_semantic(texts: str, step: int = 0, **kwargs) -> str:  # pylint: disable=unused-argument,line-too-long # noqa: E501
+def add_to_memory_semantic(texts: str, step: int = 0) -> str:  # pylint: disable=line-too-long # noqa: E501
     """
     This is a persistent memory to add relevant context to our memory.
     Use this function to add relevant context to the memory.

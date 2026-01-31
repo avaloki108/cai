@@ -151,6 +151,19 @@ TYPE_NORMALIZATION = {
     "oracle": "oracle",
     "price": "oracle",
     "flash": "flash_loan",
+    "flash-loan": "flash_loan",
+    "flashloan": "flash_loan",
+    "mev": "mev",
+    "sandwich": "mev",
+    "governance": "governance",
+    "timelock": "governance",
+    "bridge": "bridge",
+    "cross-chain": "bridge",
+    "erc4626": "accounting",
+    "share": "accounting",
+    "fee-on-transfer": "token_handling",
+    "permit": "signature",
+    "signature": "signature",
 }
 
 
@@ -535,10 +548,21 @@ def generate_strategic_digest(aggregated_results: str, ctf=None) -> str:
         
         attack_surface = []
         for category, count in sorted(categories.items(), key=lambda x: x[1], reverse=True)[:5]:
+            high_risk = {
+                "reentrancy",
+                "access_control",
+                "oracle",
+                "flash_loan",
+                "bridge",
+                "governance",
+                "liquidation",
+                "upgradeability",
+                "mev",
+            }
             attack_surface.append({
                 "category": category,
                 "finding_count": count,
-                "risk_level": "HIGH" if category in ["reentrancy", "access_control", "oracle"] else "MEDIUM",
+                "risk_level": "HIGH" if category in high_risk else "MEDIUM",
             })
         
         # Recommended workflow
@@ -591,6 +615,12 @@ def generate_strategic_digest(aggregated_results: str, ctf=None) -> str:
                 "reason": "Limited exploration due to lack of correlation",
             })
         
+        workflow.append({
+            "step": len(workflow) + 1,
+            "action": "COUNCIL_FALSE_POSITIVE_GATE",
+            "effort_allocation": "10%",
+            "notes": "Run council_filter_findings() to enforce permissionless-only findings and evidence requirements.",
+        })
         workflow.append({
             "step": len(workflow) + 1,
             "action": "Document and report validated findings",

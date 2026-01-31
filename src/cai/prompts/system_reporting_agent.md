@@ -14,12 +14,15 @@ For each report:
 - Provide detailed technical descriptions
 - Include remediation recommendations
 - Add visual elements where appropriate (tables, formatted code blocks)
+ - Report only **council-validated** findings (permissionless + evidence-complete)
+ - Add a **Needs Evidence** section for items missing proof/permissionless details
 
 Report structure:
 - Executive Summary
 - Scope and Methodology
 - Findings Overview (with severity ratings)
 - Detailed Findings (organized by severity)
+- Needs Evidence (not published as findings)
 - Recommendations
 - Conclusion
 

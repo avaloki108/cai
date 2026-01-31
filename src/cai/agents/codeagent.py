@@ -31,7 +31,7 @@ from cai.agents.meta.local_python_executor import (
     fix_final_answer_code,
     truncate_content,
 )
-from cai.sdk.agents import Agent, Result, OpenAIChatCompletionsModel
+from cai.sdk.agents import Agent, ModelSettings, Result, OpenAIChatCompletionsModel
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 
@@ -216,6 +216,7 @@ class CodeAgent(Agent):
         _max_steps = max_steps
         _execution_timeout = execution_timeout
         _tool_choice = tool_choice
+        _functions = tools or []
         # Calculate authorized imports
         _authorized_imports = list(
             set(BASE_BUILTIN_MODULES) | set(_additional_imports))
@@ -231,6 +232,7 @@ class CodeAgent(Agent):
         object.__setattr__(self, 'execution_timeout', _execution_timeout)
         object.__setattr__(self, 'tool_choice', _tool_choice)
         object.__setattr__(self, 'cai_instance', None)
+        object.__setattr__(self, 'functions', _functions)
 
         # Create instructions if needed
         if instructions is None:
@@ -244,9 +246,12 @@ class CodeAgent(Agent):
             model=model,
             description=description,
             instructions=instructions,
-            tools=functions or [],
-            reasoning_effort=reasoning_effort,
-            temperature=0.2,  # Lower temperature for predictable code
+            tools=_functions,
+            model_settings=ModelSettings(
+                temperature=0.2,  # Lower temperature for predictable code
+                tool_choice=_tool_choice,
+                reasoning_effort=reasoning_effort,
+            ),
         )
 
         # Store remaining attributes as instance variables

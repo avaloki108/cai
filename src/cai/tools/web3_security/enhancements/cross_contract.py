@@ -69,6 +69,36 @@ INVARIANT_PATTERNS = {
         "description": "Timestamp-based deadlines - front-running window",
         "risk": "Transaction replay or timing attacks",
     },
+    "interest_rate_model": {
+        "patterns": [r"borrowRate", r"supplyRate", r"utilization", r"interestRate", r"rateModel"],
+        "description": "Interest rate model dependencies - check for manipulation and rounding",
+        "risk": "Rate manipulation and bad debt scenarios",
+    },
+    "liquidation_incentive": {
+        "patterns": [r"liquidationIncentive", r"closeFactor", r"liquidationThreshold"],
+        "description": "Liquidation parameters - ensure incentives and thresholds are sane",
+        "risk": "Liquidation abuse or insolvency cascades",
+    },
+    "slippage_limit": {
+        "patterns": [r"amountOutMin", r"minOut", r"sqrtPriceLimitX96", r"slippage"],
+        "description": "Slippage controls in swaps or liquidations",
+        "risk": "Sandwich attacks and price manipulation",
+    },
+    "bridge_replay_protection": {
+        "patterns": [r"messageId", r"nonce", r"domainSeparator", r"chainId"],
+        "description": "Bridge replay protection checks",
+        "risk": "Cross-chain replay or duplicate message processing",
+    },
+    "permit_signatures": {
+        "patterns": [r"\bpermit\(", r"DOMAIN_SEPARATOR", r"nonces\("],
+        "description": "Permit-based approvals and signatures",
+        "risk": "Signature replay or nonce misuse",
+    },
+    "fee_on_transfer": {
+        "patterns": [r"feeOnTransfer", r"transferFee", r"tax", r"reflection"],
+        "description": "Fee-on-transfer or rebasing token patterns",
+        "risk": "Accounting mismatch and exploitability in balance tracking",
+    },
 }
 
 

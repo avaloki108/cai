@@ -7,7 +7,7 @@ of the main agent by providing structured analysis without making tool calls.
 
 import os
 from typing import Optional, Callable, Union
-from cai.sdk.agents import Agent  # pylint: disable=import-error
+from cai.sdk.agents import Agent, ModelSettings  # pylint: disable=import-error
 from cai.util import load_prompt_template, create_system_prompt_renderer
 
 
@@ -48,16 +48,16 @@ def create_reasoner_agent(
         agent_instructions = create_system_prompt_renderer(default_instructions)
 
     # Check if the model supports reasoning_effort
-    kwargs = {}
+    model_settings = ModelSettings()
     if any(x in model for x in ["o1", "o3"]):
-        kwargs["reasoning_effort"] = "high"
+        model_settings.reasoning_effort = "high"
 
     # Create and return the reasoner agent
     return Agent(
         name=name,
         model=model,
         instructions=agent_instructions,
-        **kwargs
+        model_settings=model_settings,
     )
 
 

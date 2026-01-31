@@ -276,3 +276,204 @@ def filter_false_positives(
         "false_positives": false_positives,
         "filter_rate": f"{(len(false_positives)/len(findings)*100):.1f}%" if findings else "0%"
     }, indent=2)
+
+
+def _extract_field(obj, keys):
+    for key in keys:
+        if isinstance(obj, dict) and key in obj and obj[key] not in [None, ""]:
+            return obj[key]
+    return None
+
+
+def _stringify_field(value) -> str:
+    if isinstance(value, list):
+        return " ".join([str(v) for v in value if v is not None])
+    return "" if value is None else str(value)
+
+
+def _looks_permissionless(text: str) -> bool:
+    if not text:
+        return False
+    lowered = text.lower()
+    allow_markers = [
+        "permissionless",
+        "public caller",
+        "anyone can",
+        "no auth",
+        "unauthenticated",
+    ]
+    return any(marker in lowered for marker in allow_markers)
+
+
+def _looks_privileged(text: str) -> bool:
+    if not text:
+        return False
+    lowered = text.lower()
+    privileged_markers = [
+        "admin",
+        "onlyadmin",
+        "owner",
+        "onlyowner",
+        "governance",
+        "multisig",
+        "timelock",
+        "operator",
+        "privileged",
+        "insider",
+        "oracle",
+        "keeper",
+        "relayer",
+    ]
+    return any(marker in lowered for marker in privileged_markers)
+
+
+def _normalize_findings(raw):
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, dict):
+        for key in ["findings", "items", "issues", "results"]:
+            if key in raw and isinstance(raw[key], list):
+                return raw[key]
+    return []
+
+
+@function_tool
+def council_filter_findings(
+    findings_json: str,
+    require_permissionless: bool = True,
+    require_signal_fields: bool = True
+) -> str:
+    """
+    Council-based false positive filter anchored to Signal/Karen Council rules.
+
+    Enforces permissionless-only findings and strict evidence requirements.
+    Findings missing required evidence are bucketed as NEEDS_EVIDENCE.
+    """
+    try:
+        payload = json.loads(findings_json)
+    except json.JSONDecodeError:
+        return json.dumps({
+            "error": "Invalid JSON format",
+            "validated": [],
+            "needs_evidence": [],
+            "rejected": [],
+        }, indent=2)
+
+    findings = _normalize_findings(payload)
+    if not findings:
+        return json.dumps({
+            "error": "Findings must be a JSON array or contain 'findings' list",
+            "validated": [],
+            "needs_evidence": [],
+            "rejected": [],
+        }, indent=2)
+
+    required_fields = [
+        "target_asset",
+        "vulnerability_class",
+        "exact_endpoint_or_component",
+        "preconditions",
+        "reproduction_steps",
+        "expected_vs_observed",
+        "impact_statement",
+        "proof_artifacts",
+    ]
+
+    validated = []
+    needs_evidence = []
+    rejected = []
+
+    for finding in findings:
+        if not isinstance(finding, dict):
+            rejected.append({
+                "finding": finding,
+                "reason": "Invalid finding format (expected object).",
+            })
+            continue
+
+        evidence = finding.get("evidence", {}) if isinstance(finding.get("evidence"), dict) else {}
+        claim = finding.get("claim", {}) if isinstance(finding.get("claim"), dict) else {}
+        signal_claim = {}
+        if isinstance(finding.get("signal_council"), dict):
+            signal_claim = finding["signal_council"].get("claim", {}) or {}
+
+        # Permissionless gate
+        permissionless_flag = finding.get("permissionless", None)
+        preconditions_text = _stringify_field(_extract_field(
+            finding, ["preconditions", "attack_requirements", "access"]
+        ))
+        permissionless_signal = _looks_permissionless(preconditions_text)
+
+        if require_permissionless:
+            if permissionless_flag is False:
+                rejected.append({
+                    "finding": finding,
+                    "reason": "Not permissionless (explicit flag).",
+                })
+                continue
+            if permissionless_flag is None and _looks_privileged(preconditions_text):
+                rejected.append({
+                    "finding": finding,
+                    "reason": "Not permissionless (privileged access indicated).",
+                })
+                continue
+            if permissionless_flag is None and not permissionless_signal:
+                needs_evidence.append({
+                    "finding": finding,
+                    "reason": "Permissionless access not demonstrated.",
+                })
+                continue
+
+        # Council verdict gates if provided
+        karen_status = ""
+        signal_status = ""
+        if isinstance(finding.get("karen_council"), dict):
+            karen_status = str(finding["karen_council"].get("status", "")).upper()
+        if isinstance(finding.get("signal_council"), dict):
+            signal_status = str(finding["signal_council"].get("status", "")).upper()
+
+        if karen_status in ["DISPROVED", "FALSE-POSITIVE", "FALSE_POSITIVE"]:
+            rejected.append({"finding": finding, "reason": "Karen Council disproved."})
+            continue
+        if signal_status in ["OUT_OF_SCOPE", "DUPLICATE_SUSPECTED", "NOT_A_VULN", "LOW_IMPACT", "UNREPRODUCIBLE"]:
+            rejected.append({"finding": finding, "reason": "Signal Council rejected."})
+            continue
+        if signal_status in ["PENDING_EVIDENCE", "NEEDS_MORE_DATA"]:
+            needs_evidence.append({"finding": finding, "reason": "Signal Council needs evidence."})
+            continue
+
+        # Evidence requirements
+        missing_fields = []
+        for field in required_fields:
+            value = _extract_field(finding, [field])
+            if value is None:
+                value = _extract_field(evidence, [field])
+            if value is None:
+                value = _extract_field(claim, [field])
+            if value is None:
+                value = _extract_field(signal_claim, [field])
+
+            if value is None or (isinstance(value, (list, str)) and len(value) == 0):
+                missing_fields.append(field)
+
+        if missing_fields and require_signal_fields:
+            needs_evidence.append({
+                "finding": finding,
+                "reason": f"Missing required evidence fields: {', '.join(missing_fields)}",
+                "missing_fields": missing_fields,
+            })
+            continue
+
+        validated.append(finding)
+
+    return json.dumps({
+        "total_findings": len(findings),
+        "validated": validated,
+        "needs_evidence": needs_evidence,
+        "rejected": rejected,
+        "summary": {
+            "validated": len(validated),
+            "needs_evidence": len(needs_evidence),
+            "rejected": len(rejected),
+        }
+    }, indent=2)

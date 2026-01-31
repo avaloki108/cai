@@ -7,7 +7,7 @@ custom enhancement tools for attack graph construction, exploit chain discovery,
 and strategic prioritization.
 
 Architecture:
-- Existing tools = Sensors (Slither, Mythril, Echidna, etc.)
+- Existing tools = Sensors (Slither, Slitheryn, Mythril, etc.)
 - Enhancement tools = Reasoning layer (attack graphs, scoring, orchestration)
 - Game-theoretic approach = Payoff/effort prioritization
 
@@ -27,6 +27,16 @@ from cai.util import load_prompt_template, create_system_prompt_renderer
 from cai.tools.reconnaissance.generic_linux_command import (
     generic_linux_command
 )
+from cai.tools.reconnaissance.filesystem import (
+    list_dir,
+    cat_file,
+    eza_list,
+    less_file,
+    change_directory,
+    pwd_command,
+    find_file,
+    read_file_lines,
+)
 from cai.tools.web.search_web import (
     make_google_search
 )
@@ -43,13 +53,35 @@ from cai.tools.web3_security import (
     # Slither - Static Analysis
     slither_analyze,
     slither_check_upgradeability,
+    slither_detectors_list,
+    slither_printers_list,
+    # Slitheryn - Enhanced Static Analysis with AI
+    slitheryn_analyze,
+    slitheryn_ai_analyze,
+    slitheryn_print,
+    slitheryn_list_detectors,
+    slitheryn_list_printers,
+    slitheryn_triage,
+    slitheryn_from_etherscan,
+    slitheryn_foundry,
+    slitheryn_hardhat,
     # Mythril - Symbolic Execution
     mythril_analyze,
+    mythril_safe_functions,
     mythril_disassemble,
+    mythril_concolic,
+    mythril_foundry,
     mythril_read_storage,
-    # Securify - Formal Verification
+    mythril_list_detectors,
+    mythril_function_to_hash,
+    # Securify - Pattern-Based Analysis
     securify_analyze,
+    securify_from_blockchain,
+    securify_list_patterns,
     securify_compliance_check,
+    securify_critical_only,
+    securify_with_interpreter,
+    securify_visualize_ast,
     # Echidna - Property-based Fuzzing
     echidna_fuzz,
     echidna_assertion_mode,
@@ -63,21 +95,30 @@ from cai.tools.web3_security import (
     generate_fuzz_seeds,
     minimize_fuzz_corpus,
     analyze_fuzz_coverage,
-    # Gambit - Symbolic Execution
-    gambit_analyze,
-    gambit_verify_property,
-    gambit_explore_paths,
+    # Gambit - Mutation Testing
+    gambit_mutate,
+    gambit_summary,
+    gambit_run_tests,
+    gambit_analyze_survivors,
     # Clorgetizer - Gas Analysis
     clorgetizer_analyze,
     clorgetizer_compare_versions,
     clorgetizer_optimize,
     # Certora - Formal Verification
     certora_verify,
-    certora_run_tests,
+    certora_foundry,
+    certora_project_sanity,
+    certora_compilation_only,
+    certora_with_linking,
     certora_check_invariants,
-    # Oyente Plus - Legacy Symbolic
+    certora_run_tests,
+    # Oyente Plus - Symbolic Execution
     oyente_analyze,
+    oyente_analyze_remote,
     oyente_check_vulnerability,
+    oyente_generate_tests,
+    oyente_with_state,
+    oyente_print_paths,
     oyente_compare_contracts,
     # Auditor Framework
     auditor_run_audit,
@@ -87,8 +128,40 @@ from cai.tools.web3_security import (
     # Validation Tools (CRITICAL for false positive filtering)
     validate_finding,
     filter_false_positives,
+    council_filter_findings,
     # Scribble - Instrumentation
     scribble_run,
+    # Scribble + Mythril - Property-Based Verification
+    scribble_instrument,
+    scribble_arm,
+    scribble_disarm,
+    scribble_mythril_verify,
+    scribble_coverage_check,
+    generate_scribble_annotations,
+    # WASP - Web3 Audit Security Platform
+    wasp_audit,
+    wasp_quick,
+    wasp_ai_analyze,
+    wasp_gen_invariants,
+    wasp_gen_spec,
+    wasp_categories,
+    wasp_tools,
+    wasp_status,
+    wasp_pattern_scan,
+    wasp_review,
+    wasp_learning_stats,
+    wasp_watch,
+    wasp_dashboard,
+    wasp_init,
+    # Memory + RAG
+    web3_memory_add,
+    web3_memory_query,
+    web3_kb_query,
+    web3_kb_add,
+    web3_rag_query,
+    # Tooling + Workflow
+    web3_tool_status,
+    plan_web3_audit,
 )
 
 # === Custom Enhancement Tools (Reasoning Layer) ===
@@ -140,37 +213,75 @@ web3_bug_bounty_system_prompt = load_prompt_template("prompts/system_web3_bug_bo
 # Core general purpose tools (always included)
 general_tools = [
     execute_code,
+    # File system exploration tools
+    list_dir,
+    cat_file,
+    eza_list,
+    less_file,
+    change_directory,
+    pwd_command,
+    find_file,
+    read_file_lines,
 ]
 
 # Tier 3: Infrastructure reconnaissance tools
-# These expand scope into infra recon - gate behind explicit opt-in
-# Set WEB3_ENABLE_INFRA_TOOLS=true to enable Shodan + generic shell
-tier3_infra_tools = []
+# Always include generic_linux_command for file system exploration (ls, cat, find, etc.)
+# This is essential for understanding project structure before running security tools
+tier3_infra_tools = [
+    generic_linux_command,  # Always available for file system exploration
+]
+# Add other infra tools (Shodan) only if explicitly enabled
 if os.getenv("WEB3_ENABLE_INFRA_TOOLS", "false").lower() == "true":
-    tier3_infra_tools = [
-        generic_linux_command,
+    tier3_infra_tools.extend([
         shodan_search,
         shodan_host_info,
-    ]
+    ])
 
-# Static analysis sensors
+# Static analysis sensors (Slither + Slitheryn)
 static_analysis_tools = [
+    # Slither
     slither_analyze,
     slither_check_upgradeability,
+    slither_detectors_list,
+    slither_printers_list,
+    # Slitheryn (Enhanced)
+    slitheryn_analyze,
+    slitheryn_ai_analyze,
+    slitheryn_print,
+    slitheryn_list_detectors,
+    slitheryn_list_printers,
+    slitheryn_triage,
+    slitheryn_from_etherscan,
+    slitheryn_foundry,
+    slitheryn_hardhat,
+    # Securify
     securify_analyze,
+    securify_from_blockchain,
+    securify_list_patterns,
     securify_compliance_check,
+    securify_critical_only,
+    securify_with_interpreter,
+    securify_visualize_ast,
 ]
 
-# Symbolic execution sensors
+# Symbolic execution sensors (Mythril, Oyente)
 symbolic_execution_tools = [
+    # Mythril
     mythril_analyze,
+    mythril_safe_functions,
     mythril_disassemble,
+    mythril_concolic,
+    mythril_foundry,
     mythril_read_storage,
-    gambit_analyze,
-    gambit_verify_property,
-    gambit_explore_paths,
+    mythril_list_detectors,
+    mythril_function_to_hash,
+    # Oyente Plus
     oyente_analyze,
+    oyente_analyze_remote,
     oyente_check_vulnerability,
+    oyente_generate_tests,
+    oyente_with_state,
+    oyente_print_paths,
     oyente_compare_contracts,
 ]
 
@@ -188,11 +299,23 @@ fuzzing_tools = [
     analyze_fuzz_coverage,
 ]
 
-# Formal verification tools
+# Mutation testing tools (Gambit)
+mutation_testing_tools = [
+    gambit_mutate,
+    gambit_summary,
+    gambit_run_tests,
+    gambit_analyze_survivors,
+]
+
+# Formal verification tools (Certora)
 formal_verification_tools = [
     certora_verify,
-    certora_run_tests,
+    certora_foundry,
+    certora_project_sanity,
+    certora_compilation_only,
+    certora_with_linking,
     certora_check_invariants,
+    certora_run_tests,
 ]
 
 # Gas and optimization tools
@@ -211,10 +334,58 @@ audit_tools = [
     scribble_run,
 ]
 
+# Scribble + Mythril property-based verification tools
+property_verification_tools = [
+    scribble_instrument,
+    scribble_arm,
+    scribble_disarm,
+    scribble_mythril_verify,
+    scribble_coverage_check,
+    generate_scribble_annotations,
+]
+
+# WASP - Web3 Audit Security Platform (Orchestrator)
+wasp_platform_tools = [
+    wasp_audit,
+    wasp_quick,
+    wasp_ai_analyze,
+    wasp_gen_invariants,
+    wasp_gen_spec,
+    wasp_categories,
+    wasp_tools,
+    wasp_status,
+    wasp_pattern_scan,
+    wasp_review,
+    wasp_learning_stats,
+    wasp_watch,
+    wasp_dashboard,
+    wasp_init,
+]
+
 # Validation tools (CRITICAL for reducing false positives)
 validation_tools = [
     validate_finding,
     filter_false_positives,
+    council_filter_findings,
+]
+
+# Memory bank tools
+memory_tools = [
+    web3_memory_add,
+    web3_memory_query,
+]
+
+# RAG knowledge base tools
+rag_tools = [
+    web3_kb_query,
+    web3_kb_add,
+    web3_rag_query,
+]
+
+# Workflow and tooling utilities
+workflow_tools = [
+    web3_tool_status,
+    plan_web3_audit,
 ]
 
 # Game-theoretic enhancement tools (reasoning layer)
@@ -245,10 +416,16 @@ tools = (
     static_analysis_tools +
     symbolic_execution_tools +
     fuzzing_tools +
+    mutation_testing_tools +
     formal_verification_tools +
     optimization_tools +
     audit_tools +
+    property_verification_tools +
+    wasp_platform_tools +
     validation_tools +
+    memory_tools +
+    rag_tools +
+    workflow_tools +
     enhancement_tools +
     tier3_infra_tools  # Only included if WEB3_ENABLE_INFRA_TOOLS=true
 )
@@ -266,8 +443,16 @@ web3_bug_bounty_agent = Agent(
     instructions=create_system_prompt_renderer(web3_bug_bounty_system_prompt),
     description="""Specialized Web3 security auditing agent with game-theoretic prioritization.
     
-    Capabilities:
-    - Comprehensive smart contract analysis (static, symbolic, fuzzing, formal)
+    Comprehensive Tool Suite:
+    - Static Analysis: Slither, Slitheryn (with AI), Securify
+    - Symbolic Execution: Mythril (analyze, concolic, foundry), Oyente Plus
+    - Fuzzing: Echidna, Medusa, Fuzz-utils
+    - Mutation Testing: Gambit (mutate, summary, analyze survivors)
+    - Formal Verification: Certora Prover (verify, invariants, linking)
+    - Property Testing: Scribble + Mythril integration
+    - Orchestration: WASP (audit, gen-invariants, gen-spec, pattern-scan)
+    
+    Key Capabilities:
     - Attack graph construction and exploit path discovery
     - Game-theoretic payoff/effort scoring for finding prioritization
     - Cross-contract interaction analysis
@@ -281,7 +466,7 @@ web3_bug_bounty_agent = Agent(
     - Tier 3: Frontend + Infrastructure
     
     Key Differentiator: Prioritizes findings by exploitability (payoff/effort),
-    not just severity. Focuses on real, economically viable exploits.""",
+    not just severity. Focuses on real, permissionless, economically viable exploits.""",
     tools=tools,
     input_guardrails=input_guardrails,
     output_guardrails=output_guardrails,

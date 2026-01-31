@@ -49,25 +49,31 @@ import importlib
 import os
 import pkgutil
 from typing import Dict
-
 from dotenv import load_dotenv  # pylint: disable=import-error # noqa: E501
 
 # Load .env file from current directory before importing agents
-# This ensures that .env files in the user's working directory are loaded
-# even when CAI is installed from PyPI
 load_dotenv(override=True)  # override=True ensures env vars from .env take precedence
-
-# Local application imports
-from cai.agents.flag_discriminator import flag_discriminator, transfer_to_flag_discriminator
-from cai.sdk.agents import Agent
-from cai.sdk.agents.handoffs import handoff
-
-# Extend the search path for namespace packages (allows merging)
-__path__ = pkgutil.extend_path(__path__, __name__)
 
 # Get model from environment or use default
 model = os.environ.get("CAI_MODEL", "alias1")
 
+# Local application imports
+from cai.agents.flag_discriminator import flag_discriminator, transfer_to_flag_discriminator
+from cai.sdk.agents import Agent, handoff
+
+# Initialize AVAILABLE_AGENTS as an empty list
+AVAILABLE_AGENTS = []
+
+# Add web3 security agents to AVAILABLE_AGENTS
+AVAILABLE_AGENTS = AVAILABLE_AGENTS + [
+    "web3_audit_agent",
+    "web3_ai_engine",
+    "web3_traditional_security_agent",
+    "web3_orchestrator"
+]
+
+# Extend the search path for namespace packages (allows merging)
+__path__ = pkgutil.extend_path(__path__, __name__)
 
 PATTERNS = ["hierarchical", "swarm", "chain_of_thought", "auction_based", "recursive"]
 

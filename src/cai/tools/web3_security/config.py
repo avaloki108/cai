@@ -11,22 +11,25 @@ from typing import Dict, Optional
 # Default tool paths
 DEFAULT_TOOL_PATHS = {
     'slither': '/home/dok/tools/W3-AUDIT/slither/slither',
-    'mythril': '/home/dok/tools/mythril2.0/myth',
-    'securify': '/home/dok/tools/securify2.5/securify',
+    'slitheryn': 'slitheryn',  # Enhanced Slither with AI analysis
+    'mythril': 'myth',  # Mythril symbolic execution
+    'securify': 'securify',  # Securify pattern analysis
     'echidna': '/home/dok/tools/echidna/echidna',
     'medusa': '/home/dok/tools/medusa/medusa',
     'fuzz_utils_base': '/home/dok/tools/fuzz-utils',
-    'gambit': '/home/dok/tools/W3-AUDIT/gambit/gambit',
+    'gambit': 'gambit',  # Gambit mutation testing
     'clorgetizer': '/home/dok/tools/W3-AUDIT/clorgetizer/clorgetizer',
-    'certora_prover': '/home/dok/tools/W3-AUDIT/certora-prover/certoraRun',
-    'oyente_plus': '/home/dok/tools/W3-AUDIT/oyente-plus/oyente',
+    'certora_prover': 'certoraRun',  # Certora formal verification
+    'oyente_plus': 'oyente',  # Oyente Plus symbolic execution
     'auditor_framework': '/home/dok/tools/auditor-framework/auditor',
     'scribble': 'scribble',
+    'wasp': 'wasp',  # WASP - Web3 Audit Security Platform
 }
 
 # Environment variable overrides
 ENV_VAR_MAP = {
     'slither': 'WEB3_SLITHER_PATH',
+    'slitheryn': 'WEB3_SLITHERYN_PATH',
     'mythril': 'WEB3_MYTHRIL_PATH',
     'securify': 'WEB3_SECURIFY_PATH',
     'echidna': 'WEB3_ECHIDNA_PATH',
@@ -38,6 +41,7 @@ ENV_VAR_MAP = {
     'oyente_plus': 'WEB3_OYENTE_PLUS_PATH',
     'auditor_framework': 'WEB3_AUDITOR_FRAMEWORK_PATH',
     'scribble': 'WEB3_SCRIBBLE_PATH',
+    'wasp': 'WEB3_WASP_PATH',
 }
 
 
@@ -105,6 +109,7 @@ def get_available_tools() -> Dict[str, bool]:
 
 # Export configured paths
 SLITHER_PATH = get_tool_path('slither')
+SLITHERYN_PATH = get_tool_path('slitheryn')
 MYTHRIL_PATH = get_tool_path('mythril')
 SECURIFY_PATH = get_tool_path('securify')
 ECHIDNA_PATH = get_tool_path('echidna')
@@ -116,3 +121,4 @@ CERTORA_PROVER_PATH = get_tool_path('certora_prover')
 OYENTE_PLUS_PATH = get_tool_path('oyente_plus')
 AUDITOR_FRAMEWORK_PATH = get_tool_path('auditor_framework')
 SCRIBBLE_PATH = get_tool_path('scribble')
+WASP_PATH = get_tool_path('wasp')

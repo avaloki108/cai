@@ -1,19 +1,4 @@
-# Cybersecurity AI (`CAI`)
-
-<div align="center">
-  <p>
-    <a align="center" href="" target="https://github.com/aliasrobotics/CAI">
-      <img
-        width="100%"
-        src="https://github.com/aliasrobotics/cai/raw/main/media/cai.png"
-      >
-    </a>
-  </p>
-
-
-<a href="https://trendshift.io/repositories/14317" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14317" alt="aliasrobotics%2Fcai | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-<a href="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-starred-top-3" target="_blank"><img src="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-starred-top-3" alt="European Open Source - Most Starred Top 3" style=" height: 75px;" height="75"/></a>
-<a href="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-forked-top-3" target="_blank"><img src="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-forked-top-3" alt="European Open Source - Most Forked Top 3" style="height: 75px;" height="75"/></a>
+EEGUD" target="_blank"><img src="https://defiant.vc/api/european-open-source/badge?domain=aliasrobotics.com&style=most-forked-top-3" alt="European Open Source - Most Forked Top 3" style="height: 75px;" height="75"/></a>
 
 
 
@@ -28,7 +13,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2506.23592-b31b1b.svg)](https://arxiv.org/pdf/2506.23592)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.13588-b31b1b.svg)](https://arxiv.org/pdf/2508.13588)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.21669-b31b1b.svg)](https://arxiv.org/pdf/2508.21669)
-[![arXiv](https://img.shields.io/badge/arXiv-2509.14096-b31b1b.svg)](https://arxiv.org/pdf/2509.14096) 
+[![arXiv](https://img.shields.io/badge/arXiv-2509.14096-b31b1b.svg)](https://arxiv.org/pH NBVBGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGY                                               YYYYYYYYYYU7Y7YYYUdf/2509.14096) 
 [![arXiv](https://img.shields.io/badge/arXiv-2509.14139-b31b1b.svg)](https://arxiv.org/pdf/2509.14139)
 [![arXiv](https://img.shields.io/badge/arXiv-2510.17521-b31b1b.svg)](https://arxiv.org/pdf/2510.17521)
 [![arXiv](https://img.shields.io/badge/arXiv-2510.24317-b31b1b.svg)](https://arxiv.org/pdf/2510.24317)

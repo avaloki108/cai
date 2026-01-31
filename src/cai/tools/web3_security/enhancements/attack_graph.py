@@ -32,6 +32,14 @@ VULN_TYPE_MAPPING = {
     "oracle-manipulation": {"category": "oracle", "entry_potential": True, "severity": 9},
     "price-manipulation": {"category": "oracle", "entry_potential": True, "severity": 9},
     "stale-price": {"category": "oracle", "entry_potential": True, "severity": 7},
+    "twap-manipulation": {"category": "oracle", "entry_potential": True, "severity": 8},
+    "oracle-staleness": {"category": "oracle", "entry_potential": True, "severity": 7},
+
+    # Flash loans / MEV
+    "flash-loan-attack": {"category": "flash_loan", "entry_potential": True, "severity": 9},
+    "flashloan": {"category": "flash_loan", "entry_potential": True, "severity": 9},
+    "mev-sandwich": {"category": "mev", "entry_potential": True, "severity": 7},
+    "sandwich-attack": {"category": "mev", "entry_potential": True, "severity": 7},
     
     # Arithmetic
     "divide-before-multiply": {"category": "arithmetic", "entry_potential": False, "severity": 5},
@@ -42,6 +50,21 @@ VULN_TYPE_MAPPING = {
     "low-level-calls": {"category": "external_call", "entry_potential": True, "severity": 6},
     "unchecked-lowlevel": {"category": "external_call", "entry_potential": True, "severity": 7},
     "delegatecall-loop": {"category": "external_call", "entry_potential": True, "severity": 8},
+
+    # DeFi / Governance / Bridge
+    "liquidation-issue": {"category": "liquidation", "entry_potential": True, "severity": 8},
+    "health-factor-bypass": {"category": "liquidation", "entry_potential": True, "severity": 8},
+    "governance-attack": {"category": "governance", "entry_potential": True, "severity": 8},
+    "timelock-bypass": {"category": "governance", "entry_potential": True, "severity": 8},
+    "bridge-replay": {"category": "bridge", "entry_potential": True, "severity": 9},
+    "bridge-message-validation": {"category": "bridge", "entry_potential": True, "severity": 9},
+    "cross-chain-replay": {"category": "bridge", "entry_potential": True, "severity": 8},
+
+    # Token handling / signature
+    "fee-on-transfer": {"category": "token_handling", "entry_potential": True, "severity": 6},
+    "permit-replay": {"category": "signature", "entry_potential": True, "severity": 7},
+    "signature-replay": {"category": "signature", "entry_potential": True, "severity": 7},
+    "share-inflation": {"category": "accounting", "entry_potential": True, "severity": 7},
     
     # Default
     "default": {"category": "other", "entry_potential": False, "severity": 5},
@@ -92,9 +115,35 @@ def build_attack_graph(findings: str, contract_code: str = "", ctf=None) -> str:
         build_attack_graph('[{"type": "reentrancy-eth", "severity": "High", "location": {"contract": "Vault", "function": "withdraw"}}]')
     """
     try:
-        # Parse findings
+        # Parse findings with robust error handling
         if isinstance(findings, str):
-            findings_list = json.loads(findings)
+            # Try to clean up potentially malformed JSON
+            findings_str = findings.strip()
+            
+            # Handle common issues with escaped quotes or truncated JSON
+            try:
+                findings_list = json.loads(findings_str)
+            except json.JSONDecodeError as e:
+                # Try to fix common issues
+                # Remove any trailing incomplete data
+                if "Expecting ',' delimiter" in str(e) or "Expecting value" in str(e):
+                    # Find the last complete object/array
+                    bracket_count = 0
+                    last_valid = 0
+                    for i, c in enumerate(findings_str):
+                        if c in '[{':
+                            bracket_count += 1
+                        elif c in ']}':
+                            bracket_count -= 1
+                            if bracket_count == 0:
+                                last_valid = i + 1
+                    
+                    if last_valid > 0:
+                        findings_list = json.loads(findings_str[:last_valid])
+                    else:
+                        raise e
+                else:
+                    raise e
         else:
             findings_list = findings
         
@@ -109,6 +158,20 @@ def build_attack_graph(findings: str, contract_code: str = "", ctf=None) -> str:
             finding_type = finding.get("type", finding.get("check", "unknown"))
             vuln_meta = _get_vuln_metadata(finding_type)
             
+            # Handle confidence - can be string ("HIGH") or number (0.9)
+            raw_confidence = finding.get("confidence", 0.5)
+            if isinstance(raw_confidence, str):
+                confidence_map = {"high": 0.9, "medium": 0.6, "low": 0.3, "critical": 0.95}
+                confidence = confidence_map.get(raw_confidence.lower(), 0.5)
+            else:
+                confidence = float(raw_confidence) if raw_confidence else 0.5
+            
+            # Handle function - might be string or list
+            location = finding.get("location", {})
+            func = location.get("function", finding.get("function", "Unknown"))
+            if isinstance(func, list):
+                func = func[0] if func else "Unknown"
+            
             node = {
                 "id": f"node_{node_id}",
                 "type": finding_type,
@@ -116,13 +179,11 @@ def build_attack_graph(findings: str, contract_code: str = "", ctf=None) -> str:
                 "severity": finding.get("severity", vuln_meta["severity"]),
                 "severity_numeric": vuln_meta["severity"],
                 "entry_potential": vuln_meta["entry_potential"],
-                "location": finding.get("location", {}),
-                "contract": finding.get("location", {}).get("contract", 
-                           finding.get("contract", "Unknown")),
-                "function": finding.get("location", {}).get("function",
-                           finding.get("function", "Unknown")),
+                "location": location,
+                "contract": location.get("contract", finding.get("contract", "Unknown")),
+                "function": func,
                 "description": finding.get("description", ""),
-                "confidence": finding.get("confidence", 0.5),
+                "confidence": confidence,
                 "raw_finding": finding,
             }
             nodes.append(node)

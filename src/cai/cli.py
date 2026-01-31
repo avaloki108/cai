@@ -142,7 +142,9 @@ if os.getenv("CAI_DEBUG", "1") != "2":
     os.environ["PYTHONWARNINGS"] = "ignore"
 
 import asyncio
+import json
 import logging
+import re
 import shlex
 import time
 
@@ -217,6 +219,71 @@ class ComprehensiveErrorFilter(logging.Filter):
             record.levelname = "DEBUG"
             
         return True
+
+
+def _extract_council_payload(text: str):
+    if not text:
+        return None
+    label = "COUNCIL_FINDINGS_JSON"
+    idx = text.find(label)
+    if idx == -1:
+        return None
+    tail = text[idx + len(label):]
+    match = re.search(r"[\[{]", tail)
+    if not match:
+        return None
+    start = match.start()
+    decoder = json.JSONDecoder()
+    try:
+        payload, _ = decoder.raw_decode(tail[start:].lstrip())
+        return payload
+    except json.JSONDecodeError:
+        return None
+
+
+def _format_council_output(filtered: dict) -> str:
+    summary = filtered.get("summary", {})
+    validated = filtered.get("validated", [])
+    needs_evidence = filtered.get("needs_evidence", [])
+    rejected_count = len(filtered.get("rejected", []))
+    header = (
+        "COUNCIL_GATE_SUMMARY\n"
+        f"validated={summary.get('validated', len(validated))} "
+        f"needs_evidence={summary.get('needs_evidence', len(needs_evidence))} "
+        f"rejected={summary.get('rejected', rejected_count)}"
+    )
+    payload = {
+        "validated": validated,
+        "needs_evidence": needs_evidence,
+    }
+    return f"{header}\n\nCOUNCIL_VALIDATED_FINDINGS_JSON\n{json.dumps(payload, indent=2)}"
+
+
+def _replace_last_assistant_message(model, new_content: str):
+    if not hasattr(model, "message_history"):
+        return
+    for idx in range(len(model.message_history) - 1, -1, -1):
+        msg = model.message_history[idx]
+        if msg.get("role") == "assistant":
+            msg["content"] = new_content
+            break
+
+
+def _apply_council_gate(output_text: str):
+    payload = _extract_council_payload(output_text)
+    if payload is None:
+        return None
+    if isinstance(payload, dict) and "validated" in payload and "needs_evidence" in payload:
+        return _format_council_output(payload)
+
+    try:
+        from cai.tools.web3_security.validate_findings import council_filter_findings
+        filtered = json.loads(council_filter_findings(json.dumps(payload)))
+    except Exception:
+        return None
+    if isinstance(filtered, dict) and filtered.get("error"):
+        return None
+    return _format_council_output(filtered)
 
 # Apply comprehensive filter to all relevant loggers
 comprehensive_filter = ComprehensiveErrorFilter()
@@ -1488,6 +1555,9 @@ def run_cai_cli(
                 # Display the results
                 for idx, result in results:
                     if result and hasattr(result, "final_output") and result.final_output:
+                        gated_output = _apply_council_gate(result.final_output)
+                        if gated_output:
+                            result.final_output = gated_output
                         # Add to main message history for context
                         agent.model.add_to_message_history(
                             {"role": "assistant", "content": f"{result.final_output}"}
@@ -1536,6 +1606,12 @@ def run_cai_cli(
                                             }
                                             agent.model.add_to_message_history(tool_msg)
 
+                            if result and hasattr(result, "final_output") and result.final_output:
+                                gated_output = _apply_council_gate(result.final_output)
+                                if gated_output:
+                                    result.final_output = gated_output
+                                    _replace_last_assistant_message(agent.model, gated_output)
+                                    print(f"\n{gated_output}\n")
                             return result
                         except (KeyboardInterrupt, asyncio.CancelledError) as e:
                             # Handle interruption specifically
@@ -1820,6 +1896,13 @@ def run_cai_cli(
                         
                         # Continue the conversation loop instead of crashing
                         continue
+
+                    if response and hasattr(response, "final_output") and response.final_output:
+                        gated_output = _apply_council_gate(response.final_output)
+                        if gated_output:
+                            response.final_output = gated_output
+                            _replace_last_assistant_message(agent.model, gated_output)
+                            print(f"\n{gated_output}\n")
 
                     # En modo no-streaming, procesamos SOLO los tool outputs de response.new_items
                     # Los tool calls (assistant messages) ya se añaden correctamente en openai_chatcompletions.py

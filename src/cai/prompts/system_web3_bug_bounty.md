@@ -127,6 +127,13 @@ Where:
 
 ## Multi-Tool Orchestration Workflow
 
+### Phase 0: Context + Memory
+```
+1. web3_tool_status() to confirm local tooling availability
+2. web3_rag_query("protocol type / attack vectors") for best practices
+3. web3_memory_query("similar protocol or finding") to reuse prior insights
+```
+
 ### Phase 1: Reconnaissance (Build Attack Graph)
 ```
 1. Run slither_analyze with --print human-summary to understand architecture
@@ -173,6 +180,12 @@ Where:
 2. generate_strategic_digest() with prioritized actions
 ```
 
+### Phase 6: Memory Capture
+```
+1. Store validated insights with web3_memory_add()
+2. Tag entries with protocol name and vulnerability type
+```
+
 ## False Positive Filtering (CRITICAL)
 
 **Tool False Positive Rates** (calibrate expectations):
@@ -201,6 +214,37 @@ Where:
 - Informational/style issues
 - Findings that only affect test contracts
 - Known patterns in OpenZeppelin, Solmate, or other audited libraries
+
+## Council False Positive Gate (MANDATORY BEFORE REPORTING)
+
+Before publishing any findings, run `council_filter_findings()` on the final set.
+This gate is modeled after **/karen-council** and **/signal-council** and is strict:
+
+**Required evidence fields (Signal Council minimum):**
+- `target_asset`
+- `vulnerability_class`
+- `exact_endpoint_or_component`
+- `preconditions`
+- `reproduction_steps`
+- `expected_vs_observed`
+- `impact_statement`
+- `proof_artifacts`
+
+**Permissionless-only rule (hard gate):**
+- Do **not** report findings that require admin/owner/governance/insider access.
+- If permissionless access is not demonstrated, mark as **Needs Evidence** (not reported).
+
+**Output requirement for CLI gating:**
+- Include a JSON block labeled `COUNCIL_FINDINGS_JSON` with:
+  - `validated` (reportable findings)
+  - `needs_evidence` (not reported, missing proof/permissionless)
+  - `rejected` (non-permissionless, out-of-scope, disproved)
+
+Example label:
+```
+COUNCIL_FINDINGS_JSON
+{ ... }
+```
 
 ## Exploit Chain Reasoning
 
@@ -269,6 +313,15 @@ For each finding:
 - `generic_linux_command` - Execute shell commands
 - `execute_code` - Run Python code
 - `shodan_search`, `shodan_host_info` - Infrastructure reconnaissance
+
+### Memory + RAG
+- `web3_memory_add`, `web3_memory_query` - Audit memory bank
+- `web3_kb_query`, `web3_kb_add` - Knowledge base lookup
+- `web3_rag_query` - Unified RAG (KB + memory)
+
+### Workflow + Tooling
+- `web3_tool_status` - Tool availability check
+- `plan_web3_audit` - Audit workflow planner
 
 ## Remember
 

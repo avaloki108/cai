@@ -4,12 +4,42 @@ Generic agent factory module for creating agent instances dynamically.
 
 import importlib
 import os
+from pathlib import Path
 from typing import Callable, Dict
 
 from openai import AsyncOpenAI
 
 from cai.sdk.agents import Agent, OpenAIChatCompletionsModel
 from cai.sdk.agents.logger import logger
+from cai.util import append_instructions
+
+_GRIT_INSTRUCTIONS: str | None = None
+
+
+def _strip_yaml_front_matter(text: str) -> str:
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return text
+    for idx in range(1, len(lines)):
+        if lines[idx].strip() == "---":
+            return "\n".join(lines[idx + 1 :])
+    return text
+
+
+def _load_grit_instructions() -> str:
+    global _GRIT_INSTRUCTIONS
+    if _GRIT_INSTRUCTIONS is not None:
+        return _GRIT_INSTRUCTIONS
+    grit_path = os.getenv("CAI_GRIT_PATH", "docs/grit.md")
+    try:
+        grit_text = Path(grit_path).read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        logger.debug("Grit instructions not loaded from %s: %s", grit_path, exc)
+        _GRIT_INSTRUCTIONS = ""
+        return _GRIT_INSTRUCTIONS
+    grit_text = _strip_yaml_front_matter(grit_text).strip()
+    _GRIT_INSTRUCTIONS = grit_text
+    return _GRIT_INSTRUCTIONS
 
 
 def create_generic_agent_factory(
@@ -65,6 +95,10 @@ def create_generic_agent_factory(
 
         # Clone the agent with the new model
         cloned_agent = original_agent.clone(model=new_model)
+
+        grit_instructions = _load_grit_instructions()
+        if grit_instructions:
+            append_instructions(cloned_agent, "\n\n" + grit_instructions)
         
         # Update agent name if custom name was provided
         if custom_name:

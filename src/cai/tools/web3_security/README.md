@@ -317,6 +317,21 @@ audit_report = auditor_run_audit("target-contract.sol", "full", "--format json")
 coverage = echidna_coverage("target-contract.sol")
 ```
 
+## Memory + RAG
+
+Use the built-in memory bank and knowledge base to reuse prior insights and best practices:
+
+```python
+# Query best practices and attack vectors
+kb_hits = web3_kb_query("oracle manipulation and flash loans", top_k=5)
+
+# Query prior audit memory
+mem_hits = web3_memory_query("lending protocol liquidation edge cases", top_k=5)
+
+# Unified RAG across knowledge base and memory
+rag_hits = web3_rag_query("bridge replay protection", top_k=5)
+```
+
 ## Tool Paths Configuration
 
 All tools are expected to be installed at:
