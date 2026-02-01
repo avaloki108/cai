@@ -1,11 +1,14 @@
 """
 Module for displaying the CAI banner and welcome message.
 """
+
 # Standard library imports
 import os
 import glob
 import logging
 import sys
+import importlib.metadata
+from pathlib import Path
 from configparser import ConfigParser
 
 # Third-party imports
@@ -25,8 +28,35 @@ else:
         pass
 
 
+def _find_pyproject():
+    for start in (Path.cwd(), Path(__file__).resolve()):
+        base = start if start.is_dir() else start.parent
+        for parent in [base, *base.parents]:
+            candidate = parent / "pyproject.toml"
+            if candidate.is_file():
+                return candidate
+    return None
+
+
+def _get_version_from_metadata():
+    for dist_name in ("cai-framework", "cai", "cai_framework"):
+        try:
+            return importlib.metadata.version(dist_name)
+        except importlib.metadata.PackageNotFoundError:
+            continue
+    return None
+
+
 def get_version():
     """Get the CAI version from pyproject.toml."""
+    version = _get_version_from_metadata()
+    if version:
+        return version
+
+    pyproject_path = _find_pyproject()
+    if not pyproject_path:
+        return "unknown"
+
     version = "unknown"
     try:
         # Determine which TOML parser to use
@@ -38,16 +68,16 @@ def get_version():
             except ImportError:
                 logging.warning("Could not import tomli. Falling back to manual parsing.")
                 # Simple manual parsing for version only
-                with open('pyproject.toml', 'r', encoding='utf-8') as f:
+                with open(pyproject_path, 'r', encoding='utf-8') as f:
                     for line in f:
                         if line.strip().startswith('version = '):
                             # Extract version from line like 'version = "0.4.0"'
                             version = line.split('=')[1].strip().strip('"\'')
                             return version
                 return version
-                
+
         # Use proper TOML parser if available
-        with open('pyproject.toml', 'rb') as f:
+        with open(pyproject_path, 'rb') as f:
             config = toml_parser.load(f)
         version = config.get('project', {}).get('version', 'unknown')
     except Exception as e:  # pylint: disable=broad-except

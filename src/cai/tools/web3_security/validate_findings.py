@@ -9,6 +9,9 @@ from cai.sdk.agents import function_tool
 import json
 import re
 
+from .finding_schema import ensure_finding_dict
+
+
 
 @function_tool
 def validate_finding(
@@ -222,60 +225,124 @@ def filter_false_positives(
         - filtered_findings: list - Valid findings with validation metadata
         - false_positives: list - Filtered out findings with reasons
     """
-    
-    try:
-        findings = json.loads(findings_json)
-    except json.JSONDecodeError:
-        return json.dumps({
-            "error": "Invalid JSON format",
-            "total_findings": 0,
-            "valid_findings": 0,
-            "filtered_findings": [],
-            "false_positives": []
-        }, indent=2)
-    
+    result = _filter_false_positives_impl(
+        findings_json=findings_json,
+        tool_source=tool_source,
+        min_confidence=min_confidence,
+    )
+    return json.dumps(result, indent=2)
+
+
+def _filter_false_positives_impl(
+    findings_json,
+    tool_source: str = "slither",
+    min_confidence: float = 0.5,
+) -> dict:
+    if isinstance(findings_json, str):
+        try:
+            findings = json.loads(findings_json)
+        except json.JSONDecodeError:
+            return {
+                "error": "Invalid JSON format",
+                "total_findings": 0,
+                "valid_findings": 0,
+                "filtered_findings": [],
+                "false_positives": [],
+            }
+    else:
+        findings = findings_json
+
     if not isinstance(findings, list):
-        return json.dumps({
+        return {
             "error": "Findings must be a JSON array",
             "total_findings": 0,
             "valid_findings": 0,
             "filtered_findings": [],
-            "false_positives": []
-        }, indent=2)
-    
+            "false_positives": [],
+        }
+
     valid_findings = []
     false_positives = []
-    
+
+    required_fields = {
+        "attack_path": ["attack_path", "attack_path_summary", "exploit_path"],
+        "preconditions": ["preconditions", "requirements", "assumptions"],
+        "affected_asset": ["affected_asset", "asset", "impact_asset"],
+        "permissionless": ["permissionless", "permissionless_proof", "access_control"],
+    }
+
+    def _evidence_value(normalized_finding, keys):
+        evidence = normalized_finding.get("evidence") or {}
+        for key in keys:
+            value = evidence.get(key) if isinstance(evidence, dict) else None
+            if value not in (None, "", [], {}):
+                return value
+            value = normalized_finding.get(key)
+            if value not in (None, "", [], {}):
+                return value
+        return None
+
     for finding in findings:
-        finding_type = finding.get("type", finding.get("vulnerability_type", "unknown"))
-        description = finding.get("description", finding.get("message", ""))
-        location = finding.get("location", finding.get("code_context", ""))
-        
-        # Validate the finding
-        validation_result = json.loads(validate_finding(
-            finding_type=finding_type,
-            finding_description=description,
-            code_context=location,
-            tool_source=tool_source
-        ))
-        
+        normalized = ensure_finding_dict(finding, tool_source).to_dict()
+        finding_type = normalized.get("type", "unknown")
+        description = normalized.get("description", "")
+        location = normalized.get("location", "")
+
+        missing = []
+        for field_name, keys in required_fields.items():
+            value = _evidence_value(normalized, keys)
+            if field_name == "permissionless" and not value:
+                if _looks_permissionless(description) or _looks_permissionless(location):
+                    value = True
+            if not value:
+                missing.append(field_name)
+
+        if missing:
+            validation_result = {
+                "is_valid": False,
+                "confidence": 0.1,
+                "reasoning": (
+                    "Missing required evidence fields for exploitability: "
+                    + ", ".join(missing)
+                ),
+                "false_positive_pattern": "missing_evidence",
+                "recommendations": [
+                    "Include exploit path summary, preconditions, affected asset, and permissionless proof",
+                ],
+            }
+            false_positives.append({
+                "finding": normalized,
+                "validation": validation_result,
+                "reason": validation_result["reasoning"],
+            })
+            continue
+
+        validation_result = json.loads(
+            validate_finding(
+                finding_type=finding_type,
+                finding_description=description,
+                code_context=location,
+                tool_source=tool_source,
+            )
+        )
+
         if validation_result["is_valid"] and validation_result["confidence"] >= min_confidence:
-            finding["validation"] = validation_result
-            valid_findings.append(finding)
+            normalized["validation"] = validation_result
+            valid_findings.append(normalized)
         else:
             false_positives.append({
-                "finding": finding,
+                "finding": normalized,
                 "validation": validation_result,
-                "reason": validation_result["reasoning"]
+                "reason": validation_result["reasoning"],
             })
-    
-    return json.dumps({
+
+    return {
         "total_findings": len(findings),
         "valid_findings": len(valid_findings),
         "filtered_findings": valid_findings,
         "false_positives": false_positives,
-        "filter_rate": f"{(len(false_positives)/len(findings)*100):.1f}%" if findings else "0%"
-    }, indent=2)
+        "filter_rate": f"{(len(false_positives)/len(findings)*100):.1f}%" if findings else "0%",
+    }
 
 
 def _extract_field(obj, keys):
@@ -337,7 +404,6 @@ def _normalize_findings(raw):
     return []
 
 
-@function_tool
 def council_filter_findings(
     findings_json: str,
     require_permissionless: bool = True,
@@ -477,3 +543,7 @@ def council_filter_findings(
             "rejected": len(rejected),
         }
     }, indent=2)
+
+
+# Tool wrapper for agent usage
+council_filter_findings_tool = function_tool(council_filter_findings)

@@ -1,0 +1,23 @@
+{
+  "bench_id": "vuldetectbench-mini",
+  "findings": [
+    {
+      "file": "ReentrancyVuln.sol",
+      "type": "reentrancy",
+      "severity": "HIGH",
+      "line_start": 11,
+      "line_end": 15,
+      "trigger_line": 13,
+      "description": "External call before state update in withdraw()"
+    },
+    {
+      "file": "UncheckedReturn.sol",
+      "type": "unchecked-return",
+      "severity": "MEDIUM",
+      "line_start": 15,
+      "line_end": 16,
+      "trigger_line": 16,
+      "description": "ERC20 transfer return value not checked"
+    }
+  ]
+}

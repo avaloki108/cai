@@ -368,6 +368,8 @@ from openai import AsyncOpenAI
 from rich.console import Console
 
 from cai import is_pentestperf_available
+from cai.cli_preflight import handle_standard_flags, extract_initial_prompt
+
 
 # CAI agents and metrics imports
 from cai.agents import get_agent_by_name
@@ -1165,7 +1167,9 @@ def run_cai_cli(
                             # Fallback: create instance if not found (shouldn't happen normally)
                             from cai.agents import get_available_agents
                             from cai.agents.patterns import get_pattern
-                            
+                            from cai.agents.patterns.pattern import PatternType
+                            from cai.agents.patterns.utils import apply_pattern_to_parallel_command, validate_pattern_agents
+
                             # Check if this is a pattern
                             agent_display_name = None
                             actual_agent_name = config.agent_name
@@ -1320,14 +1324,24 @@ def run_cai_cli(
                         input_for_config = config.prompt if config.prompt else user_input
                         tasks.append(run_agent_instance(config, input_for_config))
 
-                    # Wait for all to complete
+
+                    # Wait for all to complete, no matter if some fail
                     results = await asyncio.gather(*tasks, return_exceptions=True)
 
                     # Filter out exceptions and failed results
                     valid_results = []
-                    for item in results:
-                        if isinstance(item, tuple) and len(item) == 2 and item[1] is not None:
-                            valid_results.append(item)
+                    for idx, result in enumerate(results, start=1):
+                        if isinstance(result, Exception):
+                            logger = logging.getLogger(__name__)
+                            error_details = f"Parallel instance {idx} failed: {str(result)}"
+                            logger.error(error_details, exc_info=result)
+                            if os.getenv("CAI_DEBUG", "1") == "2":
+                                console.print(f"[bold red]{error_details}[/bold red]")
+                            continue
+                        if isinstance(result, tuple) and len(result) == 2:
+                            inst_id, res = result
+                            if res is not None and not isinstance(res, Exception):
+                                valid_results.append((inst_id, res))
 
                     return valid_results
 
@@ -1534,16 +1548,24 @@ def run_cai_cli(
                         run_agent_instance(i, conversation_input) for i in range(parallel_count)
                     ]
 
+
                     # Wait for all to complete, no matter if some fail
                     results = await asyncio.gather(*tasks, return_exceptions=True)
 
                     # Filter out exceptions and failed results
                     valid_results = []
-                    for result in results:
+                    for idx, result in enumerate(results, start=1):
+                        if isinstance(result, Exception):
+                            logger = logging.getLogger(__name__)
+                            error_details = f"Parallel instance {idx} failed: {str(result)}"
+                            logger.error(error_details, exc_info=result)
+                            if os.getenv("CAI_DEBUG", "1") == "2":
+                                console.print(f"[bold red]{error_details}[/bold red]")
+                            continue
                         if isinstance(result, tuple) and len(result) == 2:
-                            idx, res = result
+                            inst_id, res = result
                             if res is not None and not isinstance(res, Exception):
-                                valid_results.append((idx, res))
+                                valid_results.append((inst_id, res))
 
                     return valid_results
 
@@ -1715,7 +1737,7 @@ def run_cai_cli(
                             new_loop = asyncio.new_event_loop()
                             asyncio.set_event_loop(new_loop)
                             try:
-                                new_loop.run_until_complete(process_streamed_response(agent, conversation_input))
+                                new_loop.run_until_complete(Runner.run(agent, conversation_input))
                             except OutputGuardrailTripwireTriggered as e:
                                 # Display a user-friendly warning instead of crashing (new event loop)
                                 guardrail_name = e.guardrail_result.guardrail.get_name()
@@ -1803,40 +1825,75 @@ def run_cai_cli(
                         error_str = str(api_error)
                         error_type = type(api_error).__name__
                         error_module = type(api_error).__module__
-                        
+
                         # Direct check for litellm APIError
                         try:
                             import litellm
                             is_litellm_error = isinstance(api_error, litellm.exceptions.APIError)
+                            is_litellm_auth_error = isinstance(
+                                api_error, litellm.exceptions.AuthenticationError
+                            )
                         except (ImportError, AttributeError):
                             is_litellm_error = False
-                        
+                            is_litellm_auth_error = False
+
                         # Check for connection/API errors (including litellm exceptions)
                         # Also check the exception chain for wrapped errors
                         error_repr = repr(api_error).lower()
                         error_str_lower = error_str.lower()
-                        
+
+                        # Authentication errors should show targeted guidance
+                        is_auth_error = (
+                            is_litellm_auth_error or
+                            "authentication" in error_str_lower or
+                            "invalid api key" in error_str_lower or
+                            "incorrect api key" in error_str_lower or
+                            "token expired" in error_str_lower or
+                            "unauthorized" in error_str_lower
+                        )
+
                         # More comprehensive check - look for connection/API related keywords
                         is_connection_error = (
-                            is_litellm_error or
-                            "connection error" in error_str_lower or
-                            "connection" in error_str_lower and "error" in error_str_lower or
-                            "apierror" in error_type.lower() or
-                            "connection" in error_type.lower() or
-                            "timeout" in error_str_lower or
-                            "network" in error_str_lower or
-                            "litellm" in error_module.lower() or
-                            "litellm" in error_repr or
-                            "litellm" in error_str_lower or
-                            "openai" in error_module.lower() or
-                            "openai" in error_repr or
-                            "openai" in error_str_lower or
-                            "authentication" in error_str_lower or
-                            "rate limit" in error_str_lower or
-                            "unreachable" in error_str_lower or
-                            "refused" in error_str_lower
+                            not is_auth_error and (
+                                is_litellm_error or
+                                "connection error" in error_str_lower or
+                                "connection" in error_str_lower and "error" in error_str_lower or
+                                "apierror" in error_type.lower() or
+                                "connection" in error_type.lower() or
+                                "timeout" in error_str_lower or
+                                "network" in error_str_lower or
+                                "litellm" in error_module.lower() or
+                                "litellm" in error_repr or
+                                "litellm" in error_str_lower or
+                                "openai" in error_module.lower() or
+                                "openai" in error_repr or
+                                "openai" in error_str_lower or
+                                "rate limit" in error_str_lower or
+                                "unreachable" in error_str_lower or
+                                "refused" in error_str_lower
+                            )
                         )
-                        
+
+                        if is_auth_error:
+                            console.print(f"\n[bold red]❌ Authentication Error[/bold red]")
+                            main_error = error_str.split('\n')[0] if '\n' in error_str else error_str
+                            console.print(f"[red]{main_error}[/red]")
+                            console.print(
+                                "[yellow]This usually means your API key is missing, expired, or incorrect.[/yellow]"
+                            )
+                            console.print(
+                                "  • Ensure the correct *_API_KEY env var is set (e.g., OPENAI_API_KEY, OPENROUTER_API_KEY)"
+                            )
+                            console.print("  • If you use a .env file, reload your shell or restart CAI")
+                            console.print("  • Run `cai --setup` or `/quickstart` to review configured keys")
+                            console.print("[dim]After updating your key, retry the request.[/dim]\n")
+
+                            logger = logging.getLogger(__name__)
+                            logger.warning(f"API authentication error: {str(api_error)}")
+
+                            # Continue the loop so user can try again
+                            continue
+
                         if is_connection_error:
                             # Show connection errors to the user even in normal mode
                             console.print(f"\n[bold red]❌ Connection Error[/bold red]")
@@ -2058,6 +2115,7 @@ def create_last_log_symlink(log_filename):
         pass
 
 
+
 def main():
     # Apply litellm patch to fix the __annotations__ error
     patch_applied = fix_litellm_transcription_annotations()
@@ -2070,16 +2128,16 @@ def main():
         )
 
     # Check for command-line arguments to use as initial prompt
-    initial_prompt = None
-    if len(sys.argv) > 1:
-        initial_prompt = sys.argv[1]
+    if handle_standard_flags(sys.argv):
+        return
+    initial_prompt = extract_initial_prompt(sys.argv)
 
     # Get agent type from environment variables or use default
     agent_type = os.getenv("CAI_AGENT_TYPE", "one_tool_agent")
 
     # If CAI_AGENT_TYPE points at a PARALLEL pattern (e.g. "offsec_pattern"),
     # apply it to the parallel execution system and switch to a runnable base
-    # agent to avoid treating the pattern pseudo-agent as a real Agent.
+    # agent to avoid treating the pattern system as a real Agent.
     try:
         from cai.agents.patterns import get_pattern
         from cai.agents.patterns.pattern import PatternType

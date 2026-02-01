@@ -83,11 +83,11 @@ def check_tool_paths():
 
     tools = {
         'Slither': '/home/dok/tools/slither/slither',
-        'Mythril': '/home/dok/tools/mythril2.0/myth',
+        'Mythril': '/home/dok/tools/w3-audit/mythril2.0/myth2',
         'Securify': '/home/dok/tools/securify2.5/securify',
-        'Echidna': '/home/dok/tools/echidna/echidna',
-        'Medusa': '/home/dok/tools/medusa/medusa',
-        'Fuzz-utils': '/home/dok/tools/fuzz-utils',
+        'Echidna': '/home/dok/tools/w3-audit/echidna/echidna-2.2.7-x86_64-linux/echidna',
+        'Medusa': '/home/dok/tools/w3-audit/medusa',
+        'Fuzz-utils': '/home/dok/tools/w3-audit/fuzz-utils',
     }
 
     all_found = True
@@ -137,3 +137,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

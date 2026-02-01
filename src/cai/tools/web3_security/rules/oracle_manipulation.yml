@@ -1,0 +1,67 @@
+# Oracle Manipulation Vulnerability Detection Rules
+name: oracle-manipulation
+version: 1.3
+category: oracle
+severity: high
+confidence: medium
+
+description: |
+  Detects vulnerabilities related to price oracle manipulation,
+  including use of spot prices, single oracle sources, and
+  lack of freshness checks.
+
+false_positive_conditions:
+  - twap_oracle             # Time-weighted average price
+  - chainlink_oracle        # Chainlink with staleness check
+  - multiple_oracle_sources # Using multiple oracles
+  - freshness_check         # Checking update timestamp
+  - price_deviation_check   # Comparing against bounds
+
+detection_patterns:
+  - spot_price_usage
+  - single_oracle_dependency
+  - no_staleness_check
+  - no_price_bounds
+  - manipulable_amm_price
+  - unchecked_oracle_return
+
+required_patterns:
+  - oracle_usage: true
+  - missing_validation: true
+
+tool_weights:
+  slither: 0.70
+  mythril: 0.80
+  manticore: 0.75
+
+examples:
+  - name: "Using spot price from Uniswap"
+    code: |
+      function getPrice() public view returns (uint) {
+          (uint reserve0, uint reserve1,) = pair.getReserves();
+          return (reserve1 * 1e18) / reserve0;  // Easily manipulated!
+      }
+  
+  - name: "No staleness check on Chainlink"
+    code: |
+      function getPrice() public view returns (uint) {
+          (, int price,,,) = priceFeed.latestRoundData();
+          return uint(price);  // No timestamp check!
+      }
+
+impact:
+  - incorrect_pricing
+  - liquidation_exploitation
+  - arbitrage_loss
+  - bad_debt_creation
+
+remediation:
+  - Use TWAP instead of spot price
+  - Implement staleness checks
+  - Use multiple oracle sources
+  - Add price deviation bounds
+  - Validate oracle responses
+
+references:
+  - "https://blog.openzeppelin.com/secure-smart-contract-guidelines-the-dangers-of-price-oracles"
+  - "https://docs.chain.link/data-feeds/price-feeds#check-the-timestamp-of-the-latest-answer"

@@ -1,0 +1,64 @@
+# Access Control Vulnerability Detection Rules
+name: missing-access-control
+version: 1.5
+category: access_control
+severity: critical
+confidence: high
+
+description: |
+  Detects missing or improper access control on sensitive functions
+  that should be restricted to authorized users only.
+
+false_positive_conditions:
+  - onlyOwner_modifier
+  - onlyAdmin_modifier
+  - onlyRole_modifier
+  - require_msg_sender_check
+  - access_control_library  # Using AccessControl from OZ
+  - public_by_design        # Intentionally public function
+
+detection_patterns:
+  - privileged_operation_without_check
+  - state_changing_function_public
+  - fund_transfer_without_auth
+  - upgrade_without_protection
+  - admin_function_unprotected
+
+required_patterns:
+  - privileged_operation: true
+  - missing_modifier: true
+
+tool_weights:
+  slither: 0.85
+  mythril: 0.75
+  securify: 0.80
+  manticore: 0.70
+
+examples:
+  - name: "Unprotected mint function"
+    code: |
+      function mint(address to, uint amount) public {
+          _mint(to, amount);  // Anyone can mint tokens!
+      }
+  
+  - name: "Unprotected upgrade"
+    code: |
+      function upgradeTo(address newImplementation) public {
+          _upgradeTo(newImplementation);  // Anyone can upgrade!
+      }
+
+impact:
+  - unauthorized_access
+  - privilege_escalation
+  - contract_takeover
+  - fund_theft
+
+remediation:
+  - Add onlyOwner or onlyRole modifier
+  - Use OpenZeppelin AccessControl
+  - Implement role-based access control
+  - Add require checks for msg.sender
+
+references:
+  - "https://docs.openzeppelin.com/contracts/4.x/access-control"
+  - "https://swcregistry.io/docs/SWC-105"

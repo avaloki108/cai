@@ -17,6 +17,10 @@ from wasabi import color  # pylint: disable=import-error
 from cai.util import format_time, start_active_timer, stop_active_timer, start_idle_timer, stop_idle_timer, cli_print_tool_output
 
 
+# Default tool timeout (seconds) for local/ssh/ctf/docker runs
+DEFAULT_TOOL_TIMEOUT = int(os.getenv("CAI_TOOL_TIMEOUT_SEC", "120"))
+
+
 # Instead of direct import
 try:
     from cai.cli import START_TIME
@@ -558,7 +562,7 @@ def terminate_session(session_id):
     return result
 
 
-def _run_ctf(ctf, command, stdout=False, timeout=100, workspace_dir=None, stream=False):
+def _run_ctf(ctf, command, stdout=False, timeout=DEFAULT_TOOL_TIMEOUT, workspace_dir=None, stream=False):
     """Runs command in CTF env, changing to workspace_dir first."""
     target_dir = workspace_dir or _get_workspace_dir()
     full_command = f"{command}"
@@ -576,7 +580,7 @@ def _run_ctf(ctf, command, stdout=False, timeout=100, workspace_dir=None, stream
         print(color(error_msg, fg="red"))
         return error_msg
 
-def _run_ssh(command, stdout=False, timeout=100, workspace_dir=None, stream=False):
+def _run_ssh(command, stdout=False, timeout=DEFAULT_TOOL_TIMEOUT, workspace_dir=None, stream=False):
     """Runs command via SSH. Assumes SSH agent or passwordless setup unless sshpass is used externally.""" # noqa E501
     ssh_user = os.environ.get('SSH_USER')
     ssh_host = os.environ.get('SSH_HOST')
@@ -625,7 +629,7 @@ def _run_ssh(command, stdout=False, timeout=100, workspace_dir=None, stream=Fals
         return error_msg
 
 
-async def _run_local_async(command, stdout=False, timeout=100, stream=False, call_id=None, tool_name=None, workspace_dir=None, custom_args=None):
+async def _run_local_async(command, stdout=False, timeout=DEFAULT_TOOL_TIMEOUT, stream=False, call_id=None, tool_name=None, workspace_dir=None, custom_args=None):
     """Async version of _run_local that uses asyncio subprocess for non-blocking execution."""
     import asyncio
     
@@ -874,7 +878,7 @@ async def _run_local_async(command, stdout=False, timeout=100, stream=False, cal
                     call_id=call_id,
                     execution_info=execution_info,
                     token_info=token_info,
-                    streaming=False  # This is non-streaming display
+                    streaming=False  # This is non-streaminging display
                 )
             
             return output.strip()
@@ -952,7 +956,7 @@ async def _run_local_async(command, stdout=False, timeout=100, stream=False, cal
         start_idle_timer()
 
 
-async def _run_docker_async(command, container_id, stdout=False, timeout=100, stream=False, call_id=None, tool_name=None, args=None):
+async def _run_docker_async(command, container_id, stdout=False, timeout=DEFAULT_TOOL_TIMEOUT, stream=False, call_id=None, tool_name=None, args=None):
     """Async version of Docker command execution using asyncio subprocess."""
     import asyncio
     
@@ -1177,7 +1181,7 @@ async def _run_docker_async(command, container_id, stdout=False, timeout=100, st
         start_idle_timer()
 
 
-def _run_local(command, stdout=False, timeout=100, stream=False, call_id=None, tool_name=None, workspace_dir=None, custom_args=None):
+def _run_local(command, stdout=False, timeout=DEFAULT_TOOL_TIMEOUT, stream=False, call_id=None, tool_name=None, workspace_dir=None, custom_args=None):
     """Runs command locally in the specified workspace_dir."""
     # Make sure we're in active time mode for tool execution
     stop_idle_timer()
@@ -1254,24 +1258,47 @@ def _run_local(command, stdout=False, timeout=100, stream=False, call_id=None, t
                 # Don't add refresh_rate to tool_args as it affects command deduplication
                 # The refresh behavior is already handled by the streaming update logic
             
-            # Stream stdout in real-time
-            for line in iter(process.stdout.readline, ''):
-                if not line:
-                    break
+            # Stream stdout in real-time with timeout protection
+            # Use select for non-blocking reads to respect timeout
+            import select
+            start_time = time.time()
+            remaining_timeout = timeout
+            
+            while remaining_timeout > 0:
+                # Check if there's data available to read (with 1 second timeout for responsiveness)
+                ready, _, _ = select.select([process.stdout], [], [], min(1.0, remaining_timeout))
                 
-                # Add to output collection
-                output_buffer.append(line)
-                buffer_size += 1
+                if ready:
+                    line = process.stdout.readline()
+                    if not line:
+                        break  # EOF
+                    
+                    # Add to output collection
+                    output_buffer.append(line)
+                    buffer_size += 1
+                    
+                    # Only update periodically to reduce UI refreshes
+                    if buffer_size >= update_interval:
+                        current_output = ''.join(output_buffer)
+                        update_tool_streaming(tool_name, tool_args, current_output, call_id, token_info)
+                        buffer_size = 0
+                else:
+                    # No data available, check if process has finished
+                    if process.poll() is not None:
+                        break
                 
-                # Only update periodically to reduce UI refreshes
-                if buffer_size >= update_interval:
-                    current_output = ''.join(output_buffer)
-                    update_tool_streaming(tool_name, tool_args, current_output, call_id, token_info)
-                    buffer_size = 0
+                # Update remaining timeout
+                elapsed = time.time() - start_time
+                remaining_timeout = timeout - elapsed
+            
+            # Check if we timed out
+            if remaining_timeout <= 0 and process.poll() is None:
+                process.kill()
+                raise subprocess.TimeoutExpired(command, timeout)
             
             # Finish process
             process.stdout.close()
-            return_code = process.wait(timeout=timeout)
+            return_code = process.wait(timeout=5)  # Short timeout since process should be done
             process_execution_time = time.time() - process_start_time
             
             # Get any stderr output
@@ -1449,7 +1476,7 @@ def _run_local(command, stdout=False, timeout=100, stream=False, call_id=None, t
 
 async def run_command_async(command, ctf=None, stdout=False,  # pylint: disable=too-many-arguments # noqa: E501
                       async_mode=False, session_id=None,
-                      timeout=100, stream=False, call_id=None, tool_name=None, args=None):
+                      timeout=DEFAULT_TOOL_TIMEOUT, stream=False, call_id=None, tool_name=None, args=None):
     """
     Async version of run_command that properly supports parallel execution.
     
@@ -1566,7 +1593,7 @@ async def run_command_async(command, ctf=None, stdout=False,  # pylint: disable=
 
 def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arguments # noqa: E501
                 async_mode=False, session_id=None,
-                timeout=100, stream=False, call_id=None, tool_name=None, args=None):
+                timeout=DEFAULT_TOOL_TIMEOUT, stream=False, call_id=None, tool_name=None, args=None):
     """
     Run command in the appropriate environment (Docker, CTF, SSH, Local)
     and workspace.
@@ -1829,15 +1856,6 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                 
                 # Initialize the streaming session with a consistent call_id format
                 call_id = start_tool_streaming(tool_name, tool_args, call_id, token_info)
-                
-                # Start with a message indicating execution is starting
-                update_tool_streaming(
-                    tool_name,
-                    tool_args,
-                    f"Executing: {command}",  # Show the command being executed
-                    call_id,
-                    token_info
-                )
                 
                 # Ensure workspace directory exists inside the container first
                 mkdir_cmd = [
@@ -2174,6 +2192,9 @@ def run_command(command, ctf=None, stdout=False,  # pylint: disable=too-many-arg
                         "environment": "CTF",
                         "error": str(e)
                     }
+                    
+                    # Get agent token info
+                    token_info = _get_agent_token_info()
                     
                     # Complete the streaming with error output
                     finish_tool_streaming(tool_name, tool_args, error_msg, call_id, execution_info, token_info)

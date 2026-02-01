@@ -9,6 +9,8 @@ from typing import Optional
 from cai.tools.common import run_command
 from cai.sdk.agents import function_tool
 from .config import SLITHER_PATH
+from .tool_cache import load_cached_result, save_cached_result
+
 
 
 @function_tool
@@ -106,35 +108,36 @@ def slither_analyze(
             "unprotected-calls": "unprotected-upgrade",  # Common mistake
             "unchecked-calls": "unchecked-transfer",  # Common mistake
         }
-        
+
         # Check for invalid detector names and provide helpful error
         detector_list = [d.strip() for d in detectors.split(",")]
         invalid_detectors = []
         corrected_detectors = []
-        
+
         for det in detector_list:
             if det in detector_corrections:
                 invalid_detectors.append(det)
                 corrected_detectors.append(detector_corrections[det])
-        
+
         if invalid_detectors:
-            suggestions = ", ".join([f"'{old}' -> '{new}'" for old, new in zip(invalid_detectors, corrected_detectors)])
-            return f"ERROR: Invalid Slither detector names detected:\n{suggestions}\n\nUse 'slither_detectors_list' to see all valid detector names."
-        
+            # Notify user about corrections
+            print(f"Warning: Invalid detector name(s): {', '.join(invalid_detectors)}")
+            print(f"Using corrected detector(s): {', '.join(corrected_detectors)}")
+            # Replace invalid detectors with correct ones
+            detector_list = [detector_corrections.get(d, d) for d in detector_list]
+            detectors = ",".join(detector_list)
+
         cmd_parts.append(f"--detect {detectors}")
 
-    # Add exclusions
+    # Add excluded detectors if specified
     if exclude:
         cmd_parts.append(f"--exclude {exclude}")
 
-    # Add printer (validate common invalid names)
+    # Add printer if specified
     if printer:
-        # Common mistakes: "human-summary" should be "contract-summary" or removed
-        if printer == "human-summary":
-            return "ERROR: 'human-summary' is not a valid Slither printer. Use 'contract-summary' instead, or omit the printer parameter for default output."
         cmd_parts.append(f"--print {printer}")
 
-    # Add JSON output
+    # Add JSON output if specified
     if json_output:
         cmd_parts.append(f"--json {json_output}")
 
@@ -142,8 +145,27 @@ def slither_analyze(
     if args:
         cmd_parts.append(args)
 
+    # Build cache args and check cache (skip if json_output is used)
+    cache_args = {
+        "args": args,
+        "solc_version": solc_version,
+        "detectors": detectors,
+        "exclude": exclude,
+        "printer": printer,
+    }
+    if not json_output:
+        cached = load_cached_result("slither", target, cache_args)
+        if cached is not None:
+            return cached
+
+    # Build the command
     command = " ".join(cmd_parts)
-    return run_command(command, ctf=ctf)
+    result = run_command(command, ctf=ctf)
+
+    if not json_output:
+        save_cached_result("slither", target, cache_args, result)
+
+    return result
 
 
 @function_tool

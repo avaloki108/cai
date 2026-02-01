@@ -69,7 +69,19 @@ AVAILABLE_AGENTS = AVAILABLE_AGENTS + [
     "web3_audit_agent",
     "web3_ai_engine",
     "web3_traditional_security_agent",
-    "web3_orchestrator"
+    "web3_orchestrator",
+    # Aegis-integrated agents
+    "skeptic_alpha",
+    "skeptic_beta",
+    "skeptic_gamma",
+    "manager_vuln",
+    "manager_economic",
+    "manager_access",
+    "critic",
+    "planner",
+    "exploit_synthesizer",
+    "poc_generator",
+    "attributor",
 ]
 
 # Extend the search path for namespace packages (allows merging)

@@ -9,6 +9,8 @@ from typing import Optional
 from cai.tools.common import run_command
 from cai.sdk.agents import function_tool
 from .config import MYTHRIL_PATH
+from .tool_cache import load_cached_result, save_cached_result
+
 
 
 @function_tool
@@ -98,8 +100,27 @@ def mythril_analyze(
 
     args.append(target)
 
+    cache_args = {
+        "solv": solv,
+        "output_format": output_format,
+        "execution_timeout": execution_timeout,
+        "create_timeout": create_timeout,
+        "max_depth": max_depth,
+        "strategy": strategy,
+        "solver_timeout": solver_timeout,
+        "transaction_count": transaction_count,
+        "modules": modules,
+        "rpc": rpc,
+        "extra_args": extra_args,
+    }
+    cached = load_cached_result("mythril", target, cache_args)
+    if cached is not None:
+        return cached
+
     command = f"{MYTHRIL_PATH} {' '.join(args)}"
-    return run_command(command, ctf=ctf)
+    result = run_command(command, ctf=ctf)
+    save_cached_result("mythril", target, cache_args, result)
+    return result
 
 
 @function_tool

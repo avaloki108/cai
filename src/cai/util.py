@@ -30,6 +30,7 @@ from rich.tree import Tree
 from wasabi import color
 
 from cai import is_pentestperf_available
+from cai.util_cache import LRUCache
 
 # Import caibench (pentestperf) if available
 if is_pentestperf_available():
@@ -69,6 +70,10 @@ _CLAUDE_THINKING_PANELS = {}
 # Global flag to track if cleanup is in progress
 _cleanup_in_progress = False
 _cleanup_lock = threading.Lock()
+
+DEFAULT_PRICING_CACHE_MAX = int(os.getenv("CAI_PRICING_CACHE_MAX", "512"))
+DEFAULT_PRICING_CACHE_TTL = float(os.getenv("CAI_PRICING_CACHE_TTL_SEC", "3600"))
+DEFAULT_COST_CACHE_MAX = int(os.getenv("CAI_COST_CACHE_MAX", "2048"))
 
 
 def cleanup_all_streaming_resources():
@@ -406,8 +411,18 @@ class CostTracker:
     interaction_cost: float = 0.0
 
     # Calculation cache
-    model_pricing_cache: Dict[str, tuple] = field(default_factory=dict)
-    calculated_costs_cache: Dict[str, float] = field(default_factory=dict)
+    model_pricing_cache: LRUCache[str, tuple] = field(
+        default_factory=lambda: LRUCache(
+            max_size=DEFAULT_PRICING_CACHE_MAX,
+            ttl_seconds=DEFAULT_PRICING_CACHE_TTL,
+        )
+    )
+    calculated_costs_cache: LRUCache[str, float] = field(
+        default_factory=lambda: LRUCache(
+            max_size=DEFAULT_COST_CACHE_MAX,
+            ttl_seconds=DEFAULT_PRICING_CACHE_TTL,
+        )
+    )
 
     # Track the last calculation to debug inconsistencies
     last_interaction_cost: float = 0.0
@@ -519,11 +534,11 @@ class CostTracker:
         model_name = get_model_name(model_name)
 
         # Check cache first
-        if model_name in self.model_pricing_cache:
-            return self.model_pricing_cache[model_name]
+        cached_pricing = self.model_pricing_cache.get(model_name)
+        if cached_pricing is not None:
+            return cached_pricing
 
         # Try to load pricing from local pricing.json first
-        # Only use if the specific model name exists in the file
         try:
             pricing_path = pathlib.Path("pricing.json")
             if pricing_path.exists():
@@ -536,7 +551,7 @@ class CostTracker:
                         output_cost = pricing_info.get("output_cost_per_token", 0)
 
                         # Cache and return local pricing
-                        self.model_pricing_cache[model_name] = (input_cost, output_cost)
+                        self.model_pricing_cache.set(model_name, (input_cost, output_cost))
                         return input_cost, output_cost
         except Exception as e:
             print(f"  WARNING: Error loading local pricing.json: {str(e)}")
@@ -560,7 +575,7 @@ class CostTracker:
                 output_cost_per_token = pricing_info.get("output_cost_per_token", 0)
 
                 # Cache the results
-                self.model_pricing_cache[model_name] = (input_cost_per_token, output_cost_per_token)
+                self.model_pricing_cache.set(model_name, (input_cost_per_token, output_cost_per_token))
                 return input_cost_per_token, output_cost_per_token
         except Exception as e:
             # Check if it's a network connectivity issue by testing a simple connection
@@ -575,7 +590,7 @@ class CostTracker:
 
         # Default to zero cost if no pricing found (local/free models)
         default_pricing = (0.0, 0.0)
-        self.model_pricing_cache[model_name] = default_pricing
+        self.model_pricing_cache.set(model_name, default_pricing)
         return default_pricing
 
     def calculate_cost(
@@ -594,8 +609,9 @@ class CostTracker:
         cache_key = f"{model_name}_{input_tokens}_{output_tokens}"
 
         # Return cached result if available (unless force_calculation is True)
-        if cache_key in self.calculated_costs_cache and not force_calculation:
-            return self.calculated_costs_cache[cache_key]
+        cached_cost = self.calculated_costs_cache.get(cache_key)
+        if cached_cost is not None and not force_calculation:
+            return cached_cost
 
         # First, try to use litellm's completion_cost method
         try:
@@ -616,7 +632,7 @@ class CostTracker:
             
             # If litellm returns a non-zero cost, use it
             if litellm_cost > 0:
-                self.calculated_costs_cache[cache_key] = litellm_cost
+                self.calculated_costs_cache.set(cache_key, litellm_cost)
                 return litellm_cost
         except Exception:
             # If litellm fails or is not available, continue to fallback
@@ -632,7 +648,7 @@ class CostTracker:
         total_cost = input_cost + output_cost
 
         # Cache the result with full precision
-        self.calculated_costs_cache[cache_key] = total_cost
+        self.calculated_costs_cache.set(cache_key, total_cost)
 
         return total_cost
 

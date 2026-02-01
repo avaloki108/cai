@@ -164,6 +164,7 @@ nohup.out
 .aider*
 caiextensions-*
 pentestperf
+research-docs
 
 # python venvs
 venv*

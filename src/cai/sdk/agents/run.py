@@ -36,6 +36,8 @@ from .handoffs import Handoff, HandoffInputFilter, handoff
 from .items import ItemHelpers, ModelResponse, RunItem, TResponseInputItem
 from .lifecycle import RunHooks
 from .logger import logger
+from .episodic_memory import load_recent_failures, format_failures
+from .plan_first import apply_plan_first
 from .model_settings import ModelSettings
 from .models.interface import Model, ModelProvider
 from .models.openai_provider import OpenAIProvider
@@ -71,6 +73,16 @@ else:
     DEFAULT_PRICE_LIMIT = float("inf")
 
 
+tool_timeout_env = os.getenv("CAI_TOOL_TIMEOUT_SEC")
+if tool_timeout_env is not None:
+    try:
+        DEFAULT_TOOL_TIMEOUT = float(tool_timeout_env)
+    except ValueError:
+        DEFAULT_TOOL_TIMEOUT = 120.0
+else:
+    DEFAULT_TOOL_TIMEOUT = 120.0
+
+
 @dataclass
 class RunConfig:
     """Configures settings for the entire agent run."""
@@ -87,6 +99,9 @@ class RunConfig:
     """Configure global model settings. Any non-null values will override the agent-specific model
     settings.
     """
+
+    tool_timeout_sec: float = DEFAULT_TOOL_TIMEOUT
+    """Default timeout applied to tool execution (seconds)."""
 
     handoff_input_filter: HandoffInputFilter | None = None
     """A global input filter to apply to all handoffs. If `Handoff.input_filter` is set, then that
@@ -174,6 +189,14 @@ class Runner:
             hooks = RunHooks[Any]()
         if run_config is None:
             run_config = RunConfig()
+
+        plan_first_enabled = os.getenv("CAI_PLAN_FIRST", "false").lower() in ("true", "1", "yes")
+        reflexion_enabled = os.getenv("CAI_REFLEXION_MEMORY", "false").lower() in ("true", "1", "yes")
+        if plan_first_enabled:
+            failures_summary = ""
+            if reflexion_enabled:
+                failures_summary = format_failures(load_recent_failures())
+            input = apply_plan_first(input, failures_summary)
 
         tool_use_tracker = AgentToolUseTracker()
 

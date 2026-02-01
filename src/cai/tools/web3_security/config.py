@@ -10,21 +10,24 @@ from typing import Dict, Optional
 
 # Default tool paths
 DEFAULT_TOOL_PATHS = {
-    'slither': '/home/dok/tools/W3-AUDIT/slither/slither',
+    'slither': 'slither',  # Will be found via PATH
     'slitheryn': 'slitheryn',  # Enhanced Slither with AI analysis
-    'mythril': 'myth',  # Mythril symbolic execution
+    'mythril': 'myth',  # Mythril symbolic execution (via PATH)
     'securify': 'securify',  # Securify pattern analysis
-    'echidna': '/home/dok/tools/echidna/echidna',
-    'medusa': '/home/dok/tools/medusa/medusa',
-    'fuzz_utils_base': '/home/dok/tools/fuzz-utils',
+    'echidna': 'echidna',  # Echidna fuzzer (via PATH)
+    'medusa': 'medusa',  # Medusa fuzzer (via PATH)
+    'fuzz_utils_base': '/home/dok/tools/w3-audit/fuzz-utils',  # Directory-based
     'gambit': 'gambit',  # Gambit mutation testing
-    'clorgetizer': '/home/dok/tools/W3-AUDIT/clorgetizer/clorgetizer',
+    'clorgetizer': 'clorgetizer',  # Via PATH
     'certora_prover': 'certoraRun',  # Certora formal verification
     'oyente_plus': 'oyente',  # Oyente Plus symbolic execution
-    'auditor_framework': '/home/dok/tools/auditor-framework/auditor',
+    'auditor_framework': '/home/dok/tools/auditor-framework/auditor',  # Directory-based
     'scribble': 'scribble',
     'wasp': 'wasp',  # WASP - Web3 Audit Security Platform
 }
+
+# Tools that are directories rather than executables
+DIRECTORY_BASED_TOOLS = {'fuzz_utils_base', 'auditor_framework'}
 
 # Environment variable overrides
 ENV_VAR_MAP = {
@@ -63,14 +66,21 @@ def get_tool_path(tool_name: str) -> str:
     if env_var and os.getenv(env_var):
         return os.getenv(env_var)
 
-    # Check if tool is in PATH
+    # Get the default command name (may differ from tool_name key)
+    default_cmd = DEFAULT_TOOL_PATHS.get(tool_name, tool_name)
+    
+    # For directory-based tools, just return the path
+    if tool_name in DIRECTORY_BASED_TOOLS:
+        return default_cmd
+    
+    # Check if tool is in PATH (use command name, not key name)
     from shutil import which
-    tool_in_path = which(tool_name)
+    tool_in_path = which(default_cmd)
     if tool_in_path:
         return tool_in_path
 
     # Fall back to default
-    return DEFAULT_TOOL_PATHS.get(tool_name, tool_name)
+    return default_cmd
 
 
 def check_tool_available(tool_name: str) -> bool:
@@ -81,9 +91,15 @@ def check_tool_available(tool_name: str) -> bool:
         tool_name: Name of the tool
 
     Returns:
-        bool: True if tool exists and is executable
+        bool: True if tool exists and is executable (or directory exists for directory-based tools)
     """
     tool_path = get_tool_path(tool_name)
+    
+    # Directory-based tools just need the directory to exist
+    if tool_name in DIRECTORY_BASED_TOOLS:
+        return os.path.isdir(tool_path)
+    
+    # Regular tools need to be executable files
     return os.path.isfile(tool_path) and os.access(tool_path, os.X_OK)
 
 

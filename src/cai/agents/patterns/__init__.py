@@ -21,6 +21,15 @@ __all__ = [
     'hierarchical_pattern',
     'sequential_pattern',
     'conditional_pattern',
+    'hmaw_pattern',
+    'adversarial_pattern',
+    'adversarial_pattern_with_skeptics',
+    'ensemble_pattern',
+    'composite_audit_pattern',
+    'HMAWPattern',
+    'AdversarialPattern',
+    'EnsemblePattern',
+    'CompositeAuditPattern',
     'PATTERNS',
     'is_swarm_pattern'
 ]
@@ -258,3 +267,13 @@ from .pattern import (
     sequential_pattern,
     conditional_pattern
 )
+
+# Import new research-backed patterns
+from .hmaw import HMAWPattern, hmaw_pattern
+from .adversarial import (
+    AdversarialPattern,
+    adversarial_pattern,
+    adversarial_pattern_with_skeptics
+)
+from .ensemble import EnsemblePattern, ensemble_pattern
+from .composite_audit import CompositeAuditPattern, composite_audit_pattern

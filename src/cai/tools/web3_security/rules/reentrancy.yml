@@ -1,0 +1,80 @@
+# Reentrancy Vulnerability Detection Rules
+name: reentrancy-with-callback
+version: 2.1
+category: reentrancy
+severity: high
+confidence: high
+
+description: |
+  Detects reentrancy vulnerabilities where external calls are made before
+  state updates, allowing attackers to re-enter the contract and exploit
+  inconsistent state.
+
+# Conditions that would make this a FALSE POSITIVE
+false_positive_conditions:
+  - view_function              # View/pure functions can't modify state
+  - pure_function
+  - nonReentrant_modifier      # ReentrancyGuard from OpenZeppelin
+  - checks_effects_interactions # Follows checks-effects-interactions pattern
+  - no_state_change_after_call # No state modified after external call
+  - internal_call_only         # Only internal calls, no external risk
+
+# Patterns that indicate this vulnerability
+detection_patterns:
+  - external_call_before_state_update
+  - callback_to_untrusted_address
+  - state_modification_after_call
+  - value_transfer_before_balance_update
+  - delegatecall_before_state_change
+
+# Required code patterns for TRUE POSITIVE
+required_patterns:
+  - external_call: true
+  - state_update: true
+  - call_before_update: true
+
+# Tool-specific weights (how much to trust each tool for this vuln type)
+tool_weights:
+  slither: 0.8      # Good at detecting reentrancy
+  mythril: 0.9      # Excellent with symbolic execution
+  echidna: 0.95     # Very reliable with property testing
+  medusa: 0.90      # Strong fuzzing coverage
+  manticore: 0.85   # Good symbolic analysis
+
+# Examples of this vulnerability
+examples:
+  - name: "Classic reentrancy"
+    code: |
+      function withdraw(uint amount) public {
+          require(balances[msg.sender] >= amount);
+          (bool success, ) = msg.sender.call{value: amount}("");
+          require(success);
+          balances[msg.sender] -= amount;  // State update AFTER call
+      }
+    
+  - name: "Cross-function reentrancy"
+    code: |
+      function withdraw() public {
+          uint amount = balances[msg.sender];
+          (bool success, ) = msg.sender.call{value: amount}("");
+          require(success);
+          _updateBalance(msg.sender, 0);
+      }
+
+# Expected impact
+impact:
+  - fund_drainage
+  - unauthorized_withdrawal
+  - double_spending
+
+# Remediation guidance
+remediation:
+  - Use ReentrancyGuard modifier
+  - Follow checks-effects-interactions pattern
+  - Use pull over push for payments
+  - Update state before external calls
+
+# References
+references:
+  - "https://consensys.github.io/smart-contract-best-practices/attacks/reentrancy/"
+  - "https://github.com/ethereum/solidity/issues/12996"

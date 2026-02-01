@@ -18,7 +18,15 @@ import rich.box
 
 from cai.repl.commands.base import Command, register_command
 
+
 console = Console()
+
+
+
+
+# Default Docker command timeouts (seconds)
+DOCKER_CMD_TIMEOUT = int(os.getenv("CAI_DOCKER_TIMEOUT_SEC", "30"))
+DOCKER_PULL_TIMEOUT = int(os.getenv("CAI_DOCKER_PULL_TIMEOUT_SEC", "600"))
 
 # Default Docker images for CAI
 DEFAULT_IMAGES = {
@@ -171,12 +179,22 @@ class DockerManager:
                 bufsize=1,
             )
 
+
+ 
             # Stream output in real time to the console.
             if pull_proc.stdout is not None:
                 for line in pull_proc.stdout:
                     console.print(line.rstrip())
 
-            pull_proc.wait()
+            try:
+                pull_proc.wait(timeout=DOCKER_PULL_TIMEOUT)
+            except subprocess.TimeoutExpired:
+                pull_proc.kill()
+                pull_proc.wait()
+                return False, (
+                    f"Timed out pulling image after {DOCKER_PULL_TIMEOUT}s: "
+                    f"{image_name}"
+                )
 
             if pull_proc.returncode == 0:
                 return True, (
@@ -522,61 +540,6 @@ class DockerManager:
                                             if fixed_result.returncode == 0:
                                                 return True, (
                                                     f"Successfully started fixed container: {fixed_result.stdout.strip()}"
-                                                )
-                                    else:
-                                        # Container is running
-                                        return True, (
-                                            f"Successfully started existing container: {container_id}"
-                                        )
-                                else:
-                                    # If start fails, try with entrypoint override
-                                    if needs_entrypoint_override:
-                                        # Remove the existing container and create a new one
-                                        console.print(
-                                            f"[yellow]Cannot start container. Removing and creating a new one with fixed entrypoint.[/yellow]"
-                                        )
-                                        
-                                        # Remove the old container
-                                        subprocess.run(
-                                            ["docker", "rm", "-f", container_id],
-                                            capture_output=True,
-                                            text=True,
-                                            check=False
-                                        )
-                                        
-                                        # Create new name to avoid conflicts
-                                        new_name = f"{container_name}-fixed"
-                                        
-                                        # Create a new container with fixed entrypoint
-                                        fixed_cmd = [
-                                            "docker", "run", "-d",
-                                            "--entrypoint", "/bin/bash",
-                                            "--name", new_name,
-                                            "--network=host",
-                                            "--cap-add=NET_ADMIN",
-                                            "--cap-add=NET_RAW",
-                                            "--security-opt=seccomp=unconfined",
-                                            image_name,
-                                            "-c", "tail -f /dev/null"
-                                        ]
-                                        
-                                        fixed_result = subprocess.run(
-                                            fixed_cmd,
-                                            capture_output=True,
-                                            text=True,
-                                            check=False
-                                        )
-                                        
-                                        if fixed_result.returncode == 0:
-                                            container_id = fixed_result.stdout.strip()
-                                            # Verify it's running
-                                            time.sleep(0.5)
-                                            if subprocess.run(
-                                                ["docker", "ps", "--filter", f"id={container_id}", "--format", "{{.ID}}"],
-                                                capture_output=True, text=True, check=False
-                                            ).stdout.strip():
-                                                return True, (
-                                                    f"Successfully started fixed container: {container_id}"
                                                 )
                             
                             # If it doesn't match our image but has the same name, 
@@ -1538,9 +1501,8 @@ class VirtualizationCommand(Command):
                             return True
                     except Exception as e:
                         console.print(f"[red]Error starting container: {str(e)}[/red]")
-                        # Continue to set it as active anyway
-                        docker_manager.set_active_container(container_id)
-                        return True
+                        # Don't fallback here - just report the error
+                        return False
                 
                 # Set this container as active
                 docker_manager.set_active_container(container_id)

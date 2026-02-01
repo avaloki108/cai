@@ -17,6 +17,9 @@ class PatternType(Enum):
     HIERARCHICAL = "hierarchical"
     SEQUENTIAL = "sequential"
     CONDITIONAL = "conditional"
+    HMAW = "hmaw"
+    ADVERSARIAL = "adversarial"
+    ENSEMBLE = "ensemble"
     
     @classmethod
     def from_string(cls, value: str) -> 'PatternType':

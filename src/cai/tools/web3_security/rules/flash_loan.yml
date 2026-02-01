@@ -1,0 +1,69 @@
+# Flash Loan Attack Vulnerability Detection Rules
+name: flash-loan-attack
+version: 1.2
+category: flash_loan
+severity: high
+confidence: medium
+
+description: |
+  Detects vulnerabilities where flash loans can be used to manipulate
+  protocol state, prices, or governance within a single transaction.
+
+false_positive_conditions:
+  - flash_loan_fee_check
+  - collateral_requirement
+  - time_lock_protection
+  - multi_block_requirement
+  - flash_loan_resistant_oracle
+
+detection_patterns:
+  - single_block_state_manipulation
+  - price_dependent_logic
+  - uncapped_minting
+  - governance_vote_manipulation
+  - liquidity_dependent_calculation
+
+required_patterns:
+  - flash_loan_susceptible: true
+  - atomic_exploitation: true
+
+tool_weights:
+  slither: 0.65
+  mythril: 0.75
+  echidna: 0.85
+  foundry: 0.90
+
+examples:
+  - name: "Price manipulation via flash loan"
+    code: |
+      function liquidate(address user) public {
+          uint price = getSpotPrice();  // Can be manipulated!
+          uint collateralValue = getUserCollateral(user) * price;
+          if (collateralValue < getUserDebt(user)) {
+              // Liquidation logic
+          }
+      }
+  
+  - name: "Governance attack via flash loan"
+    code: |
+      function propose(address target, bytes calldata data) public {
+          require(token.balanceOf(msg.sender) > 1000);  // Can flash loan!
+          proposals.push(Proposal(target, data, msg.sender));
+      }
+
+impact:
+  - price_manipulation
+  - governance_takeover
+  - liquidity_draining
+  - protocol_insolvency
+
+remediation:
+  - Use TWAP instead of spot prices
+  - Require time-locked positions
+  - Implement snapshot-based voting
+  - Add flash loan detection
+  - Use flash-loan resistant oracles
+
+references:
+  - "https://www.immunefi.com/blog/understanding-flash-loan-attacks"
+  - "https://blog.euler.finance/euler-flash-loan-attack-post-mortem-cbc0826c6ada"

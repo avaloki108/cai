@@ -14,6 +14,13 @@ Available modules:
 - exploit_scorer: Game-theoretic scoring of exploit viability
 - multi_tool_orchestrator: Aggregate and correlate findings from multiple tools
 - repo_context: Detect repo context and set safe defaults
+- iris: IRIS neuro-symbolic integration for enhanced static analysis
+- attack_economics: Economic viability analysis for exploits
+- precision: Precision loss detection
+- timing: Race condition and timing attack detection
+- invariant_gen: Automated invariant generation
+- defi_analyzer: DeFi protocol-specific analysis
+- validation: Enhanced finding validation
 """
 
 from .attack_graph import (
@@ -44,6 +51,15 @@ from .repo_context import (
     detect_web3_repo_context,
 )
 
+# IRIS Neuro-Symbolic Integration (Aegis)
+from .iris import (
+    iris_infer_taint_specs,
+    iris_contextual_filter,
+    iris_enhanced_slither_analysis,
+    iris_generate_custom_detector,
+    iris_batch_contextual_filter,
+)
+
 __all__ = [
     # Attack Graph
     'build_attack_graph',
@@ -63,5 +79,11 @@ __all__ = [
     'generate_strategic_digest',
     # Repo Context
     'detect_web3_repo_context',
+    # IRIS Neuro-Symbolic (Aegis)
+    'iris_infer_taint_specs',
+    'iris_contextual_filter',
+    'iris_enhanced_slither_analysis',
+    'iris_generate_custom_detector',
+    'iris_batch_contextual_filter',
 ]
 

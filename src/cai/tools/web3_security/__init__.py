@@ -26,6 +26,17 @@ Enhancement Tools (Game-Theoretic Reasoning Layer):
 - Exploit Scorer: Game-theoretic scoring of exploit viability
 - Multi-Tool Orchestrator: Aggregate and correlate multi-tool findings
 - Repo Context: Detect repo context and set safe defaults
+- IRIS: Neuro-symbolic integration for enhanced static analysis
+- Attack Economics: Economic viability analysis for exploits
+- Precision Analysis: Precision loss detection
+- Timing Analysis: Race condition and timing attack detection
+- Invariant Generation: Automated invariant generation
+- DeFi Analyzer: DeFi protocol-specific analysis
+- Validation: Enhanced finding validation
+
+Protocol Analyzers:
+- ERC4626 Analyzer: Vault-specific vulnerability analysis
+- Diamond Analyzer: Diamond pattern security analysis
 """
 
 # Slither - Static Analysis
@@ -130,7 +141,7 @@ from .auditor_framework import auditor_run_audit, auditor_check_compliance, audi
 from .validate_findings import (
     validate_finding,
     filter_false_positives,
-    council_filter_findings,
+    council_filter_findings_tool as council_filter_findings,
 )
 
 # Scribble - Contract Instrumentation
@@ -169,6 +180,8 @@ from .memory_bank import web3_memory_add, web3_memory_query
 from .knowledge_base import web3_kb_query, web3_kb_add, web3_rag_query
 from .tooling import web3_tool_status
 from .audit_planner import plan_web3_audit
+from .incremental import detect_incremental_contracts
+
 
 # Enhancement Tools (Game-Theoretic Reasoning Layer)
 from .enhancements import (
@@ -191,6 +204,26 @@ from .enhancements import (
     # Repo Context
     detect_web3_repo_context,
 )
+
+# IRIS Neuro-Symbolic Integration
+from .enhancements.iris import (
+    iris_infer_taint_specs,
+    iris_contextual_filter,
+    iris_enhanced_slither_analysis,
+    iris_generate_custom_detector,
+    iris_batch_contextual_filter,
+)
+
+# Additional Enhancement Tools from Aegis Integration
+from .enhancements.attack_economics import *
+from .enhancements.precision import *
+from .enhancements.timing import *
+from .enhancements.invariant_gen import *
+from .enhancements.defi_analyzer import *
+
+# Protocol Analyzers
+from .protocols.erc4626_analyzer import *
+from .protocols.diamond_analyzer import *
 
 __all__ = [
     # Slither
@@ -327,4 +360,10 @@ __all__ = [
     'generate_strategic_digest',
     # Enhancement Tools - Repo Context
     'detect_web3_repo_context',
+    # IRIS Neuro-Symbolic
+    'iris_infer_taint_specs',
+    'iris_contextual_filter',
+    'iris_enhanced_slither_analysis',
+    'iris_generate_custom_detector',
+    'iris_batch_contextual_filter',
 ]

@@ -13,8 +13,10 @@ from urllib.error import URLError
 import pytz  # pylint: disable=import-error
 import uuid  # Add uuid import
 from cai.util import get_active_time, get_idle_time
+from cai.util_file_lock import locked_open
 import atexit
 from typing import List, Dict, Tuple
+
 
 # Global recorder instance for session-wide logging
 _session_recorder = None
@@ -129,7 +131,7 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
         self.total_cost = 0.0
 
         # Log the session start
-        with open(self.filename, 'a', encoding='utf-8') as f:
+        with locked_open(self.filename, "a", encoding="utf-8") as f:
             session_start = {
                 "event": "session_start",
                 "timestamp": datetime.now().astimezone(
@@ -261,7 +263,7 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
         }
 
         # Append both request and completion to the instance's jsonl file
-        with open(self.filename, 'a', encoding='utf-8') as f:
+        with locked_open(self.filename, "a", encoding="utf-8") as f:
             json.dump(request_data, f)
             f.write('\n')
             json.dump(completion_data, f)
@@ -274,12 +276,14 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
         Args:
             user_message: The message from the user to log
         """
-        with open(self.filename, 'a', encoding='utf-8') as f:
+        with locked_open(self.filename, "a", encoding="utf-8") as f:
             user_data = {
                 "event": "user_message",
                 "timestamp": datetime.now().astimezone(
                     pytz.timezone("Europe/Madrid")).isoformat(),
-                "content": user_message
+                "session_id": self.session_id,
+                "alias_api_key": os.getenv("ALIAS_API_KEY", ""),
+                "message": user_message
             }
             json.dump(user_data, f)
             f.write('\n')
@@ -296,15 +300,16 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
         self.last_assistant_message = assistant_message
         self.last_assistant_tool_calls = tool_calls
         
-        with open(self.filename, 'a', encoding='utf-8') as f:
+        with locked_open(self.filename, "a", encoding="utf-8") as f:
             assistant_data = {
                 "event": "assistant_message",
                 "timestamp": datetime.now().astimezone(
                     pytz.timezone("Europe/Madrid")).isoformat(),
-                "content": assistant_message
+                "session_id": self.session_id,
+                "alias_api_key": os.getenv("ALIAS_API_KEY", ""),
+                "message": assistant_message,
+                "tool_calls": tool_calls
             }
-            if tool_calls:
-                assistant_data["tool_calls"] = tool_calls
             json.dump(assistant_data, f)
             f.write('\n')
             
@@ -325,26 +330,28 @@ class DataRecorder:  # pylint: disable=too-few-public-methods
             idle_time = get_idle_time_seconds()
             # Get the global session cost from COST_TRACKER
             session_cost = COST_TRACKER.session_total_cost
+            total_input_tokens = getattr(COST_TRACKER, "current_agent_input_tokens", 0)
+            total_output_tokens = getattr(COST_TRACKER, "current_agent_output_tokens", 0)
+            total_tokens = total_input_tokens + total_output_tokens
         except ImportError:
             active_time = 0.0
             idle_time = 0.0
             session_cost = self.total_cost
+            total_input_tokens = 0
+            total_output_tokens = 0
+            total_tokens = 0
             
-        with open(self.filename, 'a', encoding='utf-8') as f:
+        with locked_open(self.filename, "a", encoding="utf-8") as f:
             session_end = {
                 "event": "session_end",
                 "timestamp": datetime.now().astimezone(
                     pytz.timezone("Europe/Madrid")).isoformat(),
                 "session_id": self.session_id,
-                "timing_metrics": {
-                    "active_time_seconds": active_time,
-                    "idle_time_seconds": idle_time,
-                    "total_time_seconds": active_time + idle_time,
-                    "active_percentage": round((active_time / (active_time + idle_time)) * 100, 2) if (active_time + idle_time) > 0 else 0.0
-                },
-                "cost": {
-                    "total_cost": session_cost  # Use the global session cost
-                }
+                "alias_api_key": os.getenv("ALIAS_API_KEY", ""),
+                "total_cost": session_cost,
+                "total_tokens": total_tokens,
+                "total_input_tokens": total_input_tokens,
+                "total_output_tokens": total_output_tokens
             }
             json.dump(session_end, f)
             f.write('\n')

@@ -4,6 +4,14 @@ CAI is built on a strong foundation of peer-reviewed research establishing the f
 
 ---
 
+## Research Docs Index
+
+For a consolidated, per-paper summary of all internal research notes (including CAI integration hooks), see:
+
+- [Research Docs Index](research_docs_index.md)
+
+---
+
 ## 📊 Research Impact & Achievements
 
 ### 🏆 Competitions and Challenges

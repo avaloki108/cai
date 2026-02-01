@@ -112,6 +112,7 @@ nav:
       - Context Management: context.md
       - Guardrails & Security: guardrails.md
       - LLM Council: council.md
+      - Grit (Audit Persistence): grit.md
       - Environment Variables: environment_variables.md
 
   # ========================================
@@ -131,6 +132,7 @@ nav:
   # ========================================
   - Research:
       - Overview: research.md
+      - Research Docs Index: research_docs_index.md
       # TODO: Opcional - expandir research
       # - Publications: research_publications.md
 
@@ -233,3 +235,4 @@ extra_css:
 
 watch:
   - "src/cai/sdk/agents"
+

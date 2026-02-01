@@ -17,10 +17,21 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+from cai.util_file_lock import locked_open
 
 DEFAULT_EMBED_DIM = int(os.getenv("CAI_RAG_EMBED_DIM", "256"))
 DEFAULT_RAG_DIR = Path(os.getenv("CAI_RAG_DIR", Path.home() / ".cai" / "rag"))
+USE_SMARTBERT = os.getenv("CAI_USE_SMARTBERT", "false").lower() in ("true", "1", "yes")
 TOKEN_RE = re.compile(r"[a-z0-9_]+")
+
+# Try to import SmartBERT embedder if enabled
+_smartbert_embedder = None
+if USE_SMARTBERT:
+    try:
+        from cai.ml.embeddings import get_embedder
+        _smartbert_embedder = get_embedder()
+    except ImportError:
+        pass  # Fall back to hash-based
 
 
 def _tokenize(text: str) -> List[str]:
@@ -33,6 +44,33 @@ def _hash_token(token: str, dim: int) -> int:
 
 
 def _embed_text(text: str, dim: int) -> List[float]:
+    """
+    Embed text using SmartBERT (if enabled) or hash-based fallback.
+    
+    To enable SmartBERT, set environment variable:
+        export CAI_USE_SMARTBERT=true
+    """
+    global _smartbert_embedder
+    
+    # Use SmartBERT if available
+    if _smartbert_embedder is not None:
+        try:
+            emb = _smartbert_embedder.embed_code(text, normalize=True)
+            # Ensure correct dimensionality
+            if len(emb) != dim:
+                # Resize if dimensions don't match
+                if len(emb) > dim:
+                    return emb[:dim].tolist()
+                else:
+                    padded = [0.0] * dim
+                    padded[:len(emb)] = emb.tolist()
+                    return padded
+            return emb.tolist()
+        except Exception:
+            # Fall through to hash-based on error
+            pass
+    
+    # Hash-based fallback
     vec = [0.0] * dim
     for tok in _tokenize(text):
         vec[_hash_token(tok, dim)] += 1.0
@@ -122,7 +160,7 @@ class QdrantConnector:
             }
             records.append(record)
 
-        with path.open("a", encoding="utf-8") as handle:
+        with locked_open(str(path), "a", encoding="utf-8") as handle:
             for record in records:
                 handle.write(json.dumps(record, ensure_ascii=True) + "\n")
 

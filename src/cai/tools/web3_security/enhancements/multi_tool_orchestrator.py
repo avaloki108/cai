@@ -13,15 +13,69 @@ Enhanced with:
 """
 
 import json
+import math
+import os
 import re
 from typing import Any, Dict, List, Optional, Union
 from collections import defaultdict
 from cai.sdk.agents import function_tool
+from ..finding_schema import ensure_finding_dict
+from ..symbolic.constraint_analyzer import extract_constraints_from_mythril, extract_constraints_from_oyente, PathConstraint
+from ..symbolic.correlator import SymbolicStaticCorrelator
+from ..taxonomy import map_to_dasp
+
+
+
 
 
 # =============================================================================
 # Similarity Helpers for Real Correlation
 # =============================================================================
+
+try:
+    from cai.ml.embeddings import get_embedder
+    _embedder = get_embedder()
+except Exception:  # pragma: no cover - optional dependency
+    _embedder = None
+
+_EMBED_CACHE_MAX = int(os.getenv("CAI_EMBED_CACHE_MAX", "1024"))
+_embed_cache: Dict[str, List[float]] = {}
+
+
+def _cosine(a: List[float], b: List[float]) -> float:
+    if not a or not b:
+        return 0.0
+    denom = (math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(x * x for x in b))) or 1.0
+    return sum(x * y for x, y in zip(a, b)) / denom
+
+
+def _embed_text(text: str) -> Optional[List[float]]:
+    if not _embedder:
+        return None
+    cached = _embed_cache.get(text)
+    if cached is not None:
+        return cached
+    try:
+        emb = _embedder.embed_code(text, normalize=True)
+        vec = emb.tolist() if hasattr(emb, "tolist") else list(emb)
+        if len(_embed_cache) >= _EMBED_CACHE_MAX:
+            _embed_cache.clear()
+        _embed_cache[text] = vec
+        return vec
+    except Exception:
+        return None
+
+
+def _embedding_similarity(f1: Dict, f2: Dict) -> Optional[float]:
+    text1 = f"{f1.get('type', '')} {f1.get('description', '')} {f1.get('location', '')}"
+    text2 = f"{f2.get('type', '')} {f2.get('description', '')} {f2.get('location', '')}"
+    v1 = _embed_text(text1)
+    v2 = _embed_text(text2)
+    if v1 is None or v2 is None:
+        return None
+    return _cosine(v1, v2)
+
+
 
 def _tok(s: str) -> set:
     """Tokenize a string into lowercase alphanumeric tokens."""
@@ -43,36 +97,36 @@ def _finding_similarity(f1: Dict, f2: Dict) -> float:
     Calculate weighted similarity between two findings.
     
     Weights:
-    - Category match: 35%
-    - Type similarity: 20%
-    - Description similarity: 30%
-    - Function match: 10%
-    - Contract match: 5%
+    - Category match: 30%
+    - Type similarity: 15%
+    - Description similarity: 20%
+    - Embedding similarity: 20% (if available)
+    - Location similarity: 10%
+    - File match: 5%
     """
     # Category match (exact)
     cat = 1.0 if f1.get("category") == f2.get("category") else 0.0
-    
+
     # Type similarity (Jaccard)
     t = _jaccard(f1.get("type", ""), f2.get("type", ""))
-    
+
     # Description similarity (Jaccard)
     d = _jaccard(f1.get("description", ""), f2.get("description", ""))
-    
-    # Location components
-    loc1 = f1.get("location", {}) or {}
-    loc2 = f2.get("location", {}) or {}
-    
-    # Function match (exact, if both have one)
-    func1 = loc1.get("function") if isinstance(loc1, dict) else None
-    func2 = loc2.get("function") if isinstance(loc2, dict) else None
-    func = 1.0 if (func1 and func1 == func2) else 0.0
-    
-    # Contract match (exact, if both have one)
-    contract1 = loc1.get("contract") if isinstance(loc1, dict) else None
-    contract2 = loc2.get("contract") if isinstance(loc2, dict) else None
-    contract = 1.0 if (contract1 and contract1 == contract2) else 0.0
-    
-    return 0.35 * cat + 0.20 * t + 0.30 * d + 0.10 * func + 0.05 * contract
+
+    # Embedding similarity (if available)
+    sem = _embedding_similarity(f1, f2)
+    if sem is None:
+        sem = 0.0
+
+    # Location similarity (Jaccard on stringified location)
+    loc_sim = _jaccard(str(f1.get("location", "")), str(f2.get("location", "")))
+
+    # File match (exact, if both have one)
+    file1 = f1.get("file")
+    file2 = f2.get("file")
+    file_match = 1.0 if (file1 and file1 == file2) else 0.0
+
+    return 0.30 * cat + 0.15 * t + 0.20 * d + 0.20 * sem + 0.10 * loc_sim + 0.05 * file_match
 
 
 def _base_confidence(c: Any) -> float:
@@ -195,18 +249,48 @@ def _normalize_type(finding_type: str) -> str:
 
 def _extract_location_key(finding: Dict) -> str:
     """Extract a unique location key for deduplication."""
-    location = finding.get("location", {})
-    
+    location = finding.get("location", "")
+
     if isinstance(location, dict):
-        contract = location.get("contract", finding.get("contract", ""))
-        function = location.get("function", finding.get("function", ""))
-        line = location.get("line", location.get("start", ""))
-    else:
-        contract = finding.get("contract", "")
-        function = finding.get("function", "")
-        line = ""
-    
-    return f"{contract}:{function}:{line}"
+        filename = location.get("filename") or location.get("file") or ""
+        line = location.get("line") or location.get("lines")
+        if filename and line:
+            return f"{filename}:{line}"
+        if filename:
+            return filename
+        return json.dumps(location, sort_keys=True)
+
+    if isinstance(location, str) and location:
+        return location
+
+    file_path = finding.get("file")
+    if file_path:
+        start = finding.get("line_start")
+        end = finding.get("line_end")
+        if start and end:
+            return f"{file_path}:{start}-{end}"
+        if start:
+            return f"{file_path}:{start}"
+        return file_path
+
+    return ""
+
+
+def _constraint_from_dict(c_dict: Dict[str, Any]) -> PathConstraint:
+    loc = c_dict.get("location", {}) or {}
+    return PathConstraint(
+        source_tool=c_dict.get("source_tool", "unknown"),
+        constraint_smt=c_dict.get("constraint_smt", ""),
+        constraint_type=c_dict.get("constraint_type", "unknown"),
+        contract=loc.get("contract", "unknown"),
+        function=loc.get("function", "unknown"),
+        pc=loc.get("pc"),
+        line=loc.get("line"),
+        affected_state_vars=c_dict.get("state_vars", []),
+        involved_variables=set(c_dict.get("variables", [])),
+        feasibility_score=c_dict.get("feasibility", 1.0),
+        complexity=c_dict.get("complexity", 0),
+    )
 
 
 @function_tool
@@ -234,6 +318,7 @@ def aggregate_tool_results(results: str, ctf=None) -> str:
         else:
             results_data = results
         
+
         # Normalize input format
         if isinstance(results_data, list):
             tool_results = {}
@@ -242,43 +327,58 @@ def aggregate_tool_results(results: str, ctf=None) -> str:
                 tool_results[tool_name] = item.get("findings", item.get("results", []))
         else:
             tool_results = results_data
-        
-        # Aggregate findings
+
+        # Collect symbolic constraints if raw tool output is available
+        symbolic_constraints = []
+
+        # Aggregate and normalize findings
         all_findings = []
-        tool_stats = {}
-        
-        for tool_name, findings in tool_results.items():
-            if not isinstance(findings, list):
-                findings = [findings] if findings else []
-            
-            tool_stats[tool_name] = {
-                "total": len(findings),
-                "by_severity": defaultdict(int),
-            }
-            
-            for finding in findings:
-                # Normalize the finding
-                finding_type = finding.get("type", finding.get("check", finding.get("title", "unknown")))
-                severity = finding.get("severity", finding.get("impact", "medium"))
-                
+        tool_stats = defaultdict(lambda: {
+            "count": 0,
+            "by_severity": defaultdict(int)
+        })
+
+        for tool_name, tool_findings in tool_results.items():
+            if not tool_findings:
+                continue
+
+            # If we have raw mythril/oyente output, extract constraints
+            if isinstance(tool_findings, dict):
+                if tool_name.lower() == "mythril":
+                    symbolic_constraints.extend(
+                        [c.to_dict() for c in extract_constraints_from_mythril(tool_findings)]
+                    )
+                if tool_name.lower() == "oyente":
+                    symbolic_constraints.extend(
+                        [c.to_dict() for c in extract_constraints_from_oyente(tool_findings)]
+                    )
+                tool_findings = (
+                    tool_findings.get("findings")
+                    or tool_findings.get("issues")
+                    or tool_findings.get("results")
+                    or []
+                )
+
+            for finding in tool_findings:
+                normalized_input = ensure_finding_dict(finding, tool_name).to_dict()
+                finding_type = normalized_input.get("type", "unknown")
+                severity = normalized_input.get("severity", finding.get("impact", "medium"))
+
                 normalized_finding = {
-                    "id": f"{tool_name}_{len(all_findings)}",
+                    **normalized_input,
+                    "id": normalized_input.get("id") or f"{tool_name}_{len(all_findings)}",
                     "tool": tool_name,
                     "type": finding_type,
                     "category": _normalize_type(finding_type),
+                    "taxonomy": {
+                        "dasp": map_to_dasp(_normalize_type(finding_type)),
+                    },
                     "severity": _normalize_severity(severity),
                     "severity_original": severity,
-                    "confidence": finding.get("confidence", "medium"),
-                    "description": finding.get("description", finding.get("markdown", "")),
-                    "location": finding.get("location", {
-                        "contract": finding.get("contract", ""),
-                        "function": finding.get("function", ""),
-                        "line": finding.get("lineno", finding.get("line", "")),
-                    }),
-                    "location_key": _extract_location_key(finding),
-                    "raw": finding,
+                    "confidence": normalized_input.get("confidence", finding.get("confidence", "medium")),
+                    "location_key": _extract_location_key(normalized_input),
                 }
-                
+
                 all_findings.append(normalized_finding)
                 tool_stats[tool_name]["by_severity"][normalized_finding["severity"]] += 1
         
@@ -292,13 +392,14 @@ def aggregate_tool_results(results: str, ctf=None) -> str:
         
         return json.dumps({
             "findings": all_findings,
-            "statistics": {
+            "tool_stats": tool_stats,
+            "summary": {
                 "total_findings": len(all_findings),
-                "by_severity": dict(severity_counts),
-                "by_category": dict(category_counts),
-                "by_tool": {k: v["total"] for k, v in tool_stats.items()},
+                "unique_categories": len(category_counts),
+                "severity_breakdown": dict(severity_counts),
+                "category_breakdown": dict(category_counts)
             },
-            "tool_breakdown": tool_stats,
+            "symbolic_constraints": symbolic_constraints,
         }, indent=2)
     
     except Exception as e:
@@ -405,7 +506,13 @@ def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=No
         # Category-based correlations (same category across contracts)
         for category, group in category_groups.items():
             if len(group) >= 3:  # Pattern of similar issues
-                contracts = list(set(f.get("location", {}).get("contract", "") for f in group if f.get("location")))
+                contracts = list(
+                    set(
+                        (f.get("file") or str(f.get("location", "")).split(":")[0])
+                        for f in group
+                        if (f.get("file") or f.get("location"))
+                    )
+                )
                 if len(contracts) >= 2:
                     correlations.append({
                         "type": "category_pattern",
@@ -419,21 +526,50 @@ def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=No
         # Calculate enhanced findings with improved confidence
         enhanced_findings = []
         correlation_map = {}
-        
+        symbolic_boost_map = {}
+
+        # Add symbolic correlation boosts if symbolic constraints are available
+        symbolic_constraints = findings_data.get("symbolic_constraints", [])
+        if symbolic_constraints:
+            correlator = SymbolicStaticCorrelator()
+            constraints = [
+                _constraint_from_dict(c) for c in symbolic_constraints if isinstance(c, dict)
+            ]
+            correlated = correlator.correlate_findings(
+                all_findings,
+                constraints,
+                correlation_threshold=correlation_threshold,
+            )
+            for corr in correlated:
+                corr_dict = corr.to_dict()
+                corr_dict["type"] = "symbolic_correlation"
+                correlations.append(corr_dict)
+                fid = corr.static_finding.get("id")
+                if fid:
+                    symbolic_boost_map[fid] = max(
+                        symbolic_boost_map.get(fid, 0),
+                        corr.confidence_boost,
+                    )
+
         for corr in correlations:
             if corr["type"] == "location_correlation":
                 for fid in corr["findings"]:
                     # Store the higher boost if multiple correlations
                     existing = correlation_map.get(fid, 0)
                     correlation_map[fid] = max(existing, corr["confidence_boost"])
-        
+
+        # Merge symbolic boosts into correlation map
+        for fid, boost in symbolic_boost_map.items():
+            correlation_map[fid] = max(correlation_map.get(fid, 0), boost)
+
         for finding in all_findings:
             enhanced = finding.copy()
             fid = finding.get("id", "")
-            
+
             if fid in correlation_map:
                 enhanced["correlated"] = True
                 enhanced["confidence_boost"] = correlation_map[fid]
+                enhanced["symbolic_boost"] = symbolic_boost_map.get(fid, 0)
                 # Use improved confidence calculation
                 base = _base_confidence(finding.get("confidence", "medium"))
                 enhanced["effective_confidence"] = min(1.0, base + correlation_map[fid])
@@ -441,8 +577,9 @@ def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=No
             else:
                 enhanced["correlated"] = False
                 enhanced["confidence_boost"] = 0
+                enhanced["symbolic_boost"] = 0
                 enhanced["effective_confidence"] = _base_confidence(finding.get("confidence", "medium"))
-            
+
             enhanced_findings.append(enhanced)
         
         return json.dumps({
@@ -452,6 +589,7 @@ def correlate_findings(findings: str, correlation_threshold: float = 0.7, ctf=No
                 "total_correlations": len(correlations),
                 "location_correlations": len([c for c in correlations if c["type"] == "location_correlation"]),
                 "category_patterns": len([c for c in correlations if c["type"] == "category_pattern"]),
+                "symbolic_correlations": len([c for c in correlations if c["type"] == "symbolic_correlation"]),
                 "findings_with_correlation": len([f for f in enhanced_findings if f.get("correlated")]),
                 "correlation_threshold": correlation_threshold,
             },

@@ -7,6 +7,7 @@ from collections.abc import Awaitable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, cast
 
+
 from openai.types.responses import (
     ResponseComputerToolCall,
     ResponseFileSearchToolCall,
@@ -48,6 +49,7 @@ from .items import (
 )
 from .lifecycle import RunHooks
 from .logger import logger
+from .episodic_memory import record_failure
 from .model_settings import ModelSettings
 from .models.interface import ModelTracing
 from .run_context import RunContextWrapper, TContext
@@ -515,6 +517,12 @@ class RunImpl:
                 if config.trace_include_sensitive_data:
                     span_fn.span_data.input = tool_call.arguments
                 try:
+                    tool_call_coro = func_tool.on_invoke_tool(context_wrapper, tool_call.arguments)
+                    if config.tool_timeout_sec:
+                        tool_call_coro = asyncio.wait_for(
+                            tool_call_coro,
+                            timeout=config.tool_timeout_sec,
+                        )
                     _, _, result = await asyncio.gather(
                         hooks.on_tool_start(context_wrapper, agent, func_tool),
                         (
@@ -522,7 +530,7 @@ class RunImpl:
                             if agent.hooks
                             else _coro.noop_coroutine()
                         ),
-                        func_tool.on_invoke_tool(context_wrapper, tool_call.arguments),
+                        tool_call_coro,
                     )
 
                     await asyncio.gather(
@@ -533,6 +541,24 @@ class RunImpl:
                             else _coro.noop_coroutine()
                         ),
                     )
+                except asyncio.TimeoutError as e:
+                    _error_tracing.attach_error_to_current_span(
+                        SpanError(
+                            message="Tool execution timeout",
+                            data={
+                                "tool_name": func_tool.name,
+                                "timeout_sec": config.tool_timeout_sec,
+                            },
+                        )
+                    )
+                    record_failure({
+                        "tool": func_tool.name,
+                        "error": "timeout",
+                        "context": f"timeout_sec={config.tool_timeout_sec}",
+                    })
+                    raise UserError(
+                        f"Tool {func_tool.name} timed out after {config.tool_timeout_sec}s"
+                    ) from e
                 except Exception as e:
                     _error_tracing.attach_error_to_current_span(
                         SpanError(
@@ -540,6 +566,10 @@ class RunImpl:
                             data={"tool_name": func_tool.name, "error": str(e)},
                         )
                     )
+                    record_failure({
+                        "tool": func_tool.name,
+                        "error": str(e),
+                    })
                     if isinstance(e, AgentsException):
                         raise e
                     raise UserError(f"Error running tool {func_tool.name}: {e}") from e
@@ -924,15 +954,42 @@ class ComputerAction:
             else cls._get_screenshot_sync(action.computer_tool.computer, action.tool_call)
         )
 
-        _, _, output = await asyncio.gather(
-            hooks.on_tool_start(context_wrapper, agent, action.computer_tool),
-            (
-                agent.hooks.on_tool_start(context_wrapper, agent, action.computer_tool)
-                if agent.hooks
-                else _coro.noop_coroutine()
-            ),
-            output_func,
-        )
+
+        if config.tool_timeout_sec:
+            output_func = asyncio.wait_for(
+                output_func,
+                timeout=config.tool_timeout_sec,
+            )
+
+        try:
+            _, _, output = await asyncio.gather(
+                hooks.on_tool_start(context_wrapper, agent, action.computer_tool),
+                (
+                    agent.hooks.on_tool_start(context_wrapper, agent, action.computer_tool)
+                    if agent.hooks
+                    else _coro.noop_coroutine()
+                ),
+                output_func,
+            )
+        except asyncio.TimeoutError as e:
+            _error_tracing.attach_error_to_current_span(
+                SpanError(
+                    message="Computer tool timeout",
+                    data={
+                        "tool_name": action.computer_tool.name,
+                        "timeout_sec": config.tool_timeout_sec,
+                    },
+                )
+            )
+            record_failure({
+                "tool": action.computer_tool.name,
+                "error": "timeout",
+                "context": f"timeout_sec={config.tool_timeout_sec}",
+            })
+            raise UserError(
+                f"Computer tool {action.computer_tool.name} timed out after "
+                f"{config.tool_timeout_sec}s"
+            ) from e
 
         await asyncio.gather(
             hooks.on_tool_end(context_wrapper, agent, action.computer_tool, output),
