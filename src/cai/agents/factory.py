@@ -14,6 +14,7 @@ from cai.sdk.agents.logger import logger
 from cai.util import append_instructions
 
 _GRIT_INSTRUCTIONS: str | None = None
+_SKILL_INSTRUCTIONS: Dict[str, str] = {}  # Cache skill instructions per agent
 
 
 def _strip_yaml_front_matter(text: str) -> str:
@@ -40,6 +41,51 @@ def _load_grit_instructions() -> str:
     grit_text = _strip_yaml_front_matter(grit_text).strip()
     _GRIT_INSTRUCTIONS = grit_text
     return _GRIT_INSTRUCTIONS
+
+
+def _load_skill_instructions(agent_name: str) -> str:
+    """
+    Load skill instructions for an agent.
+    
+    Skills are loaded from:
+    1. ~/.cai/skills/
+    2. .cai/skills/ (project directory)
+    3. Built-in skills (src/cai/skills/builtin/)
+    
+    Args:
+        agent_name: Name of the agent to load skills for
+        
+    Returns:
+        Combined skill instructions as a string
+    """
+    # Check if skills are disabled
+    if os.getenv("CAI_SKILLS", "true").lower() == "false":
+        return ""
+    
+    # Check cache first
+    if agent_name in _SKILL_INSTRUCTIONS:
+        return _SKILL_INSTRUCTIONS[agent_name]
+    
+    try:
+        from cai.skills import load_skills_for_agent, discover_skills
+        
+        # Ensure skills are discovered
+        discover_skills()
+        
+        # Load skills for this agent
+        skill_content = load_skills_for_agent(agent_name)
+        _SKILL_INSTRUCTIONS[agent_name] = skill_content
+        
+        if skill_content:
+            logger.debug("Loaded skills for agent %s", agent_name)
+        
+        return skill_content
+    except ImportError as exc:
+        logger.debug("Skills module not available: %s", exc)
+        return ""
+    except Exception as exc:
+        logger.debug("Failed to load skills for agent %s: %s", agent_name, exc)
+        return ""
 
 
 def create_generic_agent_factory(
@@ -99,6 +145,11 @@ def create_generic_agent_factory(
         grit_instructions = _load_grit_instructions()
         if grit_instructions:
             append_instructions(cloned_agent, "\n\n" + grit_instructions)
+        
+        # Load and append skill instructions
+        skill_instructions = _load_skill_instructions(original_agent.name)
+        if skill_instructions:
+            append_instructions(cloned_agent, "\n\n" + skill_instructions)
         
         # Update agent name if custom name was provided
         if custom_name:

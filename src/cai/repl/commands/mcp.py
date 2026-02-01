@@ -412,6 +412,9 @@ class MCPCommand(Command):
             "tools": "List tools from an MCP server",
             "status": "Check MCP server connection status",
             "associations": "Show agent-MCP associations",
+            "save": "Save current MCP config to ~/.cai/mcp.yaml",
+            "reload": "Reload MCP servers from config file",
+            "config": "Show current MCP configuration",
             "help": "Show MCP command usage",
         }
 
