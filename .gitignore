@@ -177,10 +177,11 @@ cai-*
 
 # Personal/local files
 .serena/
-slither_output*.json
-slither-py-index.json
+slither*.json
+slither-*.json
 oracle_security_report.txt
 oracle_security_report.md
+security_assessment.txt
 
 # Local analysis scripts (root level one-offs)
 additional_vulnerability_analysis.py
