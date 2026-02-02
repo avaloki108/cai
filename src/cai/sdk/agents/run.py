@@ -190,6 +190,29 @@ class Runner:
         if run_config is None:
             run_config = RunConfig()
 
+        # Auto-report integration: wrap hooks with auto-report hooks if enabled
+        auto_report_enabled = os.getenv("CAI_AUTO_REPORT", "true").lower() in ("true", "1", "yes")
+        auto_report_hooks = None
+        start_time = None
+        if auto_report_enabled:
+            try:
+                from .auto_report_hooks import get_auto_report_hooks, AutoReportHooks
+                from datetime import datetime
+                start_time = datetime.now()
+                hooks = get_auto_report_hooks(hooks)
+                # Find the AutoReportHooks instance for later report generation
+                if isinstance(hooks, AutoReportHooks):
+                    auto_report_hooks = hooks
+                    auto_report_hooks.start_time = start_time
+                elif hasattr(hooks, 'hooks'):  # CombinedHooks
+                    for h in hooks.hooks:
+                        if isinstance(h, AutoReportHooks):
+                            auto_report_hooks = h
+                            auto_report_hooks.start_time = start_time
+                            break
+            except ImportError:
+                pass  # Auto-report module not available
+
         plan_first_enabled = os.getenv("CAI_PLAN_FIRST", "false").lower() in ("true", "1", "yes")
         reflexion_enabled = os.getenv("CAI_REFLEXION_MEMORY", "false").lower() in ("true", "1", "yes")
         if plan_first_enabled:
@@ -304,7 +327,7 @@ class Runner:
                             turn_result.next_step.output,
                             context_wrapper,
                         )
-                        return RunResult(
+                        result = RunResult(
                             input=original_input,
                             new_items=generated_items,
                             raw_responses=model_responses,
@@ -313,6 +336,19 @@ class Runner:
                             input_guardrail_results=input_guardrail_results,
                             output_guardrail_results=output_guardrail_results,
                         )
+                        
+                        # Auto-report generation: generate report after run completes
+                        if auto_report_hooks is not None:
+                            try:
+                                report_path = auto_report_hooks.generate_report_for_result(
+                                    result, current_agent
+                                )
+                                if report_path:
+                                    logger.info(f"Auto-report saved: {report_path}")
+                            except Exception as e:
+                                logger.warning(f"Failed to generate auto-report: {e}")
+                        
+                        return result
                     elif isinstance(turn_result.next_step, NextStepHandoff):
                         # Get the previous agent before switching
                         previous_agent = current_agent
@@ -461,6 +497,25 @@ class Runner:
             hooks = RunHooks[Any]()
         if run_config is None:
             run_config = RunConfig()
+
+        # Auto-report integration for streaming mode
+        auto_report_enabled = os.getenv("CAI_AUTO_REPORT", "true").lower() in ("true", "1", "yes")
+        if auto_report_enabled:
+            try:
+                from .auto_report_hooks import get_auto_report_hooks, AutoReportHooks
+                from datetime import datetime
+                start_time = datetime.now()
+                hooks = get_auto_report_hooks(hooks)
+                # Set start time for auto-report hooks
+                if isinstance(hooks, AutoReportHooks):
+                    hooks.start_time = start_time
+                elif hasattr(hooks, 'hooks'):  # CombinedHooks
+                    for h in hooks.hooks:
+                        if isinstance(h, AutoReportHooks):
+                            h.start_time = start_time
+                            break
+            except ImportError:
+                pass  # Auto-report module not available
 
         # If there's already a trace, we don't create a new one. In addition, we can't end the
         # trace here, because the actual work is done in `stream_events` and this method ends
@@ -703,6 +758,30 @@ class Runner:
                         streamed_result.output_guardrail_results = output_guardrail_results
                         streamed_result.final_output = turn_result.next_step.output
                         streamed_result.is_complete = True
+                        
+                        # Auto-report generation for streamed runs
+                        auto_report_enabled = os.getenv("CAI_AUTO_REPORT", "true").lower() in ("true", "1", "yes")
+                        if auto_report_enabled:
+                            try:
+                                from .auto_report_hooks import AutoReportHooks
+                                # Find AutoReportHooks in hooks chain
+                                auto_report_hooks = None
+                                if isinstance(hooks, AutoReportHooks):
+                                    auto_report_hooks = hooks
+                                elif hasattr(hooks, 'hooks'):
+                                    for h in hooks.hooks:
+                                        if isinstance(h, AutoReportHooks):
+                                            auto_report_hooks = h
+                                            break
+                                if auto_report_hooks:
+                                    report_path = auto_report_hooks.generate_report_for_result(
+                                        streamed_result, current_agent
+                                    )
+                                    if report_path:
+                                        logger.info(f"Auto-report saved: {report_path}")
+                            except Exception as e:
+                                logger.warning(f"Failed to generate auto-report: {e}")
+                        
                         streamed_result._event_queue.put_nowait(QueueCompleteSentinel())
                     elif isinstance(turn_result.next_step, NextStepRunAgain):
                         pass

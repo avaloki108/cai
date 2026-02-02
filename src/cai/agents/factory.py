@@ -15,6 +15,7 @@ from cai.util import append_instructions
 
 _GRIT_INSTRUCTIONS: str | None = None
 _SKILL_INSTRUCTIONS: Dict[str, str] = {}  # Cache skill instructions per agent
+_MCP_PREFERENCE_INSTRUCTIONS: str | None = None
 
 
 def _strip_yaml_front_matter(text: str) -> str:
@@ -41,6 +42,114 @@ def _load_grit_instructions() -> str:
     grit_text = _strip_yaml_front_matter(grit_text).strip()
     _GRIT_INSTRUCTIONS = grit_text
     return _GRIT_INSTRUCTIONS
+
+
+def _load_mcp_preference_instructions(mcp_tools: list) -> str:
+    """
+    Generate instructions to prefer MCP tools over built-in alternatives.
+    
+    Args:
+        mcp_tools: List of MCP tools available to the agent
+        
+    Returns:
+        Instructions string telling the agent to prefer MCP tools
+    """
+    if not mcp_tools:
+        return ""
+    
+    tool_names = [t.name for t in mcp_tools]
+    
+    instructions_parts = ["\n## MCP Tool Preferences\n"]
+    instructions_parts.append("You have access to advanced MCP tools. Prefer these over basic shell commands:\n")
+    
+    # edit_file from morph
+    if "edit_file" in tool_names:
+        instructions_parts.append(
+            "- **edit_file**: Use this for ALL file edits. It's 10x faster than manual editing and "
+            "prevents context pollution. Use `// ... existing code ...` placeholders for unchanged sections.\n"
+        )
+    
+    # warpgrep from morph
+    if "warpgrep_codebase_search" in tool_names:
+        instructions_parts.append(
+            "- **warpgrep_codebase_search**: Use this for semantic codebase exploration. "
+            "Better than grep for finding relevant code by meaning, not just text.\n"
+        )
+    
+    # Serena tools
+    serena_tools = ["find_symbol", "get_symbols_overview", "find_referencing_symbols", 
+                    "replace_symbol_body", "insert_after_symbol", "insert_before_symbol"]
+    available_serena = [t for t in serena_tools if t in tool_names]
+    if available_serena:
+        instructions_parts.append(
+            f"- **Serena tools** ({', '.join(available_serena)}): Use for semantic code analysis. "
+            "These understand code structure (classes, methods, symbols) rather than just text.\n"
+        )
+    
+    # Serena's list_dir if available (not the shell one)
+    if "list_dir" in tool_names:
+        # Check if it's the Serena one by looking at the tool description
+        for t in mcp_tools:
+            if t.name == "list_dir" and "JSON" in (t.description or ""):
+                instructions_parts.append(
+                    "- **list_dir** (MCP): Returns structured JSON with file metadata. "
+                    "Prefer over shell `ls` commands.\n"
+                )
+                break
+    
+    # Slither MCP tools for smart contract analysis
+    slither_tools = [
+        "list_contracts", "get_contract", "get_contract_source", "get_function_source",
+        "list_functions", "get_function_callees", "get_inherited_contracts", "get_derived_contracts",
+        "list_function_implementations", "get_function_callers", "list_detectors", "run_detectors",
+        "search_contracts", "search_functions", "get_project_overview", "find_dead_code",
+        "export_call_graph", "get_contract_dependencies", "analyze_state_variables",
+        "get_storage_layout", "analyze_events", "analyze_modifiers", "analyze_low_level_calls",
+        "analyze_reentrancy_patterns", "analyze_access_control", "analyze_erc4626_vault",
+        "analyze_amm_patterns", "analyze_lending_pool", "analyze_cross_contract_calls",
+        "analyze_invariants", "run_custom_detectors"
+    ]
+    available_slither = [t for t in tool_names if t in slither_tools]
+    if available_slither:
+        # Group by category for clearer instructions
+        analysis_tools = [t for t in available_slither if t.startswith("analyze_")]
+        detector_tools = [t for t in available_slither if "detector" in t]
+        query_tools = [t for t in available_slither if t.startswith(("list_", "get_", "search_", "find_", "export_"))]
+        
+        instructions_parts.append(
+            "- **Slither MCP** (smart contract static analysis):\n"
+        )
+        if detector_tools:
+            instructions_parts.append(
+                f"  - Detectors: `run_detectors` to find vulnerabilities, `list_detectors` for available checks\n"
+            )
+        if analysis_tools:
+            instructions_parts.append(
+                f"  - Analysis: {', '.join(f'`{t}`' for t in analysis_tools[:5])}{'...' if len(analysis_tools) > 5 else ''}\n"
+            )
+        if query_tools:
+            instructions_parts.append(
+                f"  - Query: `get_contract_source`, `list_functions`, `search_contracts` for code exploration\n"
+            )
+        instructions_parts.append(
+            "  Use Slither tools for deep smart contract analysis instead of manual code reading.\n"
+        )
+    
+    # Mythril MCP tools
+    mythril_tools = [t for t in tool_names if "mythril" in t.lower()]
+    if mythril_tools:
+        instructions_parts.append(
+            f"- **Mythril tools** ({', '.join(mythril_tools)}): Use for symbolic execution "
+            "and deep vulnerability analysis of smart contracts.\n"
+        )
+    
+    # General preference
+    instructions_parts.append(
+        "\nIMPORTANT: Prefer MCP tools over shell commands like `cat`, `ls`, `grep` when "
+        "an MCP equivalent is available. MCP tools are faster, smarter, and produce better results."
+    )
+    
+    return "".join(instructions_parts)
 
 
 def _load_skill_instructions(agent_name: str) -> str:
@@ -156,6 +265,7 @@ def create_generic_agent_factory(
             cloned_agent.name = custom_name
             
         # Check if this agent has any MCP tools configured
+        mcp_tools = []
         try:
             from cai.repl.commands.mcp import get_mcp_tools_for_agent
             
@@ -172,6 +282,11 @@ def create_generic_agent_factory(
                 
                 # Add the MCP tools
                 cloned_agent.tools.extend(mcp_tools)
+                
+                # Add instructions to prefer MCP tools
+                mcp_instructions = _load_mcp_preference_instructions(mcp_tools)
+                if mcp_instructions:
+                    append_instructions(cloned_agent, mcp_instructions)
                 
         except ImportError:
             # MCP command not available, skip

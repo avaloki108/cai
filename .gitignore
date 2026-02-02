@@ -174,3 +174,42 @@ data/
 
 # ignore dev files
 cai-*
+
+# Personal/local files
+.serena/
+slither_output*.json
+slither-py-index.json
+oracle_security_report.txt
+oracle_security_report.md
+
+# Local analysis scripts (root level one-offs)
+additional_vulnerability_analysis.py
+analyze_repo.py
+analyze_slither_results.py
+check_parent_solidity_files.py
+check_solidity_files.py
+extract_*.py
+format_findings.py
+generate_*_report.py
+generate_report.py
+validate_hypotheses.py
+verify_aegis_integration.py
+verify_files_created.py
+vulnerability_analysis.py
+simple_test.py
+test_web3_integration.py
+
+# Local documentation/status files
+AEGIS_*.md
+FIXES_SUMMARY.md
+IMPLEMENTATION_COMPLETE.md
+INTEGRATION_COMPLETE.md
+PRECISION_*.md
+PRECISION_*.txt
+TECHNICAL_EVALUATION_SUMMARY.md
+WEB3_TOOLS_INTEGRATION_SUMMARY.md
+SETUP_WEB3_TOOLS.md
+
+# Local sync scripts
+quick_sync.sh
+update_from_upstream.sh

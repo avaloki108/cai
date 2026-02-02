@@ -66,6 +66,12 @@ Environment Variables
             (default: "true"). When enabled, applies security guardrails
             to prevent potentially dangerous outputs and inputs. Set to
             "false" to disable all guardrail functionality.
+        CAI_AUTO_REPORT: Enable/disable automatic report generation
+            (default: "true"). When enabled, automatically generates
+            comprehensive reports upon agent task completion and saves
+            them to the .cai/ directory.
+        CAI_REPORT_DIR: Directory for auto-generated reports (default: ".cai")
+        CAI_REPORT_FORMAT: Report format - "md", "json", "html" (default: "md")
 
     Extensions (only applicable if the right extension is installed):
 
@@ -390,7 +396,7 @@ from cai.repl.ui.prompt import get_user_input
 from cai.repl.ui.toolbar import get_toolbar_with_refresh
 
 # CAI SDK imports
-from cai.sdk.agents import Agent, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
+from cai.sdk.agents import Agent, OpenAIChatCompletionsModel, Runner, set_tracing_disabled, get_report_config
 from cai.sdk.agents.items import ToolCallOutputItem
 from cai.sdk.agents.exceptions import OutputGuardrailTripwireTriggered, InputGuardrailTripwireTriggered, ModelBehaviorError
 from cai.sdk.agents.models.openai_chatcompletions import (
@@ -435,6 +441,54 @@ global START_TIME
 START_TIME = time.time()
 
 set_tracing_disabled(True)
+
+
+def check_and_display_report_notification():
+    """
+    Check if a report was recently generated and display a notification.
+    
+    Returns the path to the most recent report if found, None otherwise.
+    """
+    try:
+        from pathlib import Path
+        from datetime import datetime, timedelta
+        
+        config = get_report_config()
+        if not config.enabled:
+            return None
+            
+        report_dir = Path(config.report_dir)
+        if not report_dir.is_absolute():
+            report_dir = Path.cwd() / report_dir
+            
+        if not report_dir.exists():
+            return None
+            
+        # Find reports created in the last 30 seconds
+        cutoff = datetime.now() - timedelta(seconds=30)
+        recent_reports = []
+        
+        for ext in ['md', 'json', 'html']:
+            for report_file in report_dir.glob(f'*.{ext}'):
+                mtime = datetime.fromtimestamp(report_file.stat().st_mtime)
+                if mtime > cutoff:
+                    recent_reports.append((report_file, mtime))
+        
+        if recent_reports:
+            # Get the most recent report
+            most_recent = max(recent_reports, key=lambda x: x[1])
+            report_path = most_recent[0]
+            
+            # Display notification
+            console.print(
+                f"\n[green]📄 Report saved:[/green] [cyan]{report_path}[/cyan]"
+            )
+            return str(report_path)
+            
+    except Exception:
+        pass  # Silently ignore errors in notification display
+        
+    return None
 
 
 def update_agent_models_recursively(agent, new_model, visited=None):
@@ -1387,6 +1441,10 @@ def run_cai_cli(
                     raise
                     
                 turn_count += 1
+                
+                # Check and display report notification after parallel agent runs complete
+                check_and_display_report_notification()
+                
                 stop_active_timer()
                 start_idle_timer()
                 continue
@@ -1990,6 +2048,9 @@ def run_cai_cli(
 
                 agent.model.message_history[:] = fix_message_list(agent.model.message_history)
             turn_count += 1
+            
+            # Check and display report notification after agent run completes
+            check_and_display_report_notification()
 
             # Stop measuring active time and start measuring idle time again
             stop_active_timer()
@@ -2159,6 +2220,24 @@ def main():
     except Exception:
         # Avoid disrupting startup if pattern system is unavailable
         pass
+
+    # Auto-load MCP servers from config (~/.cai/mcp.yaml)
+    try:
+        from cai.mcp import auto_load_mcp_servers
+        
+        # Check if MCP auto-load is enabled (default: true)
+        mcp_auto_load = os.getenv("CAI_MCP_AUTO_LOAD", "true").lower() != "false"
+        mcp_verbose = os.getenv("CAI_MCP_VERBOSE", "false").lower() == "true"
+        
+        if mcp_auto_load:
+            auto_load_mcp_servers(verbose=mcp_verbose)
+    except ImportError:
+        # MCP module not available, skip
+        pass
+    except Exception as e:
+        # Don't crash startup if MCP loading fails
+        if os.getenv("CAI_DEBUG", "1") == "2":
+            print(color(f"Warning: MCP auto-load failed: {e}", color="yellow"))
 
     # Get the agent instance by name with default ID P1
     agent = get_agent_by_name(agent_type, agent_id="P1")

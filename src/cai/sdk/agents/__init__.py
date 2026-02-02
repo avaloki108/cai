@@ -40,6 +40,21 @@ from .items import (
 )
 from .lifecycle import AgentHooks, RunHooks
 from .model_settings import ModelSettings
+from .report_generator import (
+    ReportConfig,
+    ReportMetadata,
+    ensure_report_directory,
+    generate_report_filename,
+    generate_and_save_report,
+    generate_and_save_report_sync,
+    get_report_config,
+)
+from .auto_report_hooks import (
+    AutoReportHooks,
+    CombinedHooks,
+    get_auto_report_hooks,
+    run_with_auto_report,
+)
 from .models.interface import Model, ModelProvider, ModelTracing
 from .models.openai_chatcompletions import OpenAIChatCompletionsModel
 from .models.openai_provider import OpenAIProvider
@@ -247,4 +262,16 @@ __all__ = [
     "gen_trace_id",
     "gen_span_id",
     "default_tool_error_function",
+    # Auto-report generation
+    "ReportConfig",
+    "ReportMetadata",
+    "ensure_report_directory",
+    "generate_report_filename",
+    "generate_and_save_report",
+    "generate_and_save_report_sync",
+    "get_report_config",
+    "AutoReportHooks",
+    "CombinedHooks",
+    "get_auto_report_hooks",
+    "run_with_auto_report",
 ]

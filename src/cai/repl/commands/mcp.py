@@ -50,6 +50,20 @@ QUICK START:
 2. Load it: /mcp load http://localhost:9876/sse burp
 3. Add to agent: /mcp add burp your_agent
 4. Use the tools through the agent
+
+AUTO-LOADING (NEW!):
+==================
+MCP servers can be auto-loaded on CAI startup from ~/.cai/mcp.yaml
+
+1. Load your servers manually once
+2. Save the config: /mcp save
+3. Next time CAI starts, servers load automatically!
+
+Or edit ~/.cai/mcp.yaml directly. See /mcp config for current settings.
+
+Environment Variables:
+  CAI_MCP_AUTO_LOAD=false  - Disable auto-loading
+  CAI_MCP_VERBOSE=true     - Show loading progress
 """
 
 # Standard library imports
@@ -533,6 +547,24 @@ Example: `/mcp add burp 13`
 ```
 /mcp remove <server_name>
 ```
+
+### Save Current Config
+```
+/mcp save [--project]
+```
+Saves all currently loaded servers and bindings to ~/.cai/mcp.yaml (or .cai/mcp.yaml with --project)
+
+### Reload from Config
+```
+/mcp reload
+```
+Reloads MCP servers from the config file
+
+### Show Configuration
+```
+/mcp config
+```
+Shows current configuration file contents and status
 
 ### Show Help
 ```
@@ -1329,9 +1361,141 @@ Example: `/mcp add burp 13`
             console.print(f"[red]✗ Test failed: {type(e).__name__}: {str(e)}[/red]")
             return False
 
+    def handle_save(self, args: Optional[List[str]] = None) -> bool:
+        """Handle /mcp save command to save current MCP config.
+        
+        Usage: /mcp save [--project]
+        
+        Args:
+            args: Optional list of command arguments
+            
+        Returns:
+            True if successful
+        """
+        project_level = args and "--project" in args
+        
+        try:
+            from cai.mcp.config import create_default_config_from_current, save_mcp_config
+            
+            # Create config from current state
+            config = create_default_config_from_current(save=False)
+            
+            if not config.servers:
+                console.print("[yellow]No MCP servers currently loaded to save[/yellow]")
+                console.print("Load some servers first with /mcp load, then save.")
+                return False
+            
+            # Save to file
+            config_path = save_mcp_config(config, project_level=project_level)
+            
+            console.print(f"[green]✓ Saved MCP config to {config_path}[/green]")
+            console.print(f"[dim]Saved {len(config.servers)} server(s) and {len(config.bindings)} binding(s)[/dim]")
+            console.print("\n[cyan]These servers will now auto-load on CAI startup![/cyan]")
+            
+            return True
+            
+        except ImportError as e:
+            console.print(f"[red]Error: MCP config module not available: {e}[/red]")
+            return False
+        except Exception as e:
+            console.print(f"[red]Error saving config: {e}[/red]")
+            return False
+
+    def handle_reload(self, args: Optional[List[str]] = None) -> bool:
+        """Handle /mcp reload command to reload servers from config.
+        
+        Args:
+            args: Optional list of command arguments
+            
+        Returns:
+            True if successful
+        """
+        try:
+            from cai.mcp.config import auto_load_mcp_servers
+            
+            console.print("[cyan]Reloading MCP servers from config...[/cyan]")
+            results = auto_load_mcp_servers(verbose=True)
+            
+            if not results:
+                console.print("[yellow]No servers configured in ~/.cai/mcp.yaml[/yellow]")
+                console.print("Create a config file or use /mcp save after loading servers manually.")
+            
+            return True
+            
+        except ImportError as e:
+            console.print(f"[red]Error: MCP config module not available: {e}[/red]")
+            return False
+        except Exception as e:
+            console.print(f"[red]Error reloading config: {e}[/red]")
+            return False
+
+    def handle_config(self, args: Optional[List[str]] = None) -> bool:
+        """Handle /mcp config command to show current configuration.
+        
+        Args:
+            args: Optional list of command arguments
+            
+        Returns:
+            True
+        """
+        try:
+            from cai.mcp.config import load_mcp_config, get_config_path
+            
+            # Show config file locations
+            user_path = get_config_path(project_level=False)
+            project_path = get_config_path(project_level=True)
+            
+            console.print("[bold]MCP Configuration Files:[/bold]")
+            console.print(f"  User config:    {user_path} {'[green](exists)[/green]' if user_path.exists() else '[dim](not found)[/dim]'}")
+            console.print(f"  Project config: {project_path} {'[green](exists)[/green]' if project_path.exists() else '[dim](not found)[/dim]'}")
+            console.print()
+            
+            # Load and show config
+            config = load_mcp_config()
+            
+            if config.servers:
+                table = Table(title="Configured Servers")
+                table.add_column("Name", style="cyan")
+                table.add_column("Type", style="magenta")
+                table.add_column("Enabled", style="green")
+                table.add_column("Details", style="dim")
+                
+                for name, server in config.servers.items():
+                    enabled = "[green]✓[/green]" if server.enabled else "[red]✗[/red]"
+                    if server.type == "stdio":
+                        details = f"{server.command} {' '.join(server.args[:2])}..."
+                    else:
+                        details = server.url or "N/A"
+                    table.add_row(name, server.type, enabled, details[:50])
+                
+                console.print(table)
+            else:
+                console.print("[yellow]No servers configured[/yellow]")
+            
+            if config.bindings:
+                console.print("\n[bold]Agent Bindings:[/bold]")
+                for agent, servers in config.bindings.items():
+                    console.print(f"  {agent}: {', '.join(servers)}")
+            
+            console.print(f"\n[bold]Settings:[/bold]")
+            console.print(f"  auto_load: {config.settings.get('auto_load', True)}")
+            console.print(f"  timeout: {config.settings.get('timeout', 30)}s")
+            console.print(f"  verbose: {config.settings.get('verbose', False)}")
+            
+            return True
+            
+        except ImportError as e:
+            console.print(f"[red]Error: MCP config module not available: {e}[/red]")
+            return False
+        except Exception as e:
+            console.print(f"[red]Error loading config: {e}[/red]")
+            return False
+
 
 def get_mcp_servers_for_agent(agent_name: str) -> List[str]:
     """Get list of MCP server names associated with an agent.
+    
+    Checks both explicit associations and wildcard bindings from config.
     
     Args:
         agent_name: Name of the agent
@@ -1339,7 +1503,25 @@ def get_mcp_servers_for_agent(agent_name: str) -> List[str]:
     Returns:
         List of MCP server names
     """
-    return _AGENT_MCP_ASSOCIATIONS.get(agent_name.lower(), [])
+    servers = list(_AGENT_MCP_ASSOCIATIONS.get(agent_name.lower(), []))
+    
+    # Also check config for wildcard bindings (e.g., "*": [morphmcp])
+    try:
+        from cai.mcp.config import load_mcp_config
+        config = load_mcp_config()
+        
+        # get_servers_for_agent handles both exact matches and wildcards
+        config_servers = config.get_servers_for_agent(agent_name)
+        
+        # Add any servers from config that aren't already in the list
+        # Only add if the server is actually loaded
+        for server_name in config_servers:
+            if server_name not in servers and server_name in _GLOBAL_MCP_SERVERS:
+                servers.append(server_name)
+    except Exception:
+        pass  # Config not available, use just associations
+    
+    return servers
 
 
 def add_mcp_server_to_agent(agent_name: str, server_name: str):
