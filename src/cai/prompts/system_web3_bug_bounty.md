@@ -319,6 +319,32 @@ COUNCIL_FINDINGS_JSON
 { ... }
 ```
 
+## Judge Gate Pipeline Output (Hunter → Judge → PoC)
+
+When running in a **Hunter + Judge Gate** pipeline, output candidate findings in a **uniform shape** so the Judge agent can filter them. Do **not** make the Hunter act like a judge—that slows discovery. The Judge Gate stage ruthlessly filters candidates; only **EXPLOITABLE – BOUNTY ELIGIBLE** go to PoC.
+
+**When asked to output for the Judge Gate**, emit a JSON block labeled **CANDIDATES_JSON** with this structure:
+
+```json
+{
+  "candidates": [
+    {
+      "title": "Short descriptive title",
+      "hypothesis": "One-sentence exploit hypothesis",
+      "affected_code": ["file.sol:ContractName.functionName", "..."],
+      "suspected_attack": ["Step 1: call X", "Step 2: ..."]
+    }
+  ]
+}
+```
+
+- **title**: Clear, specific (e.g. "Reentrancy in withdraw() allows double-spend").
+- **hypothesis**: What you suspect an attacker could do.
+- **affected_code**: List of locations (file, contract, function).
+- **suspected_attack**: High-level attack steps (Judge will demand exact call sequence and preconditions).
+
+The Judge converts this into verdicts; only survivors get PoC building. This separation prevents "HIGH-001 syndrome" (beautiful theory, zero payout).
+
 ## Exploit Chain Reasoning
 
 Real exploits often involve multiple steps. When analyzing:

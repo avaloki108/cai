@@ -755,6 +755,48 @@ web3_attack_graph_pattern = {
     ],
 }
 
+# =============================================================================
+# Pattern: Web3 Hunter → Judge Gate → PoC (Exploitability pipeline)
+# =============================================================================
+web3_hunter_judge_poc_pattern = {
+    "name": "web3_hunter_judge_poc_pattern",
+    "type": "parallel",
+    "description": (
+        "Hunter (creative) → Judge Gate (exploitability filter) → PoC (survivors only). "
+        "Hunter outputs CANDIDATES_JSON; Judge outputs verdicts; only EXPLOITABLE – BOUNTY ELIGIBLE go to PoC."
+    ),
+    "unified_context": False,
+    "configs": [
+        ParallelConfig(
+            "web3_bug_bounty_agent",
+            prompt=(
+                "ROLE: Hunter (Phase A). Be creative and expansive. Find suspicious patterns, "
+                "edge cases, invariants to test. Generate candidate issues. "
+                "Output findings in CANDIDATES_JSON format: { \"candidates\": [ { \"title\", \"hypothesis\", "
+                "\"affected_code\", \"suspected_attack\" } ] }. Do NOT act as judge—output many candidates."
+            ),
+        ),
+        ParallelConfig(
+            "defi_bounty_judge_agent",
+            prompt=(
+                "ROLE: Judge Gate (Phase B). You will receive candidate findings (CANDIDATES_JSON). "
+                "Evaluate each: Does this exploit work now, in current code? "
+                "Require concrete call sequence with named functions and state preconditions. "
+                "Output verdicts: only EXPLOITABLE – BOUNTY ELIGIBLE get promoted. "
+                "If no real attack path, return INVALID – NO REAL ATTACK PATH."
+            ),
+        ),
+        ParallelConfig(
+            "retester_agent",
+            prompt=(
+                "ROLE: PoC Builder (Phase C). Build Foundry tests / minimal tx sequences "
+                "ONLY for issues that passed the Judge as EXPLOITABLE – BOUNTY ELIGIBLE. "
+                "Confirm impact is measurable."
+            ),
+        ),
+    ],
+}
+
 # Cleanup legacy patterns so only the new exports remain.
 for _name in (
     "web3_comprehensive_pattern",

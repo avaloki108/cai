@@ -82,6 +82,17 @@ AVAILABLE_AGENTS = AVAILABLE_AGENTS + [
     "exploit_synthesizer",
     "poc_generator",
     "attributor",
+    # Specialized standalone audit agents
+    "web3_discovery_agent",
+    "web3_gctr_agent",
+    # Cross-chain and MEV analyzers
+    "bridge_analyzer",
+    "mev_analyzer",
+    # Protocol-specific analyzers
+    "perpetuals_analyzer",
+    "stablecoin_analyzer",
+    "aa_analyzer",
+    "restaking_analyzer",
 ]
 
 # Extend the search path for namespace packages (allows merging)

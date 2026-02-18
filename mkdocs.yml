@@ -86,6 +86,7 @@ nav:
       - Tools: tools.md
       - Handoffs: handoffs.md
       - Multi-Agent Systems: multi_agent.md
+      - Judge Gate Pipeline (Hunter → Judge → PoC): judge_gate_pipeline.md
 
   # ========================================
   # MODELS & PROVIDERS (REORGANIZADO)

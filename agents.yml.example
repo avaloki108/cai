@@ -33,3 +33,17 @@ parallel_agents:
 
 # When 2 or more agents are configured, parallel mode is automatically enabled
 # The agents will be available for selection when you enter a prompt
+
+# -----------------------------------------------------------------------------
+# Judge Gate pipeline (Hunter → Judge → PoC): Hunter outputs CANDIDATES_JSON,
+# Judge filters to EXPLOITABLE – BOUNTY ELIGIBLE only, PoC builds for survivors.
+# Use with /agent web3_hunter_judge_poc_pattern or configure manually:
+# -----------------------------------------------------------------------------
+# parallel_agents:
+#   - name: web3_bug_bounty_agent
+#     prompt: "ROLE: Hunter. Output CANDIDATES_JSON when you have candidate findings."
+#   - name: defi_bounty_judge_agent
+#     prompt: "ROLE: Judge Gate. Evaluate candidates JSON; output verdicts. Only EXPLOITABLE go to PoC."
+#   - name: retester_agent
+#     prompt: "ROLE: PoC Builder. Build Foundry tests only for EXPLOITABLE – BOUNTY ELIGIBLE issues."
+# See docs/judge_gate_pipeline.md for the full pipeline and contracts.

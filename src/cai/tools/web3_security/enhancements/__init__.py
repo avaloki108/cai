@@ -21,6 +21,7 @@ Available modules:
 - invariant_gen: Automated invariant generation
 - defi_analyzer: DeFi protocol-specific analysis
 - validation: Enhanced finding validation
+- mev_simulator: MEV extraction simulation and detection
 """
 
 from .attack_graph import (
@@ -60,6 +61,21 @@ from .iris import (
     iris_batch_contextual_filter,
 )
 
+# MEV Simulator (for detecting MEV extraction opportunities)
+try:
+    from .mev_simulator import (
+        detect_sandwich_vulnerability,
+        detect_frontrun_vulnerability,
+        detect_backrun_opportunity,
+        detect_jit_liquidity_risk,
+        simulate_sandwich_attack,
+        calculate_mev_exposure,
+        suggest_mev_mitigations,
+    )
+    MEV_AVAILABLE = True
+except ImportError:
+    MEV_AVAILABLE = False
+
 __all__ = [
     # Attack Graph
     'build_attack_graph',
@@ -87,3 +103,14 @@ __all__ = [
     'iris_batch_contextual_filter',
 ]
 
+# Add MEV tools if available
+if MEV_AVAILABLE:
+    __all__.extend([
+        'detect_sandwich_vulnerability',
+        'detect_frontrun_vulnerability',
+        'detect_backrun_opportunity',
+        'detect_jit_liquidity_risk',
+        'simulate_sandwich_attack',
+        'calculate_mev_exposure',
+        'suggest_mev_mitigations',
+    ])

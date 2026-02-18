@@ -5,6 +5,14 @@ Supports loading MCP servers from:
 1. ~/.cai/mcp.yaml (user-level, primary)
 2. .cai/mcp.yaml (project-level, merged)
 
+Serena active project: When using the Serena MCP server, the "active project"
+is required for list_dir/find_symbol etc. You can either:
+- Run cai from the target repo and use a project-level .cai/mcp.yaml that
+  overrides the serena server with args including ``--project-from-cwd`` and
+  ``cwd: .`` so Serena auto-activates the project from the process CWD, or
+- Have the agent call the ``activate_project`` tool first (e.g. by including
+  that instruction in your initial prompt).
+
 Example configuration:
 
 ```yaml
