@@ -1,0 +1,4613 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../assets/imago.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+    
+    
+      
+        <title>API Reference Documentation - CAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.4af4bdda.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference-documentation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="CAI" class="md-header__button md-logo" aria-label="CAI" data-md-component="logo">
+      
+  <img src="../assets/imago.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API Reference Documentation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aliasrobotics/cai" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliasrobotics/cai
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="CAI" class="md-nav__button md-logo" aria-label="CAI" data-md-component="logo">
+      
+  <img src="../assets/imago.png" alt="logo">
+
+    </a>
+    CAI
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aliasrobotics/cai" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aliasrobotics/cai
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Professional Edition
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Professional Edition
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🤔 Why CAI PRO?
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_alias1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ⭐ Alias1 Model
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🔥 Exclusive Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ⭐ API Server (CAI PRO)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_pricing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    💰 Pricing & Plans
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    🚀 Get Started with PRO
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_pro_contact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    📞 Contact Sales
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    User Interfaces
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Interfaces
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Mobile UI (iOS)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            Mobile UI (iOS)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/mui_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/user_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/gestures_shortcuts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Gestures & Shortcuts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mui/chat_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Chat Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Terminal UI (TUI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Terminal UI (TUI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/tui_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/user_interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    User Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/terminals_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Terminals Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/teams_and_parallel_execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Teams & Parallel Execution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/sidebar_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sidebar Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/keyboard_shortcuts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Keyboard Shortcuts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/commands_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/advanced_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Advanced Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tui/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Command Line Interface (CLI)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Command Line Interface (CLI)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/cli_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/commands_reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Commands Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/advanced_usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Advanced Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Core Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handoffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoffs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multi_agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Multi-Agent Systems
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../judge_gate_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Judge Gate Pipeline (Hunter → Judge → PoC)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models & Providers
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Models & Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_list_of_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Model Providers
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            Model Providers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/openrouter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenRouter
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/ollama/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Ollama
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/azure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Azure OpenAI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../running_agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Agents
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../continue_mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Continue Mode
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session_resume/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Session Resume
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Working with Results
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../streaming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Streaming
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tracing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tracing & Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Context Management
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guardrails & Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../council/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LLM Council
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../grit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Grit (Audit Persistence)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../environment_variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Benchmarking
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Benchmarking
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/running_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/attack_defense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Attack & Defense CTFs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/jeopardy_ctfs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jeopardy CTFs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/cyber_ranges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cyber Ranges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/knowledge_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Knowledge Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../benchmarking/privacy_benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Privacy Benchmarks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Research
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Research
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../research_docs_index/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Research Docs Index
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_1" id="__nav_9_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Agents
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_1">
+            <span class="md-nav__icon md-icon"></span>
+            Agents
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runner
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/tool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tool
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/result/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Result
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/stream_events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Stream Events
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/handoffs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoffs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Lifecycle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/items/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Items
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/run_context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Run Context
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/guardrail/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guardrail
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/model_settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Model Settings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/agent_output/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent Output
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/function_schema/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Function Schema
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_2" id="__nav_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            Models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/models/interface/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/models/openai_chatcompletions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenAI Chat Completions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/models/openai_responses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    OpenAI Responses
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_9_3" id="__nav_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Extensions
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            Extensions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/extensions/handoff_filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoff Filters
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ref/extensions/handoff_prompt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Handoff Prompt
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Advanced
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Development
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Resources
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            Resources
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_find_us/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Find Us
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cai_citation_and_acknowledgments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Citation & Acknowledgments
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#orchestrator-agent-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Orchestrator Agent API
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Orchestrator Agent API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auditorchestrator" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuditOrchestrator
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AuditOrchestrator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run_full_auditconfig-dict-auditreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_full_audit(config: dict) -&gt; AuditReport
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_parallel_audittargets-liststr-listauditreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_parallel_audit(targets: List[str]) -&gt; List[AuditReport]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_status-dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_status() -&gt; dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pause_auditaudit_id-str-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      pause_audit(audit_id: str) -&gt; bool
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resume_auditaudit_id-str-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      resume_audit(audit_id: str) -&gt; bool
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cancel_auditaudit_id-str-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      cancel_audit(audit_id: str) -&gt; bool
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#web3-audit-agent-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Web3 Audit Agent API
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web3 Audit Agent API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web3auditagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      Web3AuditAgent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web3AuditAgent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analyze_contractcontract_code-str-config-dict-none-listfinding" class="md-nav__link">
+    <span class="md-ellipsis">
+      analyze_contract(contract_code: str, config: dict = None) -&gt; List[Finding]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analyze_protocolprotocol_config-dict-protocolreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      analyze_protocol(protocol_config: dict) -&gt; ProtocolReport
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check_compliancecontract-str-standards-liststr-compliancereport" class="md-nav__link">
+    <span class="md-ellipsis">
+      check_compliance(contract: str, standards: List[str]) -&gt; ComplianceReport
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detect_patternscontract-str-listpatternmatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      detect_patterns(contract: str) -&gt; List[PatternMatch]
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aiml-engine-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      AI/ML Engine API
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AI/ML Engine API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mlsecurityanalyzer" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLSecurityAnalyzer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MLSecurityAnalyzer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#classify_vulnerabilitycode_pattern-str-context-dict-none-dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      classify_vulnerability(code_pattern: str, context: dict = None) -&gt; dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predict_risk_scorecontract_features-dict-float" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict_risk_score(contract_features: dict) -&gt; float
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detect_anomaliestransaction_data-listdict-listanomaly" class="md-nav__link">
+    <span class="md-ellipsis">
+      detect_anomalies(transaction_data: List[dict]) -&gt; List[Anomaly]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#train_modeltraining_data-listdict-validation_data-listdict-trainingresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      train_model(training_data: List[dict], validation_data: List[dict]) -&gt; TrainingResult
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluate_modeltest_data-listdict-evaluationmetrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      evaluate_model(test_data: List[dict]) -&gt; EvaluationMetrics
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#static-analysis-adapter-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Static Analysis Adapter API
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Static Analysis Adapter API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#staticanalysisadapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      StaticAnalysisAdapter
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="StaticAnalysisAdapter">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#integrate_tooltool_name-str-config-dict-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      integrate_tool(tool_name: str, config: dict) -&gt; bool
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_analysistarget-str-tools-liststr-config-dict-none-analysisresults" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_analysis(target: str, tools: List[str], config: dict = None) -&gt; AnalysisResults
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parse_resultsraw_output-str-tool-str-listfinding" class="md-nav__link">
+    <span class="md-ellipsis">
+      parse_results(raw_output: str, tool: str) -&gt; List[Finding]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_supported_tools-liststr" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_supported_tools() -&gt; List[str]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate_tool_configtool-str-config-dict-validationresult" class="md-nav__link">
+    <span class="md-ellipsis">
+      validate_tool_config(tool: str, config: dict) -&gt; ValidationResult
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#traditional-security-agent-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      Traditional Security Agent API
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Traditional Security Agent API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#traditionalsecurityagent" class="md-nav__link">
+    <span class="md-ellipsis">
+      TraditionalSecurityAgent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TraditionalSecurityAgent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#assess_network_securityconfig-dict-networkreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      assess_network_security(config: dict) -&gt; NetworkReport
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check_access_controlssystem-str-config-dict-none-accessreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      check_access_controls(system: str, config: dict = None) -&gt; AccessReport
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit_configurationconfig_files-liststr-configreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      audit_configuration(config_files: List[str]) -&gt; ConfigReport
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perform_compliance_checksystem-str-standards-liststr-compliancereport" class="md-nav__link">
+    <span class="md-ellipsis">
+      perform_compliance_check(system: str, standards: List[str]) -&gt; ComplianceReport
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generate_security_recommendationsfindings-listfinding-listrecommendation" class="md-nav__link">
+    <span class="md-ellipsis">
+      generate_security_recommendations(findings: List[Finding]) -&gt; List[Recommendation]
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-system-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core System APIs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core System APIs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auditapi" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuditAPI
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AuditAPI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      Endpoints
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1auditsubmit" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/audit/submit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1auditaudit_idstatus" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/audit/{audit_id}/status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1auditaudit_idresults" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/audit/{audit_id}/results
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-apiv1toolsregister" class="md-nav__link">
+    <span class="md-ellipsis">
+      POST /api/v1/tools/register
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cli-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      CLI API
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web3-audit-audit-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      web3-audit audit [target]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web3-audit-status-audit_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      web3-audit status [audit_id]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web3-audit-report-audit_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      web3-audit report [audit_id]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web3-audit-tools-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      web3-audit tools list
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web3-audit-config-validate-config_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      web3-audit config validate [config_file]
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Models
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Models">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#finding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finding
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#location" class="md-nav__link">
+    <span class="md-ellipsis">
+      Location
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#auditreport" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuditReport
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reportsummary" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReportSummary
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exception-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exception Hierarchy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-response-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Response Format
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-handling-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retry-mechanisms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Retry Mechanisms
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication-and-authorization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication and Authorization
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Authentication and Authorization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Authentication
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jwt-token-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      JWT Token Authentication
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-key-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Key Authentication
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#role-based-access-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      Role-Based Access Control
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rate-limiting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rate Limiting
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#webhooks-and-callbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Webhooks and Callbacks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Webhooks and Callbacks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#webhook-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Webhook Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#webhook-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      Webhook Payload
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#webhook-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      Webhook Security
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="api-reference-documentation">API Reference Documentation</h1>
+<p>This document provides comprehensive API documentation for all agent interfaces and system components of the Web3 Security Auditing AI System.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#orchestrator-agent-api">Orchestrator Agent API</a></li>
+<li><a href="#web3-audit-agent-api">Web3 Audit Agent API</a></li>
+<li><a href="#aiml-engine-api">AI/ML Engine API</a></li>
+<li><a href="#static-analysis-adapter-api">Static Analysis Adapter API</a></li>
+<li><a href="#traditional-security-agent-api">Traditional Security Agent API</a></li>
+<li><a href="#core-system-apis">Core System APIs</a></li>
+<li><a href="#data-models">Data Models</a></li>
+<li><a href="#error-handling">Error Handling</a></li>
+</ul>
+<hr />
+<h2 id="orchestrator-agent-api">Orchestrator Agent API</h2>
+<h3 id="auditorchestrator">AuditOrchestrator</h3>
+<p>The main coordination class for running comprehensive audits.</p>
+<h4 id="constructor">Constructor</h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><span class="n">AuditOrchestrator</span><span class="p">(</span>
+</span><span id="__span-0-2">    <span class="n">agents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseAuditAgent</span><span class="p">],</span>
+</span><span id="__span-0-3">    <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OrchestratorConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-4"><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Parameters:</strong>
+- <code>agents</code>: List of audit agents to coordinate
+- <code>config</code>: Optional orchestrator configuration</p>
+<h4 id="methods">Methods</h4>
+<h5 id="run_full_auditconfig-dict-auditreport">run_full_audit(config: dict) -&gt; AuditReport</h5>
+<p>Execute end-to-end audit workflow.</p>
+<p><strong>Parameters:</strong>
+- <code>config</code> (dict): Audit configuration including:
+  - <code>target</code>: Contract path, code, or repository URL
+  - <code>analysis_type</code>: "basic", "comprehensive", or "deep"
+  - <code>tools</code>: List of tools to use
+  - <code>timeout</code>: Analysis timeout in seconds
+  - <code>parallel</code>: Enable parallel processing</p>
+<p><strong>Returns:</strong>
+- <code>AuditReport</code>: Complete audit report with findings</p>
+<p><strong>Raises:</strong>
+- <code>AuditTimeoutError</code>: When analysis exceeds timeout
+- <code>AgentCommunicationError</code>: When agent coordination fails
+- <code>ConfigurationError</code>: When config is invalid</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><span class="n">orchestrator</span> <span class="o">=</span> <span class="n">AuditOrchestrator</span><span class="p">([</span><span class="n">web3_agent</span><span class="p">,</span> <span class="n">ml_agent</span><span class="p">])</span>
+</span><span id="__span-1-2"><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-1-3">    <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;contracts/Token.sol&quot;</span><span class="p">,</span>
+</span><span id="__span-1-4">    <span class="s2">&quot;analysis_type&quot;</span><span class="p">:</span> <span class="s2">&quot;comprehensive&quot;</span><span class="p">,</span>
+</span><span id="__span-1-5">    <span class="s2">&quot;tools&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;slither&quot;</span><span class="p">,</span> <span class="s2">&quot;mythril&quot;</span><span class="p">],</span>
+</span><span id="__span-1-6">    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mi">300</span>
+</span><span id="__span-1-7"><span class="p">}</span>
+</span><span id="__span-1-8"><span class="n">report</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run_full_audit</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span></code></pre></div></p>
+<h5 id="run_parallel_audittargets-liststr-listauditreport">run_parallel_audit(targets: List[str]) -&gt; List[AuditReport]</h5>
+<p>Run parallel audits on multiple targets.</p>
+<p><strong>Parameters:</strong>
+- <code>targets</code> (List[str]): List of targets to audit</p>
+<p><strong>Returns:</strong>
+- <code>List[AuditReport]</code>: List of audit reports</p>
+<h5 id="get_status-dict">get_status() -&gt; dict</h5>
+<p>Get current audit status and progress.</p>
+<p><strong>Returns:</strong>
+- <code>dict</code>: Status information including:
+  - <code>active_audits</code>: Number of running audits
+  - <code>completed_audits</code>: Number of completed audits
+  - <code>failed_audits</code>: Number of failed audits
+  - <code>progress</code>: Overall progress percentage</p>
+<h5 id="pause_auditaudit_id-str-bool">pause_audit(audit_id: str) -&gt; bool</h5>
+<p>Pause a running audit.</p>
+<p><strong>Parameters:</strong>
+- <code>audit_id</code> (str): Unique audit identifier</p>
+<p><strong>Returns:</strong>
+- <code>bool</code>: True if paused successfully</p>
+<h5 id="resume_auditaudit_id-str-bool">resume_audit(audit_id: str) -&gt; bool</h5>
+<p>Resume a paused audit.</p>
+<p><strong>Parameters:</strong>
+- <code>audit_id</code> (str): Unique audit identifier</p>
+<p><strong>Returns:</strong>
+- <code>bool</code>: True if resumed successfully</p>
+<h5 id="cancel_auditaudit_id-str-bool">cancel_audit(audit_id: str) -&gt; bool</h5>
+<p>Cancel a running audit.</p>
+<p><strong>Parameters:</strong>
+- <code>audit_id</code> (str): Unique audit identifier</p>
+<p><strong>Returns:</strong>
+- <code>bool</code>: True if cancelled successfully</p>
+<hr />
+<h2 id="web3-audit-agent-api">Web3 Audit Agent API</h2>
+<h3 id="web3auditagent">Web3AuditAgent</h3>
+<p>Specialized agent for blockchain and smart contract analysis.</p>
+<h4 id="constructor_1">Constructor</h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><span class="n">Web3AuditAgent</span><span class="p">(</span>
+</span><span id="__span-2-2">    <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Web3AgentConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-2-3">    <span class="n">tools</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">BaseTool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-2-4"><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="methods_1">Methods</h4>
+<h5 id="analyze_contractcontract_code-str-config-dict-none-listfinding">analyze_contract(contract_code: str, config: dict = None) -&gt; List[Finding]</h5>
+<p>Analyze smart contract code for vulnerabilities.</p>
+<p><strong>Parameters:</strong>
+- <code>contract_code</code> (str): Solidity contract source code
+- <code>config</code> (dict): Analysis configuration</p>
+<p><strong>Returns:</strong>
+- <code>List[Finding]</code>: List of security findings</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><span class="n">agent</span> <span class="o">=</span> <span class="n">Web3AuditAgent</span><span class="p">()</span>
+</span><span id="__span-3-2"><span class="n">findings</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">analyze_contract</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="__span-3-3"><span class="s2">pragma solidity ^0.8.0;</span>
+</span><span id="__span-3-4"><span class="s2">contract Token {</span>
+</span><span id="__span-3-5"><span class="s2">    mapping(address =&gt; uint) balances;</span>
+</span><span id="__span-3-6"><span class="s2">    function transfer(address to, uint amount) public {</span>
+</span><span id="__span-3-7"><span class="s2">        balances[msg.sender] -= amount; // Bug: no underflow check</span>
+</span><span id="__span-3-8"><span class="s2">        balances[to] += amount;</span>
+</span><span id="__span-3-9"><span class="s2">    }</span>
+</span><span id="__span-3-10"><span class="s2">}</span>
+</span><span id="__span-3-11"><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</span></code></pre></div></p>
+<h5 id="analyze_protocolprotocol_config-dict-protocolreport">analyze_protocol(protocol_config: dict) -&gt; ProtocolReport</h5>
+<p>Analyze complete blockchain protocol.</p>
+<p><strong>Parameters:</strong>
+- <code>protocol_config</code> (dict): Protocol configuration including:
+  - <code>contracts</code>: List of contract paths
+  - <code>networks</code>: Target networks
+  - <code>analysis_depth</code>: Analysis depth level</p>
+<p><strong>Returns:</strong>
+- <code>ProtocolReport</code>: Comprehensive protocol analysis report</p>
+<h5 id="check_compliancecontract-str-standards-liststr-compliancereport">check_compliance(contract: str, standards: List[str]) -&gt; ComplianceReport</h5>
+<p>Check compliance with security standards.</p>
+<p><strong>Parameters:</strong>
+- <code>contract</code> (str): Contract source code
+- <code>standards</code> (List[str]): Standards to check (e.g., ["ERC-20", "SWC"])</p>
+<p><strong>Returns:</strong>
+- <code>ComplianceReport</code>: Compliance assessment results</p>
+<h5 id="detect_patternscontract-str-listpatternmatch">detect_patterns(contract: str) -&gt; List[PatternMatch]</h5>
+<p>Detect known vulnerability patterns.</p>
+<p><strong>Parameters:</strong>
+- <code>contract</code> (str): Contract source code</p>
+<p><strong>Returns:</strong>
+- <code>List[PatternMatch]</code>: Matched vulnerability patterns</p>
+<hr />
+<h2 id="aiml-engine-api">AI/ML Engine API</h2>
+<h3 id="mlsecurityanalyzer">MLSecurityAnalyzer</h3>
+<p>Machine learning-powered vulnerability detection and classification.</p>
+<h4 id="constructor_2">Constructor</h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><span class="n">MLSecurityAnalyzer</span><span class="p">(</span>
+</span><span id="__span-4-2">    <span class="n">model_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-4-3">    <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MLConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-4-4"><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="methods_2">Methods</h4>
+<h5 id="classify_vulnerabilitycode_pattern-str-context-dict-none-dict">classify_vulnerability(code_pattern: str, context: dict = None) -&gt; dict</h5>
+<p>Classify code pattern as vulnerability type.</p>
+<p><strong>Parameters:</strong>
+- <code>code_pattern</code> (str): Code snippet to analyze
+- <code>context</code> (dict): Additional context information</p>
+<p><strong>Returns:</strong>
+- <code>dict</code>: Classification results including:
+  - <code>vulnerability_type</code>: Predicted vulnerability type
+  - <code>severity</code>: Predicted severity level
+  - <code>confidence</code>: Classification confidence score
+  - <code>explanation</code>: AI-generated explanation</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><span class="n">analyzer</span> <span class="o">=</span> <span class="n">MLSecurityAnalyzer</span><span class="p">()</span>
+</span><span id="__span-5-2"><span class="n">result</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">classify_vulnerability</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="__span-5-3"><span class="s2">function withdraw(uint amount) public {</span>
+</span><span id="__span-5-4"><span class="s2">    require(balances[msg.sender] &gt;= amount);</span>
+</span><span id="__span-5-5"><span class="s2">    (bool success,) = msg.sender.call{value: amount}(&quot;&quot;);</span>
+</span><span id="__span-5-6"><span class="s2">    require(success);</span>
+</span><span id="__span-5-7"><span class="s2">    balances[msg.sender] -= amount;</span>
+</span><span id="__span-5-8"><span class="s2">}</span>
+</span><span id="__span-5-9"><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</span><span id="__span-5-10"><span class="c1"># Returns: {&#39;vulnerability_type&#39;: &#39;reentrancy&#39;, &#39;severity&#39;: &#39;high&#39;, &#39;confidence&#39;: 0.92}</span>
+</span></code></pre></div></p>
+<h5 id="predict_risk_scorecontract_features-dict-float">predict_risk_score(contract_features: dict) -&gt; float</h5>
+<p>Predict CVSS risk score for contract.</p>
+<p><strong>Parameters:</strong>
+- <code>contract_features</code> (dict): Extracted contract features</p>
+<p><strong>Returns:</strong>
+- <code>float</code>: Predicted CVSS score (0.0-10.0)</p>
+<h5 id="detect_anomaliestransaction_data-listdict-listanomaly">detect_anomalies(transaction_data: List[dict]) -&gt; List[Anomaly]</h5>
+<p>Detect anomalous transaction patterns.</p>
+<p><strong>Parameters:</strong>
+- <code>transaction_data</code> (List[dict]): Transaction data to analyze</p>
+<p><strong>Returns:</strong>
+- <code>List[Anomaly]</code>: Detected anomalies with details</p>
+<h5 id="train_modeltraining_data-listdict-validation_data-listdict-trainingresult">train_model(training_data: List[dict], validation_data: List[dict]) -&gt; TrainingResult</h5>
+<p>Train ML model on new data.</p>
+<p><strong>Parameters:</strong>
+- <code>training_data</code> (List[dict]): Training dataset
+- <code>validation_data</code> (List[dict]): Validation dataset</p>
+<p><strong>Returns:</strong>
+- <code>TrainingResult</code>: Training metrics and model performance</p>
+<h5 id="evaluate_modeltest_data-listdict-evaluationmetrics">evaluate_model(test_data: List[dict]) -&gt; EvaluationMetrics</h5>
+<p>Evaluate model performance.</p>
+<p><strong>Parameters:</strong>
+- <code>test_data</code> (List[dict]): Test dataset</p>
+<p><strong>Returns:</strong>
+- <code>EvaluationMetrics</code>: Performance metrics (accuracy, precision, recall, F1)</p>
+<hr />
+<h2 id="static-analysis-adapter-api">Static Analysis Adapter API</h2>
+<h3 id="staticanalysisadapter">StaticAnalysisAdapter</h3>
+<p>Integration layer for static analysis tools.</p>
+<h4 id="constructor_3">Constructor</h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><span class="n">StaticAnalysisAdapter</span><span class="p">(</span>
+</span><span id="__span-6-2">    <span class="n">tool_configs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-6-3"><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="methods_3">Methods</h4>
+<h5 id="integrate_tooltool_name-str-config-dict-bool">integrate_tool(tool_name: str, config: dict) -&gt; bool</h5>
+<p>Integrate new static analysis tool.</p>
+<p><strong>Parameters:</strong>
+- <code>tool_name</code> (str): Name of the tool (e.g., "slither", "mythril")
+- <code>config</code> (dict): Tool-specific configuration</p>
+<p><strong>Returns:</strong>
+- <code>bool</code>: True if integration successful</p>
+<p><strong>Supported Tools:</strong>
+- <code>slither</code>: Smart contract static analyzer
+- <code>mythril</code>: Symbolic execution tool
+- <code>oyente</code>: Transaction analysis tool
+- <code>securify</code>: Security analysis tool</p>
+<p><strong>Example:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><span class="n">adapter</span> <span class="o">=</span> <span class="n">StaticAnalysisAdapter</span><span class="p">()</span>
+</span><span id="__span-7-2"><span class="n">success</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">integrate_tool</span><span class="p">(</span><span class="s2">&quot;slither&quot;</span><span class="p">,</span> <span class="p">{</span>
+</span><span id="__span-7-3">    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.10.0&quot;</span><span class="p">,</span>
+</span><span id="__span-7-4">    <span class="s2">&quot;solc_version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.8.19&quot;</span><span class="p">,</span>
+</span><span id="__span-7-5">    <span class="s2">&quot;exclude_dependencies&quot;</span><span class="p">:</span> <span class="kc">True</span>
+</span><span id="__span-7-6"><span class="p">})</span>
+</span></code></pre></div></p>
+<h5 id="run_analysistarget-str-tools-liststr-config-dict-none-analysisresults">run_analysis(target: str, tools: List[str], config: dict = None) -&gt; AnalysisResults</h5>
+<p>Run specified tools on target.</p>
+<p><strong>Parameters:</strong>
+- <code>target</code> (str): Target contract or directory path
+- <code>tools</code> (List[str]): List of tools to run
+- <code>config</code> (dict): Analysis configuration</p>
+<p><strong>Returns:</strong>
+- <code>AnalysisResults</code>: Combined results from all tools</p>
+<h5 id="parse_resultsraw_output-str-tool-str-listfinding">parse_results(raw_output: str, tool: str) -&gt; List[Finding]</h5>
+<p>Parse tool output into standardized findings.</p>
+<p><strong>Parameters:</strong>
+- <code>raw_output</code> (str): Raw tool output
+- <code>tool</code> (str): Tool name</p>
+<p><strong>Returns:</strong>
+- <code>List[Finding]</code>: Standardized security findings</p>
+<h5 id="get_supported_tools-liststr">get_supported_tools() -&gt; List[str]</h5>
+<p>Get list of supported tools.</p>
+<p><strong>Returns:</strong>
+- <code>List[str]</code>: Supported tool names</p>
+<h5 id="validate_tool_configtool-str-config-dict-validationresult">validate_tool_config(tool: str, config: dict) -&gt; ValidationResult</h5>
+<p>Validate tool configuration.</p>
+<p><strong>Parameters:</strong>
+- <code>tool</code> (str): Tool name
+- <code>config</code> (dict): Configuration to validate</p>
+<p><strong>Returns:</strong>
+- <code>ValidationResult</code>: Validation results with errors/warnings</p>
+<hr />
+<h2 id="traditional-security-agent-api">Traditional Security Agent API</h2>
+<h3 id="traditionalsecurityagent">TraditionalSecurityAgent</h3>
+<p>Conventional security assessment agent.</p>
+<h4 id="constructor_4">Constructor</h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><span class="n">TraditionalSecurityAgent</span><span class="p">(</span>
+</span><span id="__span-8-2">    <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SecurityConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-8-3"><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="methods_4">Methods</h4>
+<h5 id="assess_network_securityconfig-dict-networkreport">assess_network_security(config: dict) -&gt; NetworkReport</h5>
+<p>Assess network-level security.</p>
+<p><strong>Parameters:</strong>
+- <code>config</code> (dict): Network assessment configuration including:
+  - <code>target_network</code>: Network to assess
+  - <code>scan_ports</code>: Port range to scan
+  - <code>vulnerability_checks</code>: Enabled vulnerability checks</p>
+<p><strong>Returns:</strong>
+- <code>NetworkReport</code>: Network security assessment results</p>
+<h5 id="check_access_controlssystem-str-config-dict-none-accessreport">check_access_controls(system: str, config: dict = None) -&gt; AccessReport</h5>
+<p>Validate access control mechanisms.</p>
+<p><strong>Parameters:</strong>
+- <code>system</code> (str): System or contract to analyze
+- <code>config</code> (dict): Access control check configuration</p>
+<p><strong>Returns:</strong>
+- <code>AccessReport</code>: Access control assessment results</p>
+<h5 id="audit_configurationconfig_files-liststr-configreport">audit_configuration(config_files: List[str]) -&gt; ConfigReport</h5>
+<p>Audit system configuration security.</p>
+<p><strong>Parameters:</strong>
+- <code>config_files</code> (List[str]): Configuration files to audit</p>
+<p><strong>Returns:</strong>
+- <code>ConfigReport</code>: Configuration security assessment</p>
+<h5 id="perform_compliance_checksystem-str-standards-liststr-compliancereport">perform_compliance_check(system: str, standards: List[str]) -&gt; ComplianceReport</h5>
+<p>Perform compliance checks against standards.</p>
+<p><strong>Parameters:</strong>
+- <code>system</code> (str): System to check
+- <code>standards</code> (List[str]): Compliance standards (e.g., ["NIST", "ISO27001"])</p>
+<p><strong>Returns:</strong>
+- <code>ComplianceReport</code>: Compliance assessment results</p>
+<h5 id="generate_security_recommendationsfindings-listfinding-listrecommendation">generate_security_recommendations(findings: List[Finding]) -&gt; List[Recommendation]</h5>
+<p>Generate security recommendations from findings.</p>
+<p><strong>Parameters:</strong>
+- <code>findings</code> (List[Finding]): Security findings</p>
+<p><strong>Returns:</strong>
+- <code>List[Recommendation]</code>: Actionable security recommendations</p>
+<hr />
+<h2 id="core-system-apis">Core System APIs</h2>
+<h3 id="auditapi">AuditAPI</h3>
+<p>REST API interface for audit operations.</p>
+<h4 id="endpoints">Endpoints</h4>
+<h5 id="post-apiv1auditsubmit">POST /api/v1/audit/submit</h5>
+<p>Submit audit request.</p>
+<p><strong>Request Body:</strong>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><span class="p">{</span>
+</span><span id="__span-9-2"><span class="w">  </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;contract.sol&quot;</span><span class="p">,</span>
+</span><span id="__span-9-3"><span class="w">  </span><span class="nt">&quot;analysis_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;comprehensive&quot;</span><span class="p">,</span>
+</span><span id="__span-9-4"><span class="w">  </span><span class="nt">&quot;tools&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;slither&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;mythril&quot;</span><span class="p">],</span>
+</span><span id="__span-9-5"><span class="w">  </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-6"><span class="w">    </span><span class="nt">&quot;timeout&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span>
+</span><span id="__span-9-7"><span class="w">    </span><span class="nt">&quot;parallel&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+</span><span id="__span-9-8"><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-9"><span class="p">}</span>
+</span></code></pre></div></p>
+<p><strong>Response:</strong>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><span class="p">{</span>
+</span><span id="__span-10-2"><span class="w">  </span><span class="nt">&quot;audit_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;audit-12345&quot;</span><span class="p">,</span>
+</span><span id="__span-10-3"><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;queued&quot;</span><span class="p">,</span>
+</span><span id="__span-10-4"><span class="w">  </span><span class="nt">&quot;estimated_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">180</span>
+</span><span id="__span-10-5"><span class="p">}</span>
+</span></code></pre></div></p>
+<h5 id="get-apiv1auditaudit_idstatus">GET /api/v1/audit/{audit_id}/status</h5>
+<p>Get audit status.</p>
+<p><strong>Response:</strong>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-11-1"><span class="p">{</span>
+</span><span id="__span-11-2"><span class="w">  </span><span class="nt">&quot;audit_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;audit-12345&quot;</span><span class="p">,</span>
+</span><span id="__span-11-3"><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;running&quot;</span><span class="p">,</span>
+</span><span id="__span-11-4"><span class="w">  </span><span class="nt">&quot;progress&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">65</span><span class="p">,</span>
+</span><span id="__span-11-5"><span class="w">  </span><span class="nt">&quot;current_step&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Static Analysis&quot;</span><span class="p">,</span>
+</span><span id="__span-11-6"><span class="w">  </span><span class="nt">&quot;start_time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-11-05T06:26:13Z&quot;</span><span class="p">,</span>
+</span><span id="__span-11-7"><span class="w">  </span><span class="nt">&quot;estimated_completion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-11-05T06:31:13Z&quot;</span>
+</span><span id="__span-11-8"><span class="p">}</span>
+</span></code></pre></div></p>
+<h5 id="get-apiv1auditaudit_idresults">GET /api/v1/audit/{audit_id}/results</h5>
+<p>Get audit results.</p>
+<p><strong>Response:</strong>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-12-1"><span class="p">{</span>
+</span><span id="__span-12-2"><span class="w">  </span><span class="nt">&quot;audit_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;audit-12345&quot;</span><span class="p">,</span>
+</span><span id="__span-12-3"><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;completed&quot;</span><span class="p">,</span>
+</span><span id="__span-12-4"><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-5"><span class="w">    </span><span class="nt">&quot;total_findings&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-12-6"><span class="w">    </span><span class="nt">&quot;critical&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-12-7"><span class="w">    </span><span class="nt">&quot;high&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+</span><span id="__span-12-8"><span class="w">    </span><span class="nt">&quot;medium&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-12-9"><span class="w">    </span><span class="nt">&quot;low&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+</span><span id="__span-12-10"><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-12-11"><span class="w">  </span><span class="nt">&quot;findings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">],</span>
+</span><span id="__span-12-12"><span class="w">  </span><span class="nt">&quot;report_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/api/v1/reports/audit-12345.pdf&quot;</span>
+</span><span id="__span-12-13"><span class="p">}</span>
+</span></code></pre></div></p>
+<h5 id="post-apiv1toolsregister">POST /api/v1/tools/register</h5>
+<p>Register custom tool.</p>
+<p><strong>Request Body:</strong>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-13-1"><span class="p">{</span>
+</span><span id="__span-13-2"><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;custom_scanner&quot;</span><span class="p">,</span>
+</span><span id="__span-13-3"><span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;static_analysis&quot;</span><span class="p">,</span>
+</span><span id="__span-13-4"><span class="w">  </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-5"><span class="w">    </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;custom-scan&quot;</span><span class="p">,</span>
+</span><span id="__span-13-6"><span class="w">    </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;--target&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;{target}&quot;</span><span class="p">]</span>
+</span><span id="__span-13-7"><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-13-8"><span class="p">}</span>
+</span></code></pre></div></p>
+<h3 id="cli-api">CLI API</h3>
+<p>Command-line interface for audit operations.</p>
+<h4 id="commands">Commands</h4>
+<h5 id="web3-audit-audit-target">web3-audit audit [target]</h5>
+<p>Run audit on target.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><span class="c1"># Basic audit</span>
+</span><span id="__span-14-2">web3-audit<span class="w"> </span>audit<span class="w"> </span>contract.sol
+</span><span id="__span-14-3">
+</span><span id="__span-14-4"><span class="c1"># Comprehensive audit with specific tools</span>
+</span><span id="__span-14-5">web3-audit<span class="w"> </span>audit<span class="w"> </span>contracts/<span class="w"> </span>--comprehensive<span class="w"> </span>--tools<span class="w"> </span>slither,mythril
+</span><span id="__span-14-6">
+</span><span id="__span-14-7"><span class="c1"># Audit with custom config</span>
+</span><span id="__span-14-8">web3-audit<span class="w"> </span>audit<span class="w"> </span>contract.sol<span class="w"> </span>--config<span class="w"> </span>audit_config.yaml
+</span></code></pre></div>
+<h5 id="web3-audit-status-audit_id">web3-audit status [audit_id]</h5>
+<p>Check audit status.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1">web3-audit<span class="w"> </span>status<span class="w"> </span>audit-12345
+</span></code></pre></div>
+<h5 id="web3-audit-report-audit_id">web3-audit report [audit_id]</h5>
+<p>Generate audit report.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><span class="c1"># Generate PDF report</span>
+</span><span id="__span-16-2">web3-audit<span class="w"> </span>report<span class="w"> </span>audit-12345<span class="w"> </span>--format<span class="w"> </span>pdf
+</span><span id="__span-16-3">
+</span><span id="__span-16-4"><span class="c1"># Generate multiple formats</span>
+</span><span id="__span-16-5">web3-audit<span class="w"> </span>report<span class="w"> </span>audit-12345<span class="w"> </span>--format<span class="w"> </span>json,pdf,html
+</span></code></pre></div>
+<h5 id="web3-audit-tools-list">web3-audit tools list</h5>
+<p>List available tools.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1">web3-audit<span class="w"> </span>tools<span class="w"> </span>list
+</span></code></pre></div>
+<h5 id="web3-audit-config-validate-config_file">web3-audit config validate [config_file]</h5>
+<p>Validate configuration file.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1">web3-audit<span class="w"> </span>config<span class="w"> </span>validate<span class="w"> </span>audit_config.yaml
+</span></code></pre></div>
+<hr />
+<h2 id="data-models">Data Models</h2>
+<h3 id="finding">Finding</h3>
+<p>Security finding data model.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><span class="nd">@dataclass</span>
+</span><span id="__span-19-2"><span class="k">class</span><span class="w"> </span><span class="nc">Finding</span><span class="p">:</span>
+</span><span id="__span-19-3">    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-19-4">    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># e.g., &quot;reentrancy&quot;, &quot;overflow&quot;</span>
+</span><span id="__span-19-5">    <span class="n">severity</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &quot;critical&quot;, &quot;high&quot;, &quot;medium&quot;, &quot;low&quot;, &quot;info&quot;</span>
+</span><span id="__span-19-6">    <span class="n">confidence</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &quot;high&quot;, &quot;medium&quot;, &quot;low&quot;</span>
+</span><span id="__span-19-7">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-19-8">    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-19-9">    <span class="n">location</span><span class="p">:</span> <span class="n">Location</span>
+</span><span id="__span-19-10">    <span class="n">code_snippet</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-19-11">    <span class="n">impact</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-19-12">    <span class="n">recommendation</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-19-13">    <span class="n">cvss_score</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="__span-19-14">    <span class="n">references</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span id="__span-19-15">    <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span></code></pre></div>
+<h3 id="location">Location</h3>
+<p>Code location information.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><span class="nd">@dataclass</span>
+</span><span id="__span-20-2"><span class="k">class</span><span class="w"> </span><span class="nc">Location</span><span class="p">:</span>
+</span><span id="__span-20-3">    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-20-4">    <span class="n">line</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-20-5">    <span class="n">column</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-20-6">    <span class="n">function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-20-7">    <span class="n">contract</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+<h3 id="auditreport">AuditReport</h3>
+<p>Complete audit report.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><span class="nd">@dataclass</span>
+</span><span id="__span-21-2"><span class="k">class</span><span class="w"> </span><span class="nc">AuditReport</span><span class="p">:</span>
+</span><span id="__span-21-3">    <span class="n">audit_id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-21-4">    <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span>
+</span><span id="__span-21-5">    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-21-6">    <span class="n">auditor_version</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-21-7">    <span class="n">summary</span><span class="p">:</span> <span class="n">ReportSummary</span>
+</span><span id="__span-21-8">    <span class="n">findings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Finding</span><span class="p">]</span>
+</span><span id="__span-21-9">    <span class="n">recommendations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]</span>
+</span><span id="__span-21-10">    <span class="n">compliance</span><span class="p">:</span> <span class="n">ComplianceResults</span>
+</span><span id="__span-21-11">    <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span></code></pre></div>
+<h3 id="reportsummary">ReportSummary</h3>
+<p>Audit summary statistics.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><span class="nd">@dataclass</span>
+</span><span id="__span-22-2"><span class="k">class</span><span class="w"> </span><span class="nc">ReportSummary</span><span class="p">:</span>
+</span><span id="__span-22-3">    <span class="n">total_findings</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-22-4">    <span class="n">critical</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-22-5">    <span class="n">high</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-22-6">    <span class="n">medium</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-22-7">    <span class="n">low</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-22-8">    <span class="n">info</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-22-9">    <span class="n">risk_score</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="__span-22-10">    <span class="n">analysis_time</span><span class="p">:</span> <span class="nb">float</span>
+</span></code></pre></div>
+<hr />
+<h2 id="error-handling">Error Handling</h2>
+<h3 id="exception-hierarchy">Exception Hierarchy</h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1">AuditError
+</span><span id="__span-23-2">├── ConfigurationError
+</span><span id="__span-23-3">├── ValidationError
+</span><span id="__span-23-4">├── TimeoutError
+</span><span id="__span-23-5">├── AgentError
+</span><span id="__span-23-6">│   ├── AgentCommunicationError
+</span><span id="__span-23-7">│   ├── AgentTimeoutError
+</span><span id="__span-23-8">│   └── AgentConfigurationError
+</span><span id="__span-23-9">├── ToolError
+</span><span id="__span-23-10">│   ├── ToolNotFoundError
+</span><span id="__span-23-11">│   ├── ToolExecutionError
+</span><span id="__span-23-12">│   └── ToolTimeoutError
+</span><span id="__span-23-13">├── AnalysisError
+</span><span id="__span-23-14">│   ├── AnalysisTimeoutError
+</span><span id="__span-23-15">│   ├── AnalysisFailureError
+</span><span id="__span-23-16">│   └── AnalysisConfigurationError
+</span><span id="__span-23-17">└── ReportError
+</span><span id="__span-23-18">    ├── ReportGenerationError
+</span><span id="__span-23-19">    └── ReportExportError
+</span></code></pre></div>
+<h3 id="error-response-format">Error Response Format</h3>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-24-1"><span class="p">{</span>
+</span><span id="__span-24-2"><span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-24-3"><span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ToolExecutionError&quot;</span><span class="p">,</span>
+</span><span id="__span-24-4"><span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Slither analysis failed&quot;</span><span class="p">,</span>
+</span><span id="__span-24-5"><span class="w">    </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Command execution timeout&quot;</span><span class="p">,</span>
+</span><span id="__span-24-6"><span class="w">    </span><span class="nt">&quot;audit_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;audit-12345&quot;</span><span class="p">,</span>
+</span><span id="__span-24-7"><span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-11-05T06:26:13Z&quot;</span><span class="p">,</span>
+</span><span id="__span-24-8"><span class="w">    </span><span class="nt">&quot;traceback&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span>
+</span><span id="__span-24-9"><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-24-10"><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="error-handling-best-practices">Error Handling Best Practices</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-25-1"><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-25-2">    <span class="n">report</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run_full_audit</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span id="__span-25-3"><span class="k">except</span> <span class="ne">TimeoutError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-25-4">    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Audit timed out: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-25-5">    <span class="c1"># Implement retry logic or partial results</span>
+</span><span id="__span-25-6"><span class="k">except</span> <span class="n">AgentCommunicationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-25-7">    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent communication failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-25-8">    <span class="c1"># Attempt to restart failed agents</span>
+</span><span id="__span-25-9"><span class="k">except</span> <span class="n">ConfigurationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-25-10">    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid configuration: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-25-11">    <span class="c1"># Validate and prompt for corrected config</span>
+</span><span id="__span-25-12"><span class="k">finally</span><span class="p">:</span>
+</span><span id="__span-25-13">    <span class="c1"># Cleanup resources</span>
+</span><span id="__span-25-14">    <span class="n">orchestrator</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+</span></code></pre></div>
+<h3 id="retry-mechanisms">Retry Mechanisms</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-26-1"><span class="kn">from</span><span class="w"> </span><span class="nn">tenacity</span><span class="w"> </span><span class="kn">import</span> <span class="n">retry</span><span class="p">,</span> <span class="n">stop_after_attempt</span><span class="p">,</span> <span class="n">wait_exponential</span>
+</span><span id="__span-26-2">
+</span><span id="__span-26-3"><span class="nd">@retry</span><span class="p">(</span>
+</span><span id="__span-26-4">    <span class="n">stop</span><span class="o">=</span><span class="n">stop_after_attempt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+</span><span id="__span-26-5">    <span class="n">wait</span><span class="o">=</span><span class="n">wait_exponential</span><span class="p">(</span><span class="n">multiplier</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span><span id="__span-26-6"><span class="p">)</span>
+</span><span id="__span-26-7"><span class="k">def</span><span class="w"> </span><span class="nf">run_audit_with_retry</span><span class="p">(</span><span class="n">orchestrator</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+</span><span id="__span-26-8">    <span class="k">return</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run_full_audit</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<h2 id="authentication-and-authorization">Authentication and Authorization</h2>
+<h3 id="api-authentication">API Authentication</h3>
+<p>The system supports multiple authentication methods:</p>
+<h4 id="jwt-token-authentication">JWT Token Authentication</h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-27-1"><span class="kn">import</span><span class="w"> </span><span class="nn">jwt</span>
+</span><span id="__span-27-2"><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+</span><span id="__span-27-3">
+</span><span id="__span-27-4"><span class="k">def</span><span class="w"> </span><span class="nf">generate_token</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-27-5">    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-27-6">        <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+</span><span id="__span-27-7">        <span class="s1">&#39;exp&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">24</span><span class="p">),</span>
+</span><span id="__span-27-8">        <span class="s1">&#39;iat&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+</span><span id="__span-27-9">    <span class="p">}</span>
+</span><span id="__span-27-10">    <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">secret</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;HS256&#39;</span><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="api-key-authentication">API Key Authentication</h4>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-28-1"><span class="c1"># Header: Authorization: Bearer &lt;api_key&gt;</span>
+</span><span id="__span-28-2"><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-28-3">    <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Bearer </span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+</span><span id="__span-28-4">    <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+</span><span id="__span-28-5"><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="role-based-access-control">Role-Based Access Control</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-29-1"><span class="k">class</span><span class="w"> </span><span class="nc">UserRole</span><span class="p">:</span>
+</span><span id="__span-29-2">    <span class="n">ADMIN</span> <span class="o">=</span> <span class="s2">&quot;admin&quot;</span>      <span class="c1"># Full system access</span>
+</span><span id="__span-29-3">    <span class="n">AUDITOR</span> <span class="o">=</span> <span class="s2">&quot;auditor&quot;</span>  <span class="c1"># Can run audits and view reports</span>
+</span><span id="__span-29-4">    <span class="n">VIEWER</span> <span class="o">=</span> <span class="s2">&quot;viewer&quot;</span>    <span class="c1"># Can only view reports</span>
+</span><span id="__span-29-5">    <span class="n">API_USER</span> <span class="o">=</span> <span class="s2">&quot;api&quot;</span>     <span class="c1"># API-only access</span>
+</span></code></pre></div>
+<h3 id="rate-limiting">Rate Limiting</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-30-1"><span class="c1"># Rate limits per user role</span>
+</span><span id="__span-30-2"><span class="n">RATE_LIMITS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-30-3">    <span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">:</span> <span class="s2">&quot;1000/hour&quot;</span><span class="p">,</span>
+</span><span id="__span-30-4">    <span class="n">UserRole</span><span class="o">.</span><span class="n">AUDITOR</span><span class="p">:</span> <span class="s2">&quot;100/hour&quot;</span><span class="p">,</span>
+</span><span id="__span-30-5">    <span class="n">UserRole</span><span class="o">.</span><span class="n">VIEWER</span><span class="p">:</span> <span class="s2">&quot;50/hour&quot;</span><span class="p">,</span>
+</span><span id="__span-30-6">    <span class="n">UserRole</span><span class="o">.</span><span class="n">API_USER</span><span class="p">:</span> <span class="s2">&quot;500/hour&quot;</span>
+</span><span id="__span-30-7"><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h2 id="webhooks-and-callbacks">Webhooks and Callbacks</h2>
+<h3 id="webhook-configuration">Webhook Configuration</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-31-1"><span class="kn">from</span><span class="w"> </span><span class="nn">web3_security_ai.webhooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebhookManager</span>
+</span><span id="__span-31-2">
+</span><span id="__span-31-3"><span class="n">webhook_manager</span> <span class="o">=</span> <span class="n">WebhookManager</span><span class="p">()</span>
+</span><span id="__span-31-4">
+</span><span id="__span-31-5"><span class="c1"># Register webhook for audit completion</span>
+</span><span id="__span-31-6"><span class="n">webhook_manager</span><span class="o">.</span><span class="n">register_webhook</span><span class="p">(</span>
+</span><span id="__span-31-7">    <span class="n">event</span><span class="o">=</span><span class="s2">&quot;audit_completed&quot;</span><span class="p">,</span>
+</span><span id="__span-31-8">    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.com/webhook/audit-complete&quot;</span><span class="p">,</span>
+</span><span id="__span-31-9">    <span class="n">secret</span><span class="o">=</span><span class="s2">&quot;webhook_secret&quot;</span>
+</span><span id="__span-31-10"><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="webhook-payload">Webhook Payload</h3>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-32-1"><span class="p">{</span>
+</span><span id="__span-32-2"><span class="w">  </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;audit_completed&quot;</span><span class="p">,</span>
+</span><span id="__span-32-3"><span class="w">  </span><span class="nt">&quot;audit_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;audit-12345&quot;</span><span class="p">,</span>
+</span><span id="__span-32-4"><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;completed&quot;</span><span class="p">,</span>
+</span><span id="__span-32-5"><span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-11-05T06:26:13Z&quot;</span><span class="p">,</span>
+</span><span id="__span-32-6"><span class="w">  </span><span class="nt">&quot;summary&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-32-7"><span class="w">    </span><span class="nt">&quot;total_findings&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-32-8"><span class="w">    </span><span class="nt">&quot;critical&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-32-9"><span class="w">    </span><span class="nt">&quot;high&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+</span><span id="__span-32-10"><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-32-11"><span class="w">  </span><span class="nt">&quot;report_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://api.web3-security-ai.com/reports/audit-12345.pdf&quot;</span><span class="p">,</span>
+</span><span id="__span-32-12"><span class="w">  </span><span class="nt">&quot;signature&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sha256=...&quot;</span>
+</span><span id="__span-32-13"><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="webhook-security">Webhook Security</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-33-1"><span class="kn">import</span><span class="w"> </span><span class="nn">hmac</span>
+</span><span id="__span-33-2"><span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+</span><span id="__span-33-3">
+</span><span id="__span-33-4"><span class="k">def</span><span class="w"> </span><span class="nf">verify_webhook_signature</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">signature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-33-5">    <span class="n">expected_signature</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span id="__span-33-6">        <span class="n">secret</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
+</span><span id="__span-33-7">        <span class="n">payload</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span>
+</span><span id="__span-33-8">        <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span>
+</span><span id="__span-33-9">    <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</span><span id="__span-33-10">    <span class="k">return</span> <span class="n">hmac</span><span class="o">.</span><span class="n">compare_digest</span><span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;sha256=</span><span class="si">{</span><span class="n">expected_signature</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<hr />
+<p>This API reference provides comprehensive documentation for integrating with and extending the Web3 Security Auditing AI System. For additional examples and tutorials, see the <a href="../examples/">examples</a> directory.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "navigation.path", "navigation.sections", "navigation.expand", "content.code.annotate"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
