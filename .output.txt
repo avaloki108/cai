@@ -1,0 +1,434 @@
+src/cai/sdk:
+ __pycache__   agents   __init__.py
+src/cai/sdk/__pycache__:
+ __init__.cpython-311.pyc   __init__.cpython-313.pyc
+ __init__.cpython-312.pyc
+src/cai/sdk/agents:
+ __pycache__         auto_report_hooks.py        plan_first.py
+ extensions          computer.py                 py.typed
+ mcp                 episodic_memory.py          report_generator.py
+ models              exceptions.py               result.py
+ tracing             function_schema.py          run.py
+ util                global_usage_tracker.py     run_context.py
+ voice               guardrail.py                run_to_jsonl.py
+ __init__.py         handoffs.py                 simple_agent_manager.py
+ _config.py          items.py                    stream_events.py
+ _debug.py           lifecycle.py                strict_schema.py
+ _run_impl.py        logger.py                   tool.py
+ agent.py            model_settings.py           usage.py
+ agent_output.py     parallel_isolation.py       version.py
+ agent_registry.py   parallel_tool_executor.py
+src/cai/sdk/agents/__pycache__:
+ __init__.cpython-311.pyc
+ __init__.cpython-312.pyc
+ __init__.cpython-313.pyc
+ _config.cpython-311.pyc
+ _config.cpython-312.pyc
+ _config.cpython-313.pyc
+ _debug.cpython-311.pyc
+ _debug.cpython-312.pyc
+ _debug.cpython-313.pyc
+ _run_impl.cpython-311.pyc
+ _run_impl.cpython-312.pyc
+ _run_impl.cpython-313.pyc
+ agent.cpython-311.pyc
+ agent.cpython-312.pyc
+ agent.cpython-313.pyc
+ agent_output.cpython-311.pyc
+ agent_output.cpython-312.pyc
+ agent_output.cpython-313.pyc
+ agent_registry.cpython-312.pyc
+ auto_report_hooks.cpython-311.pyc
+ auto_report_hooks.cpython-312.pyc
+ auto_report_hooks.cpython-313.pyc
+ computer.cpython-311.pyc
+ computer.cpython-312.pyc
+ computer.cpython-313.pyc
+ episodic_memory.cpython-311.pyc
+ episodic_memory.cpython-313.pyc
+ exceptions.cpython-311.pyc
+ exceptions.cpython-312.pyc
+ exceptions.cpython-313.pyc
+ function_schema.cpython-311.pyc
+ function_schema.cpython-312.pyc
+ function_schema.cpython-313.pyc
+ global_usage_tracker.cpython-311.pyc
+ global_usage_tracker.cpython-312.pyc
+ global_usage_tracker.cpython-313.pyc
+ guardrail.cpython-311.pyc
+ guardrail.cpython-312.pyc
+ guardrail.cpython-313.pyc
+ handoffs.cpython-311.pyc
+ handoffs.cpython-312.pyc
+ handoffs.cpython-313.pyc
+ items.cpython-311.pyc
+ items.cpython-312.pyc
+ items.cpython-313.pyc
+ lifecycle.cpython-311.pyc
+ lifecycle.cpython-312.pyc
+ lifecycle.cpython-313.pyc
+ logger.cpython-311.pyc
+ logger.cpython-312.pyc
+ logger.cpython-313.pyc
+ model_settings.cpython-311.pyc
+ model_settings.cpython-312.pyc
+ model_settings.cpython-313.pyc
+ parallel_isolation.cpython-311.pyc
+ parallel_isolation.cpython-312.pyc
+ parallel_isolation.cpython-313.pyc
+ parallel_tool_executor.cpython-312.pyc
+ plan_first.cpython-311.pyc
+ plan_first.cpython-313.pyc
+ report_generator.cpython-311.pyc
+ report_generator.cpython-312.pyc
+ report_generator.cpython-313.pyc
+ result.cpython-311.pyc
+ result.cpython-312.pyc
+ result.cpython-313.pyc
+ run.cpython-311.pyc
+ run.cpython-312.pyc
+ run.cpython-313.pyc
+ run_context.cpython-311.pyc
+ run_context.cpython-312.pyc
+ run_context.cpython-313.pyc
+ run_to_jsonl.cpython-311.pyc
+ run_to_jsonl.cpython-312.pyc
+ run_to_jsonl.cpython-313.pyc
+ simple_agent_manager.cpython-311.pyc
+ simple_agent_manager.cpython-312.pyc
+ simple_agent_manager.cpython-313.pyc
+ stream_events.cpython-311.pyc
+ stream_events.cpython-312.pyc
+ stream_events.cpython-313.pyc
+ strict_schema.cpython-311.pyc
+ strict_schema.cpython-312.pyc
+ strict_schema.cpython-313.pyc
+ tool.cpython-311.pyc
+ tool.cpython-312.pyc
+ tool.cpython-313.pyc
+ usage.cpython-311.pyc
+ usage.cpython-312.pyc
+ usage.cpython-313.pyc
+ version.cpython-311.pyc
+ version.cpython-312.pyc
+ version.cpython-313.pyc
+src/cai/sdk/agents/extensions:
+ __pycache__   handoff_filters.py   visualization.py
+ __init__.py   handoff_prompt.py
+src/cai/sdk/agents/extensions/__pycache__:
+ __init__.cpython-311.pyc          handoff_filters.cpython-313.pyc
+ __init__.cpython-312.pyc          handoff_prompt.cpython-312.pyc
+ __init__.cpython-313.pyc          visualization.cpython-311.pyc
+ handoff_filters.cpython-311.pyc   visualization.cpython-312.pyc
+ handoff_filters.cpython-312.pyc   visualization.cpython-313.pyc
+src/cai/sdk/agents/mcp:
+ __pycache__   __init__.py   server.py   util.py
+src/cai/sdk/agents/mcp/__pycache__:
+ __init__.cpython-311.pyc   server.cpython-311.pyc   util.cpython-311.pyc
+ __init__.cpython-312.pyc   server.cpython-312.pyc   util.cpython-312.pyc
+ __init__.cpython-313.pyc   server.cpython-313.pyc   util.cpython-313.pyc
+src/cai/sdk/agents/models:
+ __pycache__         fake_id.py                  openai_provider.py
+ __init__.py         interface.py                openai_responses.py
+ _openai_shared.py   openai_chatcompletions.py
+src/cai/sdk/agents/models/__pycache__:
+ __init__.cpython-311.pyc                 openai_provider.cpython-311.pyc
+ __init__.cpython-312.pyc                 openai_provider.cpython-312.pyc
+ __init__.cpython-313.pyc                 openai_provider.cpython-313.pyc
+ _openai_shared.cpython-311.pyc           openai_responses.cpython-311.pyc
+ _openai_shared.cpython-312.pyc           openai_responses.cpython-312.pyc
+ _openai_shared.cpython-313.pyc           openai_responses.cpython-313.pyc
+ fake_id.cpython-311.pyc
+ fake_id.cpython-312.pyc
+ fake_id.cpython-313.pyc
+ interface.cpython-311.pyc
+ interface.cpython-312.pyc
+ interface.cpython-313.pyc
+ openai_chatcompletions.cpython-311.pyc
+ openai_chatcompletions.cpython-312.pyc
+ openai_chatcompletions.cpython-313.pyc
+src/cai/sdk/agents/tracing:
+ __pycache__   logger.py                scope.py       spans.py
+ __init__.py   processor_interface.py   setup.py       traces.py
+ create.py     processors.py            span_data.py   util.py
+src/cai/sdk/agents/tracing/__pycache__:
+ __init__.cpython-311.pyc              setup.cpython-311.pyc
+ __init__.cpython-312.pyc              setup.cpython-312.pyc
+ __init__.cpython-313.pyc              setup.cpython-313.pyc
+ create.cpython-311.pyc                span_data.cpython-311.pyc
+ create.cpython-312.pyc                span_data.cpython-312.pyc
+ create.cpython-313.pyc                span_data.cpython-313.pyc
+ logger.cpython-312.pyc                spans.cpython-311.pyc
+ processor_interface.cpython-311.pyc   spans.cpython-312.pyc
+ processor_interface.cpython-312.pyc   spans.cpython-313.pyc
+ processor_interface.cpython-313.pyc   traces.cpython-311.pyc
+ processors.cpython-311.pyc            traces.cpython-312.pyc
+ processors.cpython-312.pyc            traces.cpython-313.pyc
+ processors.cpython-313.pyc            util.cpython-311.pyc
+ scope.cpython-311.pyc                 util.cpython-312.pyc
+ scope.cpython-312.pyc                 util.cpython-313.pyc
+ scope.cpython-313.pyc
+src/cai/sdk/agents/util:
+ __pycache__   _coro.py            _json.py           _transforms.py
+ __init__.py   _error_tracing.py   _pretty_print.py   _types.py
+src/cai/sdk/agents/util/__pycache__:
+ __init__.cpython-311.pyc         _json.cpython-313.pyc
+ __init__.cpython-312.pyc         _pretty_print.cpython-311.pyc
+ __init__.cpython-313.pyc         _pretty_print.cpython-312.pyc
+ _coro.cpython-311.pyc            _pretty_print.cpython-313.pyc
+ _coro.cpython-312.pyc            _transforms.cpython-311.pyc
+ _coro.cpython-313.pyc            _transforms.cpython-312.pyc
+ _error_tracing.cpython-311.pyc   _transforms.cpython-313.pyc
+ _error_tracing.cpython-312.pyc   _types.cpython-311.pyc
+ _error_tracing.cpython-313.pyc   _types.cpython-312.pyc
+ _json.cpython-311.pyc            _types.cpython-313.pyc
+ _json.cpython-312.pyc
+src/cai/sdk/agents/voice:
+ __pycache__   exceptions.py   pipeline.py          workflow.py
+ models        imports.py      pipeline_config.py
+ __init__.py   input.py        result.py
+ events.py     model.py        utils.py
+src/cai/sdk/agents/voice/__pycache__:
+ __init__.cpython-311.pyc     model.cpython-313.pyc
+ __init__.cpython-312.pyc     pipeline.cpython-311.pyc
+ __init__.cpython-313.pyc     pipeline.cpython-312.pyc
+ events.cpython-311.pyc       pipeline.cpython-313.pyc
+ events.cpython-312.pyc       pipeline_config.cpython-311.pyc
+ events.cpython-313.pyc       pipeline_config.cpython-312.pyc
+ exceptions.cpython-311.pyc   pipeline_config.cpython-313.pyc
+ exceptions.cpython-312.pyc   result.cpython-311.pyc
+ exceptions.cpython-313.pyc   result.cpython-312.pyc
+ imports.cpython-311.pyc      result.cpython-313.pyc
+ imports.cpython-312.pyc      utils.cpython-311.pyc
+ imports.cpython-313.pyc      utils.cpython-312.pyc
+ input.cpython-311.pyc        utils.cpython-313.pyc
+ input.cpython-312.pyc        workflow.cpython-311.pyc
+ input.cpython-313.pyc        workflow.cpython-312.pyc
+ model.cpython-311.pyc        workflow.cpython-313.pyc
+ model.cpython-312.pyc
+src/cai/sdk/agents/voice/models:
+ __pycache__   openai_model_provider.py   openai_tts.py
+ __init__.py   openai_stt.py
+src/cai/sdk/agents/voice/models/__pycache__:
+ __init__.cpython-311.pyc                openai_stt.cpython-311.pyc
+ __init__.cpython-312.pyc                openai_stt.cpython-312.pyc
+ __init__.cpython-313.pyc                openai_stt.cpython-313.pyc
+ openai_model_provider.cpython-311.pyc   openai_tts.cpython-311.pyc
+ openai_model_provider.cpython-312.pyc   openai_tts.cpython-312.pyc
+ openai_model_provider.cpython-313.pyc   openai_tts.cpython-313.pyc
+src/cai/agents:
+ __pycache__                network_traffic_analyzer.py
+ meta                       one_tool.py
+ patterns                   perpetuals_analyzer.py
+ __init__.py                pivot_engine.py
+ aa_analyzer.py             planner.py
+ android_sast_agent.py      poc_generator.py
+ attributor.py              red_teamer.py
+ blue_teamer.py             replay_attack_agent.py
+ bridge_analyzer.py         reporter.py
+ bug_bounter.py             restaking_analyzer.py
+ codeagent.py               retester.py
+ critic.py                  reverse_engineering_agent.py
+ defi_bounty_judge.py       skeptic_alpha.py
+ dfir.py                    skeptic_beta.py
+ exploit_synthesizer.py     skeptic_gamma.py
+ factory.py                 stablecoin_analyzer.py
+ flag_discriminator.py      subghz_sdr_agent.py
+ guardrails.py              thought.py
+ mail.py                    usecase.py
+ manager_access.py          web3_bug_bounty.py
+ manager_economic.py        web3_discovery_agent.py
+ manager_vuln.py            web3_gctr_agent.py
+ memory.py                  web_pentester.py
+ memory_analysis_agent.py   wifi_security_tester.py
+ mev_analyzer.py
+src/cai/agents/__pycache__:
+ __init__.cpython-311.pyc
+ __init__.cpython-312.pyc
+ __init__.cpython-313.pyc
+ aa_analyzer.cpython-311.pyc
+ android_sast_agent.cpython-311.pyc
+ android_sast_agent.cpython-312.pyc
+ android_sast_agent.cpython-313.pyc
+ attributor.cpython-311.pyc
+ attributor.cpython-313.pyc
+ blue_teamer.cpython-311.pyc
+ blue_teamer.cpython-312.pyc
+ blue_teamer.cpython-313.pyc
+ bridge_analyzer.cpython-311.pyc
+ bug_bounter.cpython-311.pyc
+ bug_bounter.cpython-312.pyc
+ bug_bounter.cpython-313.pyc
+ codeagent.cpython-311.pyc
+ codeagent.cpython-312.pyc
+ codeagent.cpython-313.pyc
+ critic.cpython-311.pyc
+ critic.cpython-313.pyc
+ defi_bounty_judge.cpython-311.pyc
+ defi_bounty_judge.cpython-313.pyc
+ dfir.cpython-311.pyc
+ dfir.cpython-312.pyc
+ dfir.cpython-313.pyc
+ exploit_synthesizer.cpython-311.pyc
+ exploit_synthesizer.cpython-313.pyc
+ factory.cpython-311.pyc
+ factory.cpython-312.pyc
+ factory.cpython-313.pyc
+ flag_discriminator.cpython-311.pyc
+ flag_discriminator.cpython-312.pyc
+ flag_discriminator.cpython-313.pyc
+ guardrails.cpython-311.pyc
+ guardrails.cpython-312.pyc
+ guardrails.cpython-313.pyc
+ mail.cpython-311.pyc
+ mail.cpython-312.pyc
+ mail.cpython-313.pyc
+ manager_access.cpython-311.pyc
+ manager_access.cpython-312.pyc
+ manager_access.cpython-313.pyc
+ manager_economic.cpython-311.pyc
+ manager_economic.cpython-312.pyc
+ manager_economic.cpython-313.pyc
+ manager_vuln.cpython-311.pyc
+ manager_vuln.cpython-312.pyc
+ manager_vuln.cpython-313.pyc
+ memory.cpython-311.pyc
+ memory.cpython-312.pyc
+ memory.cpython-313.pyc
+ memory_analysis_agent.cpython-311.pyc
+ memory_analysis_agent.cpython-312.pyc
+ memory_analysis_agent.cpython-313.pyc
+ mev_analyzer.cpython-311.pyc
+ network_traffic_analyzer.cpython-311.pyc
+ network_traffic_analyzer.cpython-312.pyc
+ network_traffic_analyzer.cpython-313.pyc
+ one_tool.cpython-311.pyc
+ one_tool.cpython-312.pyc
+ one_tool.cpython-313.pyc
+ perpetuals_analyzer.cpython-311.pyc
+ pivot_engine.cpython-311.pyc
+ pivot_engine.cpython-312.pyc
+ pivot_engine.cpython-313.pyc
+ planner.cpython-311.pyc
+ planner.cpython-313.pyc
+ poc_generator.cpython-311.pyc
+ poc_generator.cpython-313.pyc
+ red_teamer.cpython-311.pyc
+ red_teamer.cpython-312.pyc
+ red_teamer.cpython-313.pyc
+ replay_attack_agent.cpython-311.pyc
+ replay_attack_agent.cpython-312.pyc
+ replay_attack_agent.cpython-313.pyc
+ reporter.cpython-311.pyc
+ reporter.cpython-312.pyc
+ reporter.cpython-313.pyc
+ restaking_analyzer.cpython-311.pyc
+ retester.cpython-311.pyc
+ retester.cpython-312.pyc
+ retester.cpython-313.pyc
+ reverse_engineering_agent.cpython-311.pyc
+ reverse_engineering_agent.cpython-312.pyc
+ reverse_engineering_agent.cpython-313.pyc
+ skeptic_alpha.cpython-311.pyc
+ skeptic_alpha.cpython-312.pyc
+ skeptic_alpha.cpython-313.pyc
+ skeptic_beta.cpython-311.pyc
+ skeptic_beta.cpython-312.pyc
+ skeptic_beta.cpython-313.pyc
+ skeptic_gamma.cpython-311.pyc
+ skeptic_gamma.cpython-312.pyc
+ skeptic_gamma.cpython-313.pyc
+ stablecoin_analyzer.cpython-311.pyc
+ subghz_sdr_agent.cpython-311.pyc
+ subghz_sdr_agent.cpython-312.pyc
+ subghz_sdr_agent.cpython-313.pyc
+ thought.cpython-311.pyc
+ thought.cpython-312.pyc
+ thought.cpython-313.pyc
+ usecase.cpython-311.pyc
+ usecase.cpython-312.pyc
+ usecase.cpython-313.pyc
+ web3_bug_bounty.cpython-311.pyc
+ web3_bug_bounty.cpython-312.pyc
+ web3_bug_bounty.cpython-313.pyc
+ web3_discovery_agent.cpython-311.pyc
+ web3_discovery_agent.cpython-313.pyc
+ web3_gctr_agent.cpython-311.pyc
+ web3_gctr_agent.cpython-313.pyc
+ web_pentester.cpython-311.pyc
+ web_pentester.cpython-312.pyc
+ web_pentester.cpython-313.pyc
+ wifi_security_tester.cpython-311.pyc
+ wifi_security_tester.cpython-312.pyc
+ wifi_security_tester.cpython-313.pyc
+src/cai/agents/meta:
+ __pycache__   local_python_executor.py   reasoner_support.py
+src/cai/agents/meta/__pycache__:
+ local_python_executor.cpython-311.pyc
+ local_python_executor.cpython-312.pyc
+ local_python_executor.cpython-313.pyc
+ reasoner_support.cpython-312.pyc
+src/cai/agents/patterns:
+ __pycache__                      pattern.py
+ configs                          red_blue_team.py
+ __init__.py                      red_blue_team_split.py
+ adversarial.py                   red_team.py
+ bb_triage.py                     utils.py
+ composite_audit.py               web3_comprehensive.py
+ ensemble.py                      web3_hunt.py
+ hmaw.py                          web3_repo_audit.py
+ offsec.py                        web3_sequential_audit.py
+ parallel_offensive_patterns.py
+src/cai/agents/patterns/__pycache__:
+ __init__.cpython-311.pyc
+ __init__.cpython-312.pyc
+ __init__.cpython-313.pyc
+ adversarial.cpython-311.pyc
+ adversarial.cpython-312.pyc
+ adversarial.cpython-313.pyc
+ bb_triage.cpython-311.pyc
+ bb_triage.cpython-312.pyc
+ bb_triage.cpython-313.pyc
+ composite_audit.cpython-311.pyc
+ composite_audit.cpython-312.pyc
+ composite_audit.cpython-313.pyc
+ ensemble.cpython-311.pyc
+ ensemble.cpython-312.pyc
+ ensemble.cpython-313.pyc
+ hmaw.cpython-311.pyc
+ hmaw.cpython-312.pyc
+ hmaw.cpython-313.pyc
+ offsec.cpython-311.pyc
+ offsec.cpython-312.pyc
+ offsec.cpython-313.pyc
+ parallel_offensive_patterns.cpython-311.pyc
+ parallel_offensive_patterns.cpython-312.pyc
+ parallel_offensive_patterns.cpython-313.pyc
+ pattern.cpython-311.pyc
+ pattern.cpython-312.pyc
+ pattern.cpython-313.pyc
+ red_blue_team.cpython-311.pyc
+ red_blue_team.cpython-312.pyc
+ red_blue_team.cpython-313.pyc
+ red_blue_team_split.cpython-311.pyc
+ red_blue_team_split.cpython-312.pyc
+ red_blue_team_split.cpython-313.pyc
+ red_team.cpython-311.pyc
+ red_team.cpython-312.pyc
+ red_team.cpython-313.pyc
+ utils.cpython-311.pyc
+ utils.cpython-312.pyc
+ utils.cpython-313.pyc
+ web3_comprehensive.cpython-311.pyc
+ web3_comprehensive.cpython-312.pyc
+ web3_comprehensive.cpython-313.pyc
+ web3_hunt.cpython-311.pyc
+ web3_hunt.cpython-312.pyc
+ web3_hunt.cpython-313.pyc
+ web3_repo_audit.cpython-311.pyc
+ web3_repo_audit.cpython-312.pyc
+ web3_repo_audit.cpython-313.pyc
+ web3_sequential_audit.cpython-311.pyc
+ web3_sequential_audit.cpython-313.pyc
+src/cai/agents/patterns/configs:
+ agents.yml.example
