@@ -262,15 +262,28 @@ def analyze_position_management(contract_code: str, ctf=None) -> str:
 @function_tool
 def render_perpetuals_report(
     contract_name: str,
-    funding_findings: List[Dict],
-    liquidation_findings: List[Dict],
-    margin_findings: List[Dict],
-    position_findings: List[Dict],
+    funding_findings: str = "[]",
+    liquidation_findings: str = "[]",
+    margin_findings: str = "[]",
+    position_findings: str = "[]",
     ctf=None
 ) -> str:
     """
     Render comprehensive perpetuals security report.
+    Each findings argument is a JSON array of finding objects.
     """
+    def _parse(s: str) -> List[Dict]:
+        try:
+            out = json.loads(s)
+            return out if isinstance(out, list) else []
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    funding_findings = _parse(funding_findings)
+    liquidation_findings = _parse(liquidation_findings)
+    margin_findings = _parse(margin_findings)
+    position_findings = _parse(position_findings)
+
     all_findings = funding_findings + liquidation_findings + margin_findings + position_findings
     critical = sum(1 for f in all_findings if f.get("severity") == "CRITICAL")
     high = sum(1 for f in all_findings if f.get("severity") == "HIGH")

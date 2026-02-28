@@ -507,10 +507,10 @@ def suggest_mev_mitigations(
 @function_tool
 def render_mev_report(
     contract_name: str,
-    sandwich_findings: List[Dict],
-    frontrun_findings: List[Dict],
-    backrun_findings: List[Dict],
-    mev_exposure: Dict,
+    sandwich_findings: str = "[]",
+    frontrun_findings: str = "[]",
+    backrun_findings: str = "[]",
+    mev_exposure: str = "{}",
     ctf=None
 ) -> str:
     """
@@ -518,14 +518,33 @@ def render_mev_report(
     
     Args:
         contract_name: Name of the contract
-        sandwich_findings: Sandwich attack findings
-        frontrun_findings: Frontrunning findings
-        backrun_findings: Backrunning findings
-        mev_exposure: MEV exposure calculation
+        sandwich_findings: JSON array of sandwich attack findings
+        frontrun_findings: JSON array of frontrunning findings
+        backrun_findings: JSON array of backrunning findings
+        mev_exposure: JSON object with MEV exposure calculation
         
     Returns:
         Formatted MEV report
     """
+    def _parse_list(s: str) -> List[Dict]:
+        try:
+            out = json.loads(s)
+            return out if isinstance(out, list) else []
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    def _parse_dict(s: str) -> Dict:
+        try:
+            out = json.loads(s)
+            return out if isinstance(out, dict) else {}
+        except (json.JSONDecodeError, TypeError):
+            return {}
+
+    sandwich_findings = _parse_list(sandwich_findings)
+    frontrun_findings = _parse_list(frontrun_findings)
+    backrun_findings = _parse_list(backrun_findings)
+    mev_exposure = _parse_dict(mev_exposure)
+
     all_findings = sandwich_findings + frontrun_findings + backrun_findings
     critical_count = sum(1 for f in all_findings if f.get("severity") == "CRITICAL")
     high_count = sum(1 for f in all_findings if f.get("severity") == "HIGH")

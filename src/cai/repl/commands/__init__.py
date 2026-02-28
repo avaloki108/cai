@@ -22,6 +22,7 @@ from cai.repl.commands import (  # pylint: disable=import-error,unused-import,li
     graph,
     help,
     history,
+    hunt,  # Web3 audit quickstart
     kill,
     load,
     mcp,  # Add the MCP command

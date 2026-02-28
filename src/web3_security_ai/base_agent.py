@@ -2,7 +2,9 @@
 
 """
 Base agent class for the Web3 Security Audit System.
-Defines the common interface and structure for all security agents.
+
+DEPRECATED: New agents should use cai.sdk.agents.Agent directly.
+This module is retained for backward compatibility with web3_security_ai.
 """
 
 from abc import ABC, abstractmethod
@@ -70,7 +72,7 @@ class BaseAgent(ABC):
         pass
     
     @abstractmethod
-    async def execute_task(self, task: str, **kwargs) -> Dict[str, Any]:
+    async def execute_task(self, task: str, **kwargs) -> Any:
         """Execute a task assigned to this agent.
         
         Args:
@@ -82,7 +84,7 @@ class BaseAgent(ABC):
         """
         pass
     
-    async def execute_with_concurrency_limit(self, task: str, **kwargs) -> Dict[str, Any]:
+    async def execute_with_concurrency_limit(self, task: str, **kwargs) -> Any:
         """Execute task with concurrency limiting.
         
         Args:

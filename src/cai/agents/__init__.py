@@ -64,12 +64,8 @@ from cai.sdk.agents import Agent, handoff
 # Initialize AVAILABLE_AGENTS as an empty list
 AVAILABLE_AGENTS = []
 
-# Add web3 security agents to AVAILABLE_AGENTS
+# CAI-native Web3 security agents (all must be cai.sdk.agents.Agent instances)
 AVAILABLE_AGENTS = AVAILABLE_AGENTS + [
-    "web3_audit_agent",
-    "web3_ai_engine",
-    "web3_traditional_security_agent",
-    "web3_orchestrator",
     # Aegis-integrated agents
     "skeptic_alpha",
     "skeptic_beta",

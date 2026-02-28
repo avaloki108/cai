@@ -32,9 +32,9 @@ For a complete reference organized by use case, see [Environment Variables Refer
 | CAI_TRACING | Enable/disable OpenTelemetry tracing. When enabled, traces execution flow and agent interactions for debugging and analysis | true |
 | CAI_AGENT_TYPE | Specify the agents to use (e.g., boot2root, one_tool, redteam_agent). Use "/agent" command in CLI to list all available agents | redteam_agent |
 | CAI_STATE | Enable/disable stateful mode. When enabled, the agent will use a state agent to keep track of the state of the network and the flags found | false |
-| CAI_MEMORY | Enable/disable memory mode (episodic: use episodic memory, semantic: use semantic memory, all: use both episodic and semantic memory) | false |
-| CAI_MEMORY_ONLINE | Enable/disable online memory mode | false |
-| CAI_MEMORY_OFFLINE | Enable/disable offline memory | false |
+| CAI_MEMORY | Enable memory mode (episodic, semantic, all). When combined with Mem0/OpenMemory, provides persistent cross-session retrieval and write-back aligned with pipeline stages | false |
+| CAI_MEMORY_ONLINE | Enable online memory mode for live retrieval during agent turns | false |
+| CAI_MEMORY_OFFLINE | Enable offline memory for batch analysis and post-session storage | false |
 | CAI_ENV_CONTEXT | Add environment context, dirs and current env available | true |
 | CAI_MEMORY_ONLINE_INTERVAL | Number of turns between online memory updates | 5 |
 | CAI_SUPPORT_MODEL | Model to use for the support agent | o3-mini |

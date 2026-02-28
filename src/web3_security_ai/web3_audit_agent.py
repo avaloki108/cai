@@ -12,8 +12,17 @@ from dataclasses import dataclass
 from enum import Enum
 import logging
 import hashlib
+import re
+import os
 
 from .base_agent import BaseAgent, AgentConfig, AgentType, AgentRole
+from cai.core.finding import Finding
+from cai.tools.web3_security import (
+    slither_analyze, 
+    slitheryn_print,
+    analyze_precision_vulnerabilities,
+    score_exploit_viability
+)
 
 
 class ContractAnalysisResult:
@@ -46,115 +55,116 @@ class Web3AuditAgent(BaseAgent):
         self.is_active = False
         self.logger.info(f"Web3 Audit Agent {self.name} cleaned up")
     
-    async def execute_task(self, task: str, **kwargs) -> Dict[str, Any]:
-        """Execute a Web3 audit task.
+    async def execute_task(self, task: str, **kwargs) -> List[Finding]:
+        """Execute a Web3 audit task and return List[Finding].
         
         Args:
             task: Description of task to execute
             **kwargs: Additional parameters
             
         Returns:
-            Dictionary with execution results
+            List of Finding objects
         """
         try:
             # Parse the task
             task_data = json.loads(task) if isinstance(task, str) else task
             
             # Extract contract information
-            contract_address = task_data.get("contract_address")
+            contract_address = task_data.get("contract_address", "0x0")
+            contract_path = task_data.get("contract_path")
             contract_source = task_data.get("contract_source")
-            analysis_type = task_data.get("analysis_type", "full")
             
-            if not contract_address:
-                raise ValueError("Contract address is required")
+            if not contract_path and not contract_source:
+                raise ValueError("Contract path or source is required")
             
-            # Check cache first
-            cache_key = f"{contract_address}_{analysis_type}"
-            if cache_key in self.contract_cache:
-                self.logger.info(f"Using cached result for {contract_address}")
-                return {
-                    "success": True,
-                    "result": self.contract_cache[cache_key],
-                    "cached": True
-                }
+            # If source provided but no path, save to temp file
+            if contract_source and not contract_path:
+                contract_path = "/tmp/audit_target.sol"
+                with open(contract_path, "w") as f:
+                    f.write(contract_source)
             
             # Perform the analysis
-            result = await self._analyze_contract(contract_address, contract_source, analysis_type, **kwargs)
+            findings = await self._analyze_contract(contract_address, contract_path, **kwargs)
             
-            # Cache the result
-            self.contract_cache[cache_key] = result
-            
-            return {
-                "success": True,
-                "result": result,
-                "cached": False,
-                "message": f"Contract {contract_address} analyzed successfully"
-            }
+            return findings
             
         except Exception as e:
             self.logger.error(f"Error in Web3 audit task: {str(e)}")
-            return {
-                "success": False,
-                "error": str(e),
-                "message": f"Web3 audit failed: {str(e)}"
-            }
+            return []
     
-    async def _analyze_contract(self, contract_address: str, contract_source: str, 
-                               analysis_type: str, **kwargs) -> Dict[str, Any]:
-        """Perform the actual contract analysis.
+    async def _analyze_contract(self, contract_address: str, contract_path: str, **kwargs) -> List[Finding]:
+        """Perform the actual contract analysis using Slither.
         
         Args:
             contract_address: Address of the contract to analyze
-            contract_source: Source code of the contract
-            analysis_type: Type of analysis to perform
+            contract_path: Path to the contract file or project
             **kwargs: Additional parameters
             
         Returns:
-            Analysis results
+            List of Finding objects
         """
-        # Simulated analysis - in practice this would integrate with real tools
-        findings = []
-        vulnerabilities = []
-        confidence_score = 0.0
+        self.logger.info(f"Analyzing contract {contract_address} at {contract_path}")
         
-        # Simulate vulnerability detection
-        if contract_source and "require(msg.sender == owner)" in contract_source:
-            vulnerabilities.append("Owner-only access control")
-            findings.append({
-                "type": "access_control",
-                "severity": "medium",
-                "description": "Potential owner-only access control detected"
-            })
+        findings_objects = []
         
-        if contract_source and "send()" in contract_source:
-            vulnerabilities.append("Ether transfer vulnerability")
-            findings.append({
-                "type": "ether_transfer",
-                "severity": "high",
-                "description": "Direct ether transfer may lead to reentrancy attacks"
-            })
+        # 1. Slither Static Analysis (JSON output)
+        json_output = "/tmp/slither_results.json"
+        slither_analyze(contract_path, json_output=json_output)
         
-        if contract_source and "unchecked_call" in contract_source:
-            vulnerabilities.append("Unchecked external call")
-            findings.append({
-                "type": "unchecked_call",
-                "severity": "high",
-                "description": "Unchecked external call may lead to unexpected behavior"
-            })
+        if os.path.exists(json_output):
+            with open(json_output, "r") as f:
+                try:
+                    slither_data = json.load(f)
+                    if "results" in slither_data and "detectors" in slither_data["results"]:
+                        for detector in slither_data["results"]["detectors"]:
+                            detector_name = detector.get("check", "unknown")
+                            severity = detector.get("impact", "medium")
+                            
+                            for element in detector.get("elements", []):
+                                f_id = f"{detector_name}_{hashlib.md_str(str(element)).hexdigest()[:8]}" if hasattr(hashlib, 'md_str') else f"{detector_name}_{hashlib.md5(str(element).encode()).hexdigest()[:8]}"
+                                
+                                finding = Finding(
+                                    id=f_id,
+                                    vulnerability_type=detector_name,
+                                    severity=severity,
+                                    contract=element.get("contract", {}).get("name", "unknown") if isinstance(element.get("contract"), dict) else element.get("contract", "unknown"),
+                                    function_name=element.get("name", "unknown"),
+                                    location=f"{element.get('source_mapping', {}).get('filename_short')}:{element.get('source_mapping', {}).get('lines')}"
+                                )
+                                
+                                # Extract additional context
+                                if "external_calls" in element:
+                                    finding.external_call_depth = len(element["external_calls"])
+                                    finding.cross_contract = any(c.get("type") == "external" for c in element["external_calls"])
+                                
+                                findings_objects.append(finding)
+                except Exception as e:
+                    self.logger.error(f"Error parsing Slither JSON: {e}")
+
+        # 2. Extract Call Graph and External Call Targets (using printers)
+        # In a real implementation, we would parse the output of these printers
+        # slitheryn_print(contract_path, printer="call-graph")
+        # slitheryn_print(contract_path, printer="vars-and-auth")
         
-        # Calculate confidence score (simplified)
-        confidence_score = min(1.0, len(vulnerabilities) * 0.3 + 0.2)
-        
-        # Return analysis result
-        return {
-            "contract_address": contract_address,
-            "analysis_type": analysis_type,
-            "findings": findings,
-            "vulnerabilities": vulnerabilities,
-            "confidence_score": confidence_score,
-            "timestamp": asyncio.get_event_loop().time(),
-            "raw_analysis": contract_source[:200] + "..." if contract_source else "No source provided"
-        }
+        # 3. Precision Analysis
+        if os.path.exists(contract_path) and os.path.isfile(contract_path):
+            with open(contract_path, "r") as f:
+                source = f.read()
+                precision_results_json = analyze_precision_vulnerabilities(source)
+                precision_results = json.loads(precision_results_json)
+                
+                for cat in precision_results.get("categories", []):
+                    for f_p in cat.get("findings", []):
+                        findings_objects.append(Finding(
+                            id=f"precision_{hashlib.md5(f_p.get('description', '').encode()).hexdigest()[:8]}",
+                            vulnerability_type="precision_loss",
+                            severity=f_p.get("severity", "medium"),
+                            contract=contract_address,
+                            function_name="unknown",
+                            location=str(f_p.get("line_number", "0"))
+                        ))
+
+        return findings_objects
     
     def get_contract_summary(self, contract_address: str) -> Optional[Dict[str, Any]]:
         """Get a summary of a contract from cache.

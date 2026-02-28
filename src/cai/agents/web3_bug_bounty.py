@@ -178,15 +178,34 @@ from cai.tools.web3_security.enhancements import (
     score_exploit_viability,
     rank_findings_by_exploitability,
     estimate_attacker_cost,
+    analyze_finding_feasibility,
     # Multi-Tool Orchestration
     aggregate_tool_results,
     correlate_findings,
     generate_strategic_digest,
     # Repo Context
     detect_web3_repo_context,
+    # Upgradeability
+    discover_proxy_patterns,
+    check_initialization_state,
+    # Access Control
+    construct_role_lattice,
+    detect_privilege_escalation,
+    # Signatures
+    validate_domain_separator,
+    analyze_nonce_replay,
+    analyze_permit_flows,
 )
 
 from cai.agents.guardrails import get_security_guardrails
+from cai.agents.bridge_analyzer import (
+    analyze_replay_protection,
+    analyze_signature_verification,
+    analyze_message_validation,
+    analyze_validator_security,
+    check_known_bridge_exploits,
+    render_bridge_audit_report,
+)
 
 load_dotenv()
 
@@ -197,11 +216,22 @@ api_key = (
     or os.getenv("MISTRAL_API_KEY")
     or os.getenv("MISTRALAI_API_KEY")
     or os.getenv("ZAI_API_KEY")
+    or os.getenv("ANTHROPIC_API_KEY")
 )
+
+# If no API key is set, use a placeholder to prevent hanging
+# The error will be raised when the agent tries to actually use the key
 if not api_key:
-    raise RuntimeError(
-        "Web3 Bug Bounty Agent requires an API key. "
-        "Set ALIAS_API_KEY, OPENAI_API_KEY, MISTRAL_API_KEY, or ZAI_API_KEY."
+    api_key = "sk-placeholder-no-valid-key"
+    print(
+        "\n⚠️  WARNING: No API key configured!\n"
+        "Web3 Bug Bounty Hunter requires one of:\n"
+        "  - ALIAS_API_KEY\n"
+        "  - OPENAI_API_KEY\n"
+        "  - MISTRAL_API_KEY / MISTRALAI_API_KEY\n"
+        "  - ZAI_API_KEY\n"
+        "  - ANTHROPIC_API_KEY\n\n"
+        "Set any of these environment variables to enable the agent.\n"
     )
 
 # Load specialized Web3 bug bounty prompt
@@ -408,6 +438,26 @@ enhancement_tools = [
     generate_strategic_digest,
     # Repo context
     detect_web3_repo_context,
+    # Upgradeability
+    discover_proxy_patterns,
+    check_initialization_state,
+    # Access Control
+    construct_role_lattice,
+    detect_privilege_escalation,
+    # Signatures
+    validate_domain_separator,
+    analyze_nonce_replay,
+    analyze_permit_flows,
+]
+
+# Bridge / cross-chain analyzer tools (replay, signatures, validators, known exploits)
+bridge_tools = [
+    analyze_replay_protection,
+    analyze_signature_verification,
+    analyze_message_validation,
+    analyze_validator_security,
+    check_known_bridge_exploits,
+    render_bridge_audit_report,
 ]
 
 # Combine all tools
@@ -427,6 +477,7 @@ tools = (
     rag_tools +
     workflow_tools +
     enhancement_tools +
+    bridge_tools +
     tier3_infra_tools  # Only included if WEB3_ENABLE_INFRA_TOOLS=true
 )
 
@@ -451,6 +502,8 @@ web3_bug_bounty_agent = Agent(
     - Formal Verification: Certora Prover (verify, invariants, linking)
     - Property Testing: Scribble + Mythril integration
     - Orchestration: WASP (audit, gen-invariants, gen-spec, pattern-scan)
+    - Bridge/Cross-Chain: replay protection, signature verification, message validation,
+      validator security, known bridge exploits (Ronin, Wormhole, Nomad, Harmony), audit report
     
     Key Capabilities:
     - Attack graph construction and exploit path discovery

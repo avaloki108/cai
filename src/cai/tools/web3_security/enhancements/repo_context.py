@@ -116,7 +116,27 @@ def _detect_oracle_and_defi(repo: Path, corpus: List[str]) -> Dict[str, Any]:
         protocol_type = "bridge"
     elif hits["uniswap_v2"] or hits["uniswap_v3"] or hits["curve"]:
         protocol_type = "amm/dex"
+    elif hits["pendle"]:
+        protocol_type = "yield/derivative"
     return {"protocol_type": protocol_type, "signals": hits}
+
+
+def _detect_roles(corpus: List[str]) -> Dict[str, Any]:
+    rx = {
+        "owner": r"\bonlyOwner\b|\bOwnable\b|owner\(\)|transferOwnership|_setOwner",
+        "governance": r"onlyGovernance|governance\(\)|DAO|propose\(|vote\(|quorum|GovernorAlpha|GovernorBravo",
+        "relayer": r"relayer|isRelayer|onlyRelayer|trustedRelayer|GSN|MetaTransaction",
+        "admin": r"onlyAdmin|DEFAULT_ADMIN_ROLE|AccessControl",
+        "pauser": r"onlyPauser|Pausable",
+    }
+    hits = {k: False for k in rx}
+    for txt in corpus:
+        for k, rxx in rx.items():
+            if re.search(rxx, txt, flags=re.IGNORECASE):
+                hits[k] = True
+    
+    roles_mapped = [k for k, v in hits.items() if v]
+    return {"roles": roles_mapped, "signals": hits}
 
 
 @function_tool
@@ -143,6 +163,7 @@ def detect_web3_repo_context(repo_path: str, ctf=None) -> str:
     corpus = _glob_read(repo, ["*.sol", "foundry.toml", "hardhat.config.*", "package.json", "*.md"], limit_files=120)
     upgradeability = _detect_upgradeability(repo, corpus)
     defi = _detect_oracle_and_defi(repo, corpus)
+    roles = _detect_roles(corpus)
 
     context: Dict[str, Any] = {
         "mode": "repo",
@@ -152,9 +173,11 @@ def detect_web3_repo_context(repo_path: str, ctf=None) -> str:
         "tests": tests,
         "solidity_versions": solidity_versions,
         "protocol_type": defi["protocol_type"],
+        "roles": roles["roles"],
         "signals": {
             "upgradeability": upgradeability["signals"],
             "defi": defi["signals"],
+            "roles": roles["signals"],
         },
         # Scoring defaults (don’t over-hype local-only results)
         "assumed_live": False,

@@ -2,6 +2,14 @@
 sync:
 	uv sync --all-extras --all-packages --group dev
 
+# Symlink cai from this repo's venv into ~/.local/bin so 'cai' works from any directory
+.PHONY: install-global
+install-global:
+	@mkdir -p "$$HOME/.local/bin"
+	@ln -sf "$(CURDIR)/.venv/bin/cai" "$$HOME/.local/bin/cai"
+	@echo "Linked $(CURDIR)/.venv/bin/cai -> $$HOME/.local/bin/cai"
+	@echo "Run 'cai' from any terminal (ensure ~/.local/bin is in your PATH)."
+
 .PHONY: format
 format: 
 	uv run ruff format

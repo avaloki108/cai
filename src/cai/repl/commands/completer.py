@@ -34,6 +34,14 @@ from cai.repl.commands.model import get_predefined_model_names
 
 console = Console()
 
+
+def _escape_html_text(text: str) -> str:
+    """Escape < and > so text is safe inside prompt_toolkit HTML()."""
+    if not text:
+        return text
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 # Global cache for command descriptions and subcommands
 COMMAND_DESCRIPTIONS_CACHE = None
 SUBCOMMAND_DESCRIPTIONS_CACHE = None
@@ -313,8 +321,9 @@ class FuzzyCommandCompleter(Completer):
             reverse=True
         )
 
-        # Add command completions
+        # Add command completions (escape descriptions so <location> etc. don't break HTML)
         for cmd, description in sorted_commands:
+            safe_desc = _escape_html_text(description)
             # Exact prefix match
             if cmd.startswith(current_word):
                 suggestions.append(Completion(
@@ -322,7 +331,7 @@ class FuzzyCommandCompleter(Completer):
                     start_position=-len(current_word),
                     display=HTML(
                         f"<ansicyan><b>{cmd:<15}</b></ansicyan> "
-                        f"{description}"),
+                        f"{safe_desc}"),
                     style="fg:ansicyan bold"
                 ))
             # Fuzzy match (contains the substring)
@@ -331,20 +340,21 @@ class FuzzyCommandCompleter(Completer):
                     cmd,
                     start_position=-len(current_word),
                     display=HTML(
-                        f"<ansicyan>{cmd:<15}</ansicyan> {description}"),
+                        f"<ansicyan>{cmd:<15}</ansicyan> {safe_desc}"),
                     style="fg:ansicyan"
                 ))
 
         # Add alias completions
         for alias, cmd in sorted(COMMAND_ALIASES.items()):
             cmd_description = command_descriptions.get(cmd, "")
+            safe_desc = _escape_html_text(cmd_description)
             if alias.startswith(current_word):
                 suggestions.append(Completion(
                     alias,
                     start_position=-len(current_word),
                     display=HTML(
                         f"<ansigreen><b>{alias:<15}</b></ansigreen> "
-                        f"{cmd} - {cmd_description}"),
+                        f"{cmd} - {safe_desc}"),
                     style="fg:ansigreen bold"
                 ))
             elif current_word in alias and not alias.startswith(current_word):
@@ -353,7 +363,7 @@ class FuzzyCommandCompleter(Completer):
                     start_position=-len(current_word),
                     display=HTML(
                         f"<ansigreen>{alias:<15}</ansigreen> "
-                        f"{cmd} - {cmd_description}"),
+                        f"{cmd} - {safe_desc}"),
                     style="fg:ansigreen"
                 ))
         

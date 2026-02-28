@@ -72,6 +72,16 @@ Environment Variables
             them to the .cai/ directory.
         CAI_REPORT_DIR: Directory for auto-generated reports (default: ".cai")
         CAI_REPORT_FORMAT: Report format - "md", "json", "html" (default: "md")
+        CAI_STREAM: Enable/disable streaming output (default: "false").
+        CAI_STREAM_TIMEOUT_SEC: Timeout in seconds for a single streaming run
+            (default: "300"). Prevents infinite hang when the model/API is slow
+            or stuck. Increase for long tool runs or set to 0 to disable.
+        CAI_MODEL_FIRST_CHUNK_TIMEOUT_SEC: Timeout in seconds for the model to
+            send the first response chunk after tool results (default: "120").
+            Prevents hang after "Thinking..." when the API never responds.
+            Set to 0 to disable.
+        CAI_OUTPUT_GUARDRAILS_TIMEOUT_SEC: Timeout for output guardrails when
+            the agent finishes (default: "60"). Set to 0 to disable.
 
     Extensions (only applicable if the right extension is installed):
 
@@ -148,6 +158,22 @@ if os.getenv("CAI_DEBUG", "1") != "2":
     os.environ["PYTHONWARNINGS"] = "ignore"
 
 import asyncio
+
+# Fix for asyncio event loop issues in restricted environments
+try:
+    # Try to set event loop policy to avoid PermissionError on file descriptors
+    # This is needed in Docker/WSL/restricted environments
+    if hasattr(asyncio, 'WindowsSelectorEventLoopPolicy'):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    elif hasattr(asyncio, 'DefaultEventLoopPolicy'):
+        asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+except Exception:
+    # If policy setting fails, try to set event loop directly
+    try:
+        asyncio.set_event_loop(asyncio.new_event_loop())
+    except Exception:
+        pass  # Continue anyway, error will surface later if critical
+
 import json
 import logging
 import re
@@ -366,9 +392,6 @@ def suppress_aiohttp_warnings():
         # aiohttp not installed, skip
         pass
 
-# Call the function to suppress aiohttp warnings
-suppress_aiohttp_warnings()
-
 # OpenAI imports
 from openai import AsyncOpenAI
 from rich.console import Console
@@ -406,7 +429,7 @@ from cai.sdk.agents.models.openai_chatcompletions import (
 # Import handled where needed to avoid circular imports
 from cai.sdk.agents.run_to_jsonl import get_session_recorder
 from cai.sdk.agents.global_usage_tracker import GLOBAL_USAGE_TRACKER
-from cai.sdk.agents.stream_events import RunItemStreamEvent
+from cai.sdk.agents.stream_events import RunItemStreamEvent, WaitingForModelStreamEvent
 
 # CAI utility imports
 from cai.util import (
@@ -1650,6 +1673,15 @@ def run_cai_cli(
                     cai_stream = "false"
                 stream = cai_stream.lower() == "true"
 
+                # Timeout for streaming run (prevents infinite hang when model/API is slow or stuck)
+                try:
+                    stream_timeout_sec = int(os.getenv("CAI_STREAM_TIMEOUT_SEC", "300"))
+                except ValueError:
+                    stream_timeout_sec = 300
+                # 0 or negative = no timeout
+                if stream_timeout_sec <= 0:
+                    stream_timeout_sec = None
+
                 # Single agent execution (original behavior)
                 if stream:
 
@@ -1665,7 +1697,10 @@ def run_cai_cli(
 
                             # Consume events so the async generator is executed.
                             async for event in stream_iterator:
-                                if isinstance(event, RunItemStreamEvent):
+                                if isinstance(event, WaitingForModelStreamEvent):
+                                    # Show progress so UI does not appear stuck after tool output
+                                    console.print("[dim]Thinking...[/dim]")
+                                elif isinstance(event, RunItemStreamEvent):
                                     if event.name == "tool_called":
                                         # Track tool calls that were issued
                                         if hasattr(event.item, 'raw_item'):
@@ -1752,7 +1787,25 @@ def run_cai_cli(
                             return None
 
                     try:
-                        asyncio.run(process_streamed_response(agent, conversation_input))
+                        if stream_timeout_sec is not None:
+                            asyncio.run(
+                                asyncio.wait_for(
+                                    process_streamed_response(agent, conversation_input),
+                                    timeout=stream_timeout_sec,
+                                )
+                            )
+                        else:
+                            asyncio.run(process_streamed_response(agent, conversation_input))
+                    except asyncio.TimeoutError:
+                        console.print(
+                            f"[yellow]Streaming run timed out after {stream_timeout_sec}s.[/yellow]"
+                        )
+                        console.print(
+                            "[dim]To see where it stalls: CAI_DEBUG_STREAM=1 cai (watch stderr for "
+                            "[stream] waiting/got event). Try CAI_STREAM=false for non-streaming, "
+                            "or increase CAI_STREAM_TIMEOUT_SEC. Ctrl+C to interrupt.[/dim]\n"
+                        )
+                        continue
                     except ModelBehaviorError as e:
                         # Display a user-friendly warning for unexpected model behavior (e.g., unknown tool)
                         tool_list = ", ".join([t.name for t in getattr(agent, "tools", [])]) or "(none)"
@@ -2178,6 +2231,8 @@ def create_last_log_symlink(log_filename):
 
 
 def main():
+    # Suppress aiohttp warnings (deferred from import to avoid slow/sensitive startup)
+    suppress_aiohttp_warnings()
     # Apply litellm patch to fix the __annotations__ error
     patch_applied = fix_litellm_transcription_annotations()
     if not patch_applied:

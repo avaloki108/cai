@@ -12,7 +12,7 @@ from typing import Dict, Optional
 DEFAULT_TOOL_PATHS = {
     'slither': 'slither',  # Will be found via PATH
     'slitheryn': 'slitheryn',  # Enhanced Slither with AI analysis
-    'mythril': 'myth',  # Mythril symbolic execution (via PATH)
+    'mythril': 'myth2',  # Mythril symbolic execution (via PATH)
     'securify': 'securify',  # Securify pattern analysis
     'echidna': 'echidna',  # Echidna fuzzer (via PATH)
     'medusa': 'medusa',  # Medusa fuzzer (via PATH)

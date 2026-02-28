@@ -22,7 +22,7 @@ Based on analysis of major bridge exploits:
 import os
 import json
 import re
-from typing import Dict, Any, List, Optional
+from typing import Any
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 
@@ -34,8 +34,20 @@ api_key = (
     os.getenv("OPENAI_API_KEY")
     or os.getenv("ANTHROPIC_API_KEY")
     or os.getenv("ALIAS_API_KEY")
-    or "sk-placeholder"
 )
+
+# If no API key is set, use a placeholder to prevent hanging
+# The error will be raised when the agent tries to actually use the key
+if not api_key:
+    api_key = "sk-placeholder-no-valid-key"
+    print(
+        "\n⚠️  WARNING: No API key configured!\n"
+        "Bridge Analyzer requires one of:\n"
+        "  - OPENAI_API_KEY\n"
+        "  - ANTHROPIC_API_KEY\n"
+        "  - ALIAS_API_KEY\n\n"
+        "Set any of these environment variables to enable this agent.\n"
+    )
 
 
 # Known bridge vulnerability patterns
@@ -115,8 +127,12 @@ def analyze_replay_protection(
         
         # Check for nonce usage
         has_nonce = bool(re.search(r'\bnonce\b', contract_code, re.IGNORECASE))
-        has_nonce_tracking = bool(re.search(r'usedNonces\s*\[|processedNonces\s*\[|executedMessages\s*\[', contract_code))
-        has_nonce_increment = bool(re.search(r'nonce\s*\+\+|nonce\s*\+=\s*1', contract_code))
+        has_nonce_tracking = bool(
+            re.search(
+                r'usedNonces\s*\[|processedNonces\s*\[|executedMessages\s*\[',
+                contract_code,
+            )
+        )
         
         if not has_nonce:
             findings.append({
@@ -146,7 +162,13 @@ def analyze_replay_protection(
             })
         
         # Check for chain ID in message
-        has_chain_id = bool(re.search(r'chainId|block\.chainid|getChainId', contract_code, re.IGNORECASE))
+        has_chain_id = bool(
+            re.search(
+                r'chainId|block\.chainid|getChainId',
+                contract_code,
+                re.IGNORECASE,
+            )
+        )
         
         if not has_chain_id:
             findings.append({
@@ -204,7 +226,12 @@ def analyze_signature_verification(
             })
         
         # Check for zero address validation
-        has_zero_check = bool(re.search(r'signer\s*!=\s*address\s*\(\s*0\s*\)|recovered\s*!=\s*address\s*\(\s*0\s*\)', contract_code))
+        has_zero_check = bool(
+            re.search(
+                r'signer\s*!=\s*address\s*\(\s*0\s*\)|recovered\s*!=\s*address\s*\(\s*0\s*\)',
+                contract_code,
+            )
+        )
         
         if uses_ecrecover and not has_zero_check:
             findings.append({
@@ -215,8 +242,17 @@ def analyze_signature_verification(
             })
         
         # Check for multi-sig threshold
-        has_threshold = bool(re.search(r'threshold|requiredSignatures|minSigners|validatorCount', contract_code, re.IGNORECASE))
-        threshold_value = re.search(r'threshold\s*[=:]\s*(\d+)|requiredSignatures\s*[=:]\s*(\d+)', contract_code)
+        has_threshold = bool(
+            re.search(
+                r'threshold|requiredSignatures|minSigners|validatorCount',
+                contract_code,
+                re.IGNORECASE,
+            )
+        )
+        threshold_value = re.search(
+            r'threshold\s*[=:]\s*(\d+)|requiredSignatures\s*[=:]\s*(\d+)',
+            contract_code,
+        )
         
         if has_threshold:
             if threshold_value:
@@ -329,12 +365,20 @@ def analyze_message_validation(
             "findings_count": len(findings),
             "findings": findings,
             "verdict": "SECURE" if len(findings) == 0 else "VULNERABLE",
-            "risk_level": "CRITICAL" if any(f["severity"] == "CRITICAL" for f in findings) else "HIGH" if findings else "LOW"
+            "risk_level": (
+                "CRITICAL"
+                if any(f["severity"] == "CRITICAL" for f in findings)
+                else "HIGH"
+                if findings
+                else "LOW"
+            )
         }
-        
+
         return json.dumps(result, indent=2)
     except Exception as e:
-        return json.dumps({"error": f"Error analyzing message validation: {str(e)}"})
+        return json.dumps(
+            {"error": f"Error analyzing message validation: {str(e)}"}
+        )
 
 
 @function_tool
@@ -383,9 +427,6 @@ def analyze_validator_security(
                 "description": "No slashing/penalty mechanism for malicious validators",
                 "recommendation": "Implement economic penalties for misbehavior"
             })
-        
-        # Check for maximum validator control
-        has_max_check = bool(re.search(r'maxValidators|MAX_SIGNERS', contract_code))
         
         result = {
             "analysis_type": "validator_security",
@@ -478,27 +519,40 @@ def check_known_bridge_exploits(
 @function_tool
 def render_bridge_audit_report(
     contract_name: str,
-    replay_findings: List[Dict],
-    signature_findings: List[Dict],
-    message_findings: List[Dict],
-    validator_findings: List[Dict],
-    exploit_matches: List[Dict],
-    ctf=None
+    replay_findings: str = "[]",
+    signature_findings: str = "[]",
+    message_findings: str = "[]",
+    validator_findings: str = "[]",
+    exploit_matches: str = "[]",
+    ctf=None,
 ) -> str:
     """
     Render comprehensive bridge audit report.
     
     Args:
         contract_name: Name of the bridge contract
-        replay_findings: Findings from replay analysis
-        signature_findings: Findings from signature analysis
-        message_findings: Findings from message validation
-        validator_findings: Findings from validator analysis
-        exploit_matches: Known exploit pattern matches
+        replay_findings: JSON array of findings from replay analysis
+        signature_findings: JSON array of findings from signature analysis
+        message_findings: JSON array of findings from message validation
+        validator_findings: JSON array of findings from validator analysis
+        exploit_matches: JSON array of known exploit pattern matches
         
     Returns:
         Formatted audit report
     """
+    def _parse(s: str) -> list[dict[str, Any]]:
+        try:
+            out = json.loads(s)
+            return out if isinstance(out, list) else []
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    replay_findings = _parse(replay_findings)
+    signature_findings = _parse(signature_findings)
+    message_findings = _parse(message_findings)
+    validator_findings = _parse(validator_findings)
+    exploit_matches = _parse(exploit_matches)
+
     all_findings = replay_findings + signature_findings + message_findings + validator_findings
     critical_count = sum(1 for f in all_findings if f.get("severity") == "CRITICAL")
     high_count = sum(1 for f in all_findings if f.get("severity") == "HIGH")

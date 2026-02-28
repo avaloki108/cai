@@ -43,7 +43,11 @@ from .models.interface import Model, ModelProvider
 from .models.openai_provider import OpenAIProvider
 from .result import RunResult, RunResultStreaming
 from .run_context import RunContextWrapper, TContext
-from .stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent
+from .stream_events import (
+    AgentUpdatedStreamEvent,
+    RawResponsesStreamEvent,
+    WaitingForModelStreamEvent,
+)
 from .tool import Tool
 from .tracing import Span, SpanError, agent_span, get_current_trace, trace
 from .tracing.span_data import AgentSpanData
@@ -682,6 +686,10 @@ class Runner:
                             current_span,
                         )
                     )
+                # Emit so UI can show "Thinking..." instead of appearing stuck after tool output
+                streamed_result._event_queue.put_nowait(
+                    WaitingForModelStreamEvent(turn=current_turn)
+                )
                 try:
                     turn_result = await cls._run_single_turn_streamed(
                         streamed_result,
@@ -750,9 +758,28 @@ class Runner:
                         )
 
                         try:
-                            output_guardrail_results = await streamed_result._output_guardrails_task
-                        except Exception:
-                            # Exceptions will be checked in the stream_events loop
+                            guardrails_timeout = int(
+                                os.getenv("CAI_OUTPUT_GUARDRAILS_TIMEOUT_SEC", "60")
+                            )
+                        except ValueError:
+                            guardrails_timeout = 60
+                        if guardrails_timeout <= 0:
+                            guardrails_timeout = None
+                        try:
+                            if guardrails_timeout is not None:
+                                output_guardrail_results = await asyncio.wait_for(
+                                    streamed_result._output_guardrails_task,
+                                    timeout=guardrails_timeout,
+                                )
+                            else:
+                                output_guardrail_results = await streamed_result._output_guardrails_task
+                        except (Exception, asyncio.TimeoutError):
+                            # Exceptions or timeout: cancel task and continue
+                            if (
+                                streamed_result._output_guardrails_task
+                                and not streamed_result._output_guardrails_task.done()
+                            ):
+                                streamed_result._output_guardrails_task.cancel()
                             output_guardrail_results = []
 
                         streamed_result.output_guardrail_results = output_guardrail_results
@@ -852,8 +879,19 @@ class Runner:
         input = ItemHelpers.input_to_new_input_list(streamed_result.input)
         input.extend([item.to_input_item() for item in streamed_result.new_items])
 
-        # 1. Stream the output events
-        async for event in model.stream_response(
+        # 1. Stream the output events (with optional timeout for first chunk to avoid indefinite hang)
+        if os.getenv("CAI_DEBUG_STREAM", "").lower() in ("1", "true", "yes"):
+            import sys
+            print("[stream] runner: calling model.stream_response (turn)", streamed_result.current_turn, flush=True, file=sys.stderr)
+        first_chunk = True
+        try:
+            first_chunk_timeout_sec = int(os.getenv("CAI_MODEL_FIRST_CHUNK_TIMEOUT_SEC", "120"))
+        except ValueError:
+            first_chunk_timeout_sec = 120
+        if first_chunk_timeout_sec <= 0:
+            first_chunk_timeout_sec = None
+
+        stream = model.stream_response(
             system_prompt,
             input,
             model_settings,
@@ -863,7 +901,25 @@ class Runner:
             get_model_tracing_impl(
                 run_config.tracing_disabled, run_config.trace_include_sensitive_data
             ),
-        ):
+        )
+        stream_iter = stream.__aiter__()
+        try:
+            if first_chunk_timeout_sec is not None:
+                event = await asyncio.wait_for(
+                    stream_iter.__anext__(),
+                    timeout=first_chunk_timeout_sec,
+                )
+            else:
+                event = await stream_iter.__anext__()
+        except StopAsyncIteration:
+            raise ModelBehaviorError("Model did not produce a final response!") from None
+        except asyncio.TimeoutError:
+            raise ModelBehaviorError(
+                f"Model did not respond within {first_chunk_timeout_sec}s "
+                "(CAI_MODEL_FIRST_CHUNK_TIMEOUT_SEC). API may be slow or stuck."
+            ) from None
+
+        while True:
             if isinstance(event, ResponseCompletedEvent):
                 usage = (
                     Usage(
@@ -881,7 +937,16 @@ class Runner:
                     referenceable_id=event.response.id,
                 )
 
+            if first_chunk and os.getenv("CAI_DEBUG_STREAM", "").lower() in ("1", "true", "yes"):
+                import sys
+                print("[stream] runner: first chunk from model received", flush=True, file=sys.stderr)
+            first_chunk = False
             streamed_result._event_queue.put_nowait(RawResponsesStreamEvent(data=event))
+
+            try:
+                event = await stream_iter.__anext__()
+            except StopAsyncIteration:
+                break
 
         # 2. At this point, the streaming is complete for this turn of the agent loop.
         if not final_response:

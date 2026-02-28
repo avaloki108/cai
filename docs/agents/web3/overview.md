@@ -4,10 +4,18 @@ The CAI framework includes a specialized suite of twelve cybersecurity AI agents
 
 ## Architecture
 
+All Web3 agents run through the **CAI runtime** (Agent Factory → Runner → Turns/Interactions).
+The primary audit paths are:
+
+1. **Deterministic pipeline** (`EliteWeb3Pipeline` in `src/cai/web3/pipeline.py`):
+   Discovery → Risk Queue → Skeptic Gate → Fork Exploit → Formal
+2. **Judge-gated bounty** (see [Judge Gate pipeline](../../judge_gate_pipeline.md)):
+   `web3_bug_bounty_agent` → `defi_bounty_judge_agent` → `retester_agent`
+
 ```
                     ┌──────────────────────┐
-                    │   Web3 Orchestrator  │
-                    │   (Master Control)   │
+                    │  CAI Agent Factory   │
+                    │  & Runner (Turns)    │
                     └──────────┬───────────┘
                                │
            ┌───────────────────┼───────────────────┐

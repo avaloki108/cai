@@ -214,3 +214,6 @@ SETUP_WEB3_TOOLS.md
 # Local sync scripts
 quick_sync.sh
 update_from_upstream.sh
+
+# OpenMemory - IDE/Assistant specific rules
+.cursor/rules/openmemory.mdc

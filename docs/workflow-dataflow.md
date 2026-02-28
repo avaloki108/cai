@@ -1,6 +1,10 @@
 # Workflow and Data Flow Documentation
 
-This document provides comprehensive documentation of the audit workflow, data formats, agent communication protocols, and report generation processes in the Web3 Security Auditing AI System.
+This document provides comprehensive documentation of the audit workflow, data formats, agent communication protocols, and report generation processes in CAI's Web3 security auditing flow.
+
+> **Note:** All audit workflows run through the CAI-native `EliteWeb3Pipeline`
+> (`src/cai/web3/pipeline.py`). The `web3_security_ai` package is a backward-
+> compatibility adapter that delegates to this pipeline.
 
 ## Table of Contents
 
@@ -165,25 +169,47 @@ class AnalysisConfig:
 
 #### Finding
 
+The canonical Finding model lives in `src/cai/core/finding.py` and is shared
+across all pipeline stages, tools, and report generators:
+
 ```python
 @dataclass
 class Finding:
-    """Security finding or vulnerability."""
+    """Canonical CAI finding — used by pipeline, tools, and reports."""
 
     id: str
-    type: str  # Vulnerability type (e.g., "reentrancy", "overflow")
-    severity: Severity  # CRITICAL, HIGH, MEDIUM, LOW, INFO
-    confidence: str  # "high", "medium", "low"
-    title: str
-    description: str
-    location: Location
-    code_snippet: str
-    impact: str
-    recommendation: str
-    cvss_score: float
-    references: List[str]
-    metadata: Dict[str, Any]
-    tags: List[str]
+    vulnerability_type: str
+    severity: str
+    contract: str
+    function_name: str
+    location: str
+
+    call_trace: List[str] = field(default_factory=list)
+    state_variables: List[str] = field(default_factory=list)
+    taint_path: List[str] = field(default_factory=list)
+
+    cross_contract: bool = False
+    external_call_depth: int = 0
+    privilege_required: bool = False
+
+    exploit_path: Optional[List[str]] = None
+    economic_profitability: Optional[float] = None
+    gas_cost_estimate: Optional[float] = None
+
+    fork_verified: bool = False
+    invariant_broken: bool = False
+
+    consensus_score: float = 0.0
+    rejected_reason: Optional[str] = None
+
+    def is_critical(self) -> bool:
+        return (
+            self.fork_verified
+            and self.invariant_broken
+            and self.economic_profitability is not None
+            and self.economic_profitability > 0
+            and self.consensus_score >= 0.85
+        )
 ```
 
 #### Location

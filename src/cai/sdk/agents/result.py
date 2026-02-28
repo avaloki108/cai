@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import asyncio
+import os
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, cast
@@ -164,7 +165,16 @@ class RunResultStreaming(RunResultBase):
                 break
 
             try:
+                if os.getenv("CAI_DEBUG_STREAM", "").lower() in ("1", "true", "yes"):
+                    import sys
+                    print("[stream] waiting for next event...", flush=True, file=sys.stderr)
                 item = await self._event_queue.get()
+                if os.getenv("CAI_DEBUG_STREAM", "").lower() in ("1", "true", "yes"):
+                    import sys
+                    ev_type = type(item).__name__
+                    if hasattr(item, "name"):
+                        ev_type = f"{ev_type}({getattr(item, 'name', '')})"
+                    print(f"[stream] got event: {ev_type}", flush=True, file=sys.stderr)
             except asyncio.CancelledError:
                 break
 

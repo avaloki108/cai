@@ -81,7 +81,7 @@ CAI> Analyze https://example.com for vulnerabilities
 - **Split context**: Each agent has its own message history and works independently
 - **Shared context**: Both agents see the same message history and can build on each other's work
 
-**Judge Gate pipeline (Hunter → Judge → PoC):** For DeFi audits, use `web3_hunter_judge_poc_pattern` so the Hunter stays creative and expansive while a dedicated **Judge Gate** agent filters candidates. Only **EXPLOITABLE – BOUNTY ELIGIBLE** issues go to the PoC Builder. See [Judge Gate pipeline](judge_gate_pipeline.md) for contracts (CANDIDATES_JSON, verdicts) and wiring.
+**Judge Gate pipeline (Hunter → Judge → PoC):** For DeFi audits, use the judge-gated mode so the Hunter (`web3_bug_bounty_agent`) stays creative and expansive while the dedicated **Judge Gate** agent (`defi_bounty_judge_agent`) filters candidates. Only **EXPLOITABLE – BOUNTY ELIGIBLE** issues go to the PoC Builder (`retester_agent`). All three agents run through CAI Runner and are discoverable via `/agent list`. See [Judge Gate pipeline](judge_gate_pipeline.md) for contracts (CANDIDATES_JSON, verdicts) and wiring.
 
 **Example workflow with offsec_pattern:**
 

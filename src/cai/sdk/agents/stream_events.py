@@ -54,5 +54,22 @@ class AgentUpdatedStreamEvent:
     type: Literal["agent_updated_stream_event"] = "agent_updated_stream_event"
 
 
-StreamEvent: TypeAlias = Union[RawResponsesStreamEvent, RunItemStreamEvent, AgentUpdatedStreamEvent]
+@dataclass
+class WaitingForModelStreamEvent:
+    """Emitted before calling the model so the UI can show progress (e.g. 'Thinking...').
+    Prevents the interface from appearing stuck after tool output while waiting for the next response.
+    """
+
+    turn: int
+    """Current turn number."""
+
+    type: Literal["waiting_for_model"] = "waiting_for_model"
+
+
+StreamEvent: TypeAlias = Union[
+    RawResponsesStreamEvent,
+    RunItemStreamEvent,
+    AgentUpdatedStreamEvent,
+    WaitingForModelStreamEvent,
+]
 """A streaming event from an agent."""

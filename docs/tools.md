@@ -8,7 +8,9 @@ Tools let agents take actions: things like fetching data, running code, calling 
 
 ## Hosted tools
 
-CAI offers a few built-in tools when using the [`OpenAIResponsesModel`][cai.sdk.agents.models.openai_responses.OpenAIResponsesModel]. They are in [tools](src/cai/tools) and grouped in 6 major categories inspired by the security kill chain[2]:
+CAI offers a few built-in tools when using the [`OpenAIResponsesModel`][cai.sdk.agents.models.openai_responses.OpenAIResponsesModel]. They are in [tools](src/cai/tools) and grouped in 6 major categories inspired by the security kill chain[2].
+
+For Web3 security, a stage-mapped **enhancement layer** (`tools/web3_security/enhancements/`) adds game-theoretic reasoning on top of raw sensor output. See `enhancements/__init__.py` for the full stage mapping (Pre-flight → Discovery → Scoring → Correlation → Aggregation → MEV Simulation).
 
  
 1. Reconnaissance and weaponization - *reconnaissance*  (crypto, listing, etc)

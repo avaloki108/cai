@@ -368,6 +368,7 @@ def display_quick_guide(console: Console):
         
         ("ENVIRONMENT", "bold yellow"), "\n",
         ("  CAI>/workspace set [NAME]", "green"), " - Set workspace directory\n",
+        ("  CAI>/hunt <location>", "green"), " - Web3 audit quickstart (workspace + agent)\n",
         ("  CAI>/config", "green"), " - Manage environment variables\n",
         ("  CAI>/virt run [IMAGE]", "green"), " - Run Docker containers\n\n",
         
@@ -399,6 +400,9 @@ def display_quick_guide(console: Console):
         ("  1. CAI> /agent select bug_bounter_agent", "green"), "\n",
         ("  2. CAI> /model claude-3-7-sonnet", "green"), "\n",
         ("  3. CAI> Test https://example.com", "green"), "\n\n",
+        
+        ("🔍 Web3 Audit", "bold yellow"), "\n",
+        ("  CAI> /hunt /path/to/repo", "green"), " - Set workspace and web3 bug bounty agent\n\n",
         
         ("CAI collects pseudonymized data to improve our research.\n"
          "Your privacy is protected in compliance with GDPR.\n"

@@ -50,26 +50,34 @@ cai
 ├── benchmarks
 ├── ci
 ├── docs
-├── examples                     # Basic use of CAI for start building on your own
+├── examples                       # Basic use of CAI for start building on your own
 ├── src
 │   └── cai
 │        ├── __init__.py
+│        ├── cli.py                # Entrypoint for CLI
 │        ├── agents
-│        │   ├── one_tool.py     # Agent definitions, one agent per file
-│        │   └── patterns
-│        ├── cli.py              # Entrypoint for CLI
+│        │   ├── one_tool.py       # Agent definitions, one agent per file
+│        │   ├── web3_bug_bounty.py  # Web3 audit agent (100+ tools)
+│        │   ├── defi_bounty_judge.py  # Judge-gate agent
+│        │   └── patterns          # Agentic patterns (composite, parallel, etc.)
+│        ├── core
+│        │   └── finding.py        # Canonical Finding data model
+│        ├── web3
+│        │   └── pipeline.py       # Deterministic Web3 audit pipeline
 │        ├── prompts
-│        ├── repl                # CLI aesthetics and commands
+│        ├── repl                  # CLI aesthetics and commands
 │        │   ├── commands
 │        │   └── ui
-│        ├── sdk                 # Necessary class for chat completions
+│        ├── sdk                   # Agent runtime (Runner, turns, streaming)
 │        │   └── agents
 │        │       └── model
-│        ├── tools               # Agent tools
-│        │   └──common.py
-│        └── util.py             # Utility functions
+│        ├── tools                 # Agent tools
+│        │   ├── common.py
+│        │   └── web3_security/    # Web3 tool suite
+│        │       └── enhancements/ # Stage-mapped reasoning tools
+│        └── util.py               # Utility functions
 ├── tests
-└── tools                        # Usable tools
+└── tools                          # Usable tools
 ```
 
 ---

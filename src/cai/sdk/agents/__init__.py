@@ -67,6 +67,7 @@ from .stream_events import (
     RawResponsesStreamEvent,
     RunItemStreamEvent,
     StreamEvent,
+    WaitingForModelStreamEvent,
 )
 from .tool import (
     ComputerTool,
@@ -214,6 +215,7 @@ __all__ = [
     "RawResponsesStreamEvent",
     "RunItemStreamEvent",
     "AgentUpdatedStreamEvent",
+    "WaitingForModelStreamEvent",
     "StreamEvent",
     "FunctionTool",
     "FunctionToolResult",

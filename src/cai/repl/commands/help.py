@@ -93,6 +93,7 @@ class HelpCommand(Command):
         self.add_subcommand("config", "Display help for configuration", self.handle_config)
         self.add_subcommand("env", "Display help for environment variables", self.handle_env)
         self.add_subcommand("workspace", "Display help for workspace management", self.handle_workspace)
+        self.add_subcommand("hunt", "Display help for web3 audit quickstart", self.handle_hunt)
         self.add_subcommand("virtualization", "Display help for Docker containers", self.handle_virtualization)
         
         # Tools & Integration
@@ -364,6 +365,7 @@ class HelpCommand(Command):
                 ("[cyan]/config[/cyan]", "Manage environment variables"),
                 ("[cyan]/env[/cyan]", "Display current environment"),
                 ("[cyan]/workspace[/cyan]", "Manage working directories"),
+                ("[cyan]/hunt[/cyan]", "Web3 audit quickstart: set workspace and agent"),
                 ("[cyan]/virtualization[/cyan]", "Docker container management"),
             ]),
             ("[bold magenta]Tools & Integration[/bold magenta]", [
@@ -918,6 +920,28 @@ class HelpCommand(Command):
         )
         return True
 
+    def handle_hunt(self, _: Optional[List[str]] = None) -> bool:
+        """Show help for web3 audit quickstart."""
+        console.print(
+            Panel(
+                "[bold]Web3 Audit Quickstart[/bold]\n\n"
+                "One command to set the workspace to a project path and switch to the "
+                "web3 bug bounty agent for auditing or bug bounty.\n\n"
+                "[bold yellow]Usage:[/bold yellow]\n"
+                "• [yellow]/hunt <location>[/yellow] - Path to the web3 project (absolute or relative)\n\n"
+                "[bold cyan]Examples:[/bold cyan]\n"
+                "• [green]/hunt /home/user/web3_2/aqua[/green] - Audit the aqua repo\n"
+                "• [green]/hunt ./my-contracts[/green] - Use relative path\n\n"
+                "[bold]What it does:[/bold]\n"
+                "• Sets CAI_WORKSPACE_DIR and CAI_WORKSPACE so tools use that directory\n"
+                "• Switches to [cyan]web3_bug_bounty_agent[/cyan]\n"
+                "• Folder name (last path segment) must be alphanumeric, underscore, or hyphen only",
+                title="Hunt Command",
+                border_style="green",
+            )
+        )
+        return True
+
     def handle_virtualization(self, _: Optional[List[str]] = None) -> bool:
         """Show help for Docker container management."""
         console.print(
@@ -1041,6 +1065,7 @@ class HelpCommand(Command):
                 ("/config", "/cfg", "Manage environment variables"),
                 ("/env", "/e", "Display environment"),
                 ("/workspace", "/ws", "Manage workspaces"),
+                ("/hunt", "", "Web3 audit quickstart: set workspace and agent"),
                 ("/virtualization", "/virt", "Docker containers"),
             ]),
             # Tools & Integration

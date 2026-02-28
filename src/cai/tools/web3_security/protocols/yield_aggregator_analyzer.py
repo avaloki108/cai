@@ -17,6 +17,7 @@ from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 from dotenv import load_dotenv
+from openai import AsyncOpenAI
 
 from cai.sdk.agents import Agent, OpenAIChatCompletionsModel, function_tool
 
