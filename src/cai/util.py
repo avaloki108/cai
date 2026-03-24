@@ -3130,7 +3130,7 @@ def cli_print_tool_output(
         )
 
         # When CAI_STREAM=false and this is the first display (not a duplicate),
-        # show a small command execution panel first
+        # show a small command execution panel first (only for tools that have a real command)
         if not streaming_enabled and not streaming and is_first_display:
             # Get agent name for the panel
             agent_name = ""
@@ -3148,27 +3148,24 @@ def cli_print_tool_output(
                         command_text += f" {display_args['args']}"
                 elif "full_command" in display_args:
                     command_text = display_args.get("full_command", "")
-                else:
-                    # Fallback to string representation
-                    command_text = str(display_args)
             else:
-                command_text = str(display_args)
-                
-            # Create a small panel showing just the command being executed
-            command_panel = Panel(
-                f"[bold cyan]{command_text}[/bold cyan]",
-                title=f"[bold blue]{agent_name} - Executing Command[/bold blue]",
-                border_style="blue",
-                padding=(0, 1),
-                box=ROUNDED,
-                title_align="left",
-                width=None,  # Auto width based on content
-                expand=False  # Don't expand to full width
-            )
-            
-            # Print the command panel
-            console.print(command_panel)
-            console.print()  # Add spacing between panels
+                command_text = str(display_args) if display_args else ""
+
+            # Only show "Executing Command" panel when we have a real command to display.
+            # Skip for no-arg tools (e.g. pwd_command) to avoid showing "{}".
+            if command_text and command_text.strip() and command_text not in ("{}", "''", '""'):
+                command_panel = Panel(
+                    f"[bold cyan]{command_text}[/bold cyan]",
+                    title=f"[bold blue]{agent_name} - Executing Command[/bold blue]",
+                    border_style="blue",
+                    padding=(0, 1),
+                    box=ROUNDED,
+                    title_align="left",
+                    width=None,  # Auto width based on content
+                    expand=False  # Don't expand to full width
+                )
+                console.print(command_panel)
+                console.print()  # Add spacing between panels
         
         # Display the panel
         console.print(panel)

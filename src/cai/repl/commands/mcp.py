@@ -827,7 +827,8 @@ Shows current configuration file contents and status
         )
 
         async def connect_and_test():
-            params: MCPServerStdioParams = {"command": command, "args": cmd_args}
+            import os as _os
+            params: MCPServerStdioParams = {"command": command, "args": cmd_args, "env": dict(_os.environ)}
             server = MCPServerStdio(params, name=name, cache_tools_list=True)
 
             # Connect to the server

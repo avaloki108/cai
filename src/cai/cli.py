@@ -179,8 +179,31 @@ import logging
 import re
 import shlex
 import time
+import uuid
 
 # Configure comprehensive error filtering
+DEBUG_LOG_PATH = "/home/dok/tools/cai/.cursor/debug-7cde7a.log"
+DEBUG_SESSION_ID = "7cde7a"
+
+
+def _debug_log(*, hypothesis_id: str, location: str, message: str, data: dict) -> None:
+    payload = {
+        "sessionId": DEBUG_SESSION_ID,
+        "id": f"log_{uuid.uuid4().hex}",
+        "timestamp": int(time.time() * 1000),
+        "location": location,
+        "message": message,
+        "data": data,
+        "runId": os.getenv("CAI_DEBUG_RUN_ID", "pre-fix"),
+        "hypothesisId": hypothesis_id,
+    }
+    try:
+        with open(DEBUG_LOG_PATH, "a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
+    except Exception:
+        pass
+
+
 class ComprehensiveErrorFilter(logging.Filter):
     """Filter to suppress various expected errors and warnings."""
     def filter(self, record):
@@ -1489,15 +1512,70 @@ def run_cai_cli(
 
                 command = parts[0]
                 args = parts[1:] if len(parts) > 1 else None
+                # region agent log
+                _debug_log(
+                    hypothesis_id="H3",
+                    location="src/cai/cli.py:run_cai_cli",
+                    message="Processing slash/shell command",
+                    data={"command": command, "args": args or []},
+                )
+                # endregion
 
                 # Process the command with the handler
-                if commands_handle_command(command, args):
-                    continue  # Command was handled, continue to next iteration
+                handled = commands_handle_command(command, args)
+                should_continue_after_command = True
+                # region agent log
+                _debug_log(
+                    hypothesis_id="H4",
+                    location="src/cai/cli.py:run_cai_cli",
+                    message="Command handler result",
+                    data={"command": command, "handled": handled},
+                )
+                # endregion
+                if handled:
+                    auto_hunt_prompt = ""
+                    if command == "/hunt":
+                        auto_hunt_prompt = os.environ.pop("CAI_HUNT_AUTO_PROMPT", "").strip()
+                        # region agent log
+                        _debug_log(
+                            hypothesis_id="H6",
+                            location="src/cai/cli.py:run_cai_cli",
+                            message="Checked queued /hunt auto prompt",
+                            data={"has_auto_prompt": bool(auto_hunt_prompt)},
+                        )
+                        # endregion
+                    if auto_hunt_prompt:
+                        user_input = auto_hunt_prompt
+                        should_continue_after_command = False
+                        # region agent log
+                        _debug_log(
+                            hypothesis_id="H6",
+                            location="src/cai/cli.py:run_cai_cli",
+                            message="Executing queued /hunt auto prompt",
+                            data={"prompt_preview": auto_hunt_prompt[:180]},
+                        )
+                        # endregion
+                    if should_continue_after_command:
+                        continue  # Command was handled, continue to next iteration
 
                 # If command wasn't recognized, show error (skip for /shell or /s)
-                if command not in ("/shell", "/s"):
+                if not handled and command not in ("/shell", "/s"):
+                    # region agent log
+                    _debug_log(
+                        hypothesis_id="H7",
+                        location="src/cai/cli.py:run_cai_cli",
+                        message="Unknown command branch reached",
+                        data={"command": command},
+                    )
+                    # endregion
                     console.print(f"[red]Command failed or unknown: {command}[/red]")
-                continue
+                    continue
+                if handled:
+                    # Command handled and optionally transformed into normal user_input.
+                    # Fall through only when should_continue_after_command is False.
+                    pass
+                else:
+                    continue
             from rich.text import Text
 
             log_text = Text(
@@ -1692,7 +1770,12 @@ def run_cai_cli(
                         stream_iterator = None
                         
                         try:
-                            result = Runner.run_streamed(agent, conversation_input)
+                            # Pass current max_turns so /config and env are respected each run
+                            result = Runner.run_streamed(
+                                agent,
+                                conversation_input,
+                                max_turns=int(max_turns) if max_turns != float("inf") else max_turns,
+                            )
                             stream_iterator = result.stream_events()
 
                             # Consume events so the async generator is executed.
@@ -1807,12 +1890,9 @@ def run_cai_cli(
                         )
                         continue
                     except ModelBehaviorError as e:
-                        # Display a user-friendly warning for unexpected model behavior (e.g., unknown tool)
-                        tool_list = ", ".join([t.name for t in getattr(agent, "tools", [])]) or "(none)"
                         print(f"\n\033[91m⚠️  MODEL BEHAVIOR ERROR\033[0m")
                         print(f"\033[91mReason: {e.message}\033[0m")
-                        print(f"\033[93mAvailable tools for this agent: {tool_list}\033[0m")
-                        print(f"\033[96mYou can retry the request or rephrase it to use known tools.\033[0m\n")
+                        print(f"\033[93mTry: /compact to reduce context, /flush to clear history, or reduce tool count.\033[0m\n")
                         continue
                     except OutputGuardrailTripwireTriggered as e:
                         # Display a user-friendly warning instead of crashing (streaming mode)
@@ -1924,12 +2004,18 @@ def run_cai_cli(
                                 else:
                                     raise
                     except ModelBehaviorError as e:
-                        # Display a user-friendly warning for unexpected model behavior (e.g., unknown tool)
-                        tool_list = ", ".join([t.name for t in getattr(agent, "tools", [])]) or "(none)"
                         print(f"\n\033[91m⚠️  MODEL BEHAVIOR ERROR\033[0m")
                         print(f"\033[91mReason: {e.message}\033[0m")
-                        print(f"\033[93mAvailable tools for this agent: {tool_list}\033[0m")
-                        print(f"\033[96mYou can retry the request or rephrase it to use known tools.\033[0m\n")
+                        print(f"\033[93mTry: /compact to reduce context, /flush to clear history, or reduce tool count.\033[0m\n")
+                        continue
+                    except asyncio.TimeoutError as e:
+                        print(f"\n\033[91m⚠️  API TIMEOUT\033[0m")
+                        print(f"\033[91m{str(e)}\033[0m")
+                        print(f"\033[93mThe model API did not respond in time. This usually means:\033[0m")
+                        print(f"\033[93m  - Context is too large (try /compact or /flush)\033[0m")
+                        print(f"\033[93m  - Too many tools registered (196 tools = large request payload)\033[0m")
+                        print(f"\033[93m  - API is overloaded (try again in a moment)\033[0m")
+                        print(f"\033[96mAdjust timeout: CAI_MODEL_RESPONSE_TIMEOUT_SEC or CAI_API_CALL_TIMEOUT_SEC\033[0m\n")
                         continue
                     except Exception as api_error:
                         # Check if this is an API connection error that should be shown to the user

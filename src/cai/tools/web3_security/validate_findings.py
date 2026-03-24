@@ -270,6 +270,12 @@ def _filter_false_positives_impl(
         "affected_asset": ["affected_asset", "asset", "impact_asset"],
         "permissionless": ["permissionless", "permissionless_proof", "access_control"],
     }
+    verdict_buckets = {
+        "EXPLOITABLE – BOUNTY ELIGIBLE": 0,
+        "NOT EXPLOITABLE – ALREADY MITIGATED": 0,
+        "THEORETICAL / DESIGN RISK ONLY": 0,
+        "INVALID – NO REAL ATTACK PATH": 0,
+    }
 
     def _evidence_value(normalized_finding, keys):
         evidence = normalized_finding.get("evidence") or {}
@@ -306,14 +312,19 @@ def _filter_false_positives_impl(
                     + ", ".join(missing)
                 ),
                 "false_positive_pattern": "missing_evidence",
+                "reason_code": "needs_evidence",
+                "exploitability_verdict": "INVALID – NO REAL ATTACK PATH",
                 "recommendations": [
                     "Include exploit path summary, preconditions, affected asset, and permissionless proof",
                 ],
             }
+            verdict_buckets[validation_result["exploitability_verdict"]] += 1
             false_positives.append({
                 "finding": normalized,
                 "validation": validation_result,
                 "reason": validation_result["reasoning"],
+                "reason_code": validation_result["reason_code"],
+                "exploitability_verdict": validation_result["exploitability_verdict"],
             })
             continue
 
@@ -327,13 +338,24 @@ def _filter_false_positives_impl(
         )
 
         if validation_result["is_valid"] and validation_result["confidence"] >= min_confidence:
+            validation_result["reason_code"] = "validated"
+            validation_result["exploitability_verdict"] = "EXPLOITABLE – BOUNTY ELIGIBLE"
+            verdict_buckets[validation_result["exploitability_verdict"]] += 1
             normalized["validation"] = validation_result
+            normalized["exploitability_verdict"] = validation_result["exploitability_verdict"]
             valid_findings.append(normalized)
         else:
+            reason_code = "already_mitigated" if validation_result.get("false_positive_pattern", "").startswith("safe_pattern:") else "theoretical_only"
+            verdict = "NOT EXPLOITABLE – ALREADY MITIGATED" if reason_code == "already_mitigated" else "THEORETICAL / DESIGN RISK ONLY"
+            validation_result["reason_code"] = reason_code
+            validation_result["exploitability_verdict"] = verdict
+            verdict_buckets[verdict] += 1
             false_positives.append({
                 "finding": normalized,
                 "validation": validation_result,
                 "reason": validation_result["reasoning"],
+                "reason_code": reason_code,
+                "exploitability_verdict": verdict,
             })
 
     return {
@@ -342,6 +364,7 @@ def _filter_false_positives_impl(
         "filtered_findings": valid_findings,
         "false_positives": false_positives,
         "filter_rate": f"{(len(false_positives)/len(findings)*100):.1f}%" if findings else "0%",
+        "exploitability_breakdown": verdict_buckets,
     }
 
 
@@ -475,18 +498,24 @@ def council_filter_findings(
                 rejected.append({
                     "finding": finding,
                     "reason": "Not permissionless (explicit flag).",
+                    "reason_code": "not_permissionless",
+                    "exploitability_verdict": "NOT EXPLOITABLE – ALREADY MITIGATED",
                 })
                 continue
             if permissionless_flag is None and _looks_privileged(preconditions_text):
                 rejected.append({
                     "finding": finding,
                     "reason": "Not permissionless (privileged access indicated).",
+                    "reason_code": "not_permissionless",
+                    "exploitability_verdict": "NOT EXPLOITABLE – ALREADY MITIGATED",
                 })
                 continue
             if permissionless_flag is None and not permissionless_signal:
                 needs_evidence.append({
                     "finding": finding,
                     "reason": "Permissionless access not demonstrated.",
+                    "reason_code": "needs_permissionless_proof",
+                    "exploitability_verdict": "INVALID – NO REAL ATTACK PATH",
                 })
                 continue
 
@@ -499,13 +528,28 @@ def council_filter_findings(
             signal_status = str(finding["signal_council"].get("status", "")).upper()
 
         if karen_status in ["DISPROVED", "FALSE-POSITIVE", "FALSE_POSITIVE"]:
-            rejected.append({"finding": finding, "reason": "Karen Council disproved."})
+            rejected.append({
+                "finding": finding,
+                "reason": "Karen Council disproved.",
+                "reason_code": "already_mitigated",
+                "exploitability_verdict": "NOT EXPLOITABLE – ALREADY MITIGATED",
+            })
             continue
         if signal_status in ["OUT_OF_SCOPE", "DUPLICATE_SUSPECTED", "NOT_A_VULN", "LOW_IMPACT", "UNREPRODUCIBLE"]:
-            rejected.append({"finding": finding, "reason": "Signal Council rejected."})
+            rejected.append({
+                "finding": finding,
+                "reason": "Signal Council rejected.",
+                "reason_code": "council_rejected",
+                "exploitability_verdict": "THEORETICAL / DESIGN RISK ONLY",
+            })
             continue
         if signal_status in ["PENDING_EVIDENCE", "NEEDS_MORE_DATA"]:
-            needs_evidence.append({"finding": finding, "reason": "Signal Council needs evidence."})
+            needs_evidence.append({
+                "finding": finding,
+                "reason": "Signal Council needs evidence.",
+                "reason_code": "needs_evidence",
+                "exploitability_verdict": "INVALID – NO REAL ATTACK PATH",
+            })
             continue
 
         # Evidence requirements
@@ -527,9 +571,12 @@ def council_filter_findings(
                 "finding": finding,
                 "reason": f"Missing required evidence fields: {', '.join(missing_fields)}",
                 "missing_fields": missing_fields,
+                "reason_code": "needs_evidence",
+                "exploitability_verdict": "INVALID – NO REAL ATTACK PATH",
             })
             continue
 
+        finding["exploitability_verdict"] = "EXPLOITABLE – BOUNTY ELIGIBLE"
         validated.append(finding)
 
     return json.dumps({

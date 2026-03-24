@@ -37,7 +37,7 @@ When the Hunter is run for this pipeline, it must output candidates in this shap
 }
 ```
 
-See [system_web3_bug_bounty.md](../src/cai/prompts/system_web3_bug_bounty.md) (Judge Gate Pipeline Output) for field details.
+This CANDIDATES_JSON shape is the required handoff contract between Hunter and Judge.
 
 ### Judge output (verdicts)
 
@@ -63,10 +63,47 @@ The Judge evaluates each candidate and returns exactly one verdict per candidate
      - name: retester_agent
        prompt: "ROLE: PoC Builder. Build Foundry tests only for issues marked EXPLOITABLE – BOUNTY ELIGIBLE."
    ```
-3. **Sequential (manual or script)**: Run Hunter → save `candidates.json` → run Judge with that file as input → save `verdicts.json` → run PoC Builder only on EXPLOITABLE entries.
+3. **Sequential (manual or script)**: Run Hunter -> save `candidates.json` -> run Judge with that file as input -> save `verdicts.json` -> run PoC Builder only on EXPLOITABLE entries.
+
+## Minimal handoff example
+
+Hunter output:
+
+```json
+{
+  "candidates": [
+    {
+      "title": "Unchecked callback before balance update",
+      "hypothesis": "Attacker can reenter withdraw() through token hook before state update.",
+      "affected_code": ["Vault.withdraw", "Vault._transferOut"],
+      "suspected_attack": ["deposit", "withdraw", "token callback reenter withdraw"]
+    }
+  ]
+}
+```
+
+Judge output:
+
+```json
+{
+  "verdicts": [
+    {
+      "title": "Unchecked callback before balance update",
+      "verdict": "EXPLOITABLE – BOUNTY ELIGIBLE",
+      "attack_path": [
+        "Call deposit() to seed shares",
+        "Call withdraw() from attacker contract",
+        "Reenter withdraw() via callback before balance update"
+      ],
+      "preconditions": "withdraw() is permissionless and callback-capable token is accepted",
+      "impact": "attacker drains additional assets beyond owned balance"
+    }
+  ]
+}
+```
 
 ## Quick reference
 
-- **Judge prompt**: [system_defi_bounty_judge.md](../src/cai/prompts/system_defi_bounty_judge.md)
+- **Judge prompt**: `src/cai/prompts/system_defi_bounty_judge.md`
 - **Judge agent**: `defi_bounty_judge_agent` in `src/cai/agents/defi_bounty_judge.py`
-- **Hunter output contract**: "Judge Gate Pipeline Output" in [system_web3_bug_bounty.md](../src/cai/prompts/system_web3_bug_bounty.md)
+- **Hunter output contract**: "Judge Gate Pipeline Output" in `src/cai/prompts/system_web3_bug_bounty.md`

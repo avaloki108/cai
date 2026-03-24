@@ -28,6 +28,7 @@ def test_validated_permissionless_with_evidence():
     assert result["summary"]["validated"] == 1
     assert result["summary"]["needs_evidence"] == 0
     assert result["summary"]["rejected"] == 0
+    assert result["validated"][0]["exploitability_verdict"] == "EXPLOITABLE – BOUNTY ELIGIBLE"
 
 
 def test_rejects_non_permissionless_explicit():
@@ -37,6 +38,7 @@ def test_rejects_non_permissionless_explicit():
     result = _run_filter(findings)
     assert result["summary"]["validated"] == 0
     assert result["summary"]["rejected"] == 1
+    assert result["rejected"][0]["exploitability_verdict"] == "NOT EXPLOITABLE – ALREADY MITIGATED"
 
 
 def test_rejects_privileged_preconditions():
@@ -47,6 +49,7 @@ def test_rejects_privileged_preconditions():
     result = _run_filter(findings)
     assert result["summary"]["validated"] == 0
     assert result["summary"]["rejected"] == 1
+    assert result["rejected"][0]["reason_code"] == "not_permissionless"
 
 
 def test_needs_evidence_when_missing_fields():
@@ -56,3 +59,4 @@ def test_needs_evidence_when_missing_fields():
     result = _run_filter(findings)
     assert result["summary"]["validated"] == 0
     assert result["summary"]["needs_evidence"] == 1
+    assert result["needs_evidence"][0]["exploitability_verdict"] == "INVALID – NO REAL ATTACK PATH"

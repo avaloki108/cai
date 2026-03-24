@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Optional, Tuple
+import hashlib
 import json
 import re
 import uuid
@@ -192,3 +193,47 @@ def ensure_finding_dict(obj: Any, tool_name: str) -> Finding:
 
 def findings_to_dicts(findings: Iterable[Finding]) -> List[Dict[str, Any]]:
     return [finding.to_dict() for finding in findings]
+
+
+def to_pipeline_payload(finding: Finding, fallback_contract_path: str = "") -> Dict[str, Any]:
+    """Convert normalized schema finding into a deterministic pipeline payload."""
+    raw = finding.raw if isinstance(finding.raw, dict) else {}
+    element = (raw.get("elements") or [{}])[0] if isinstance(raw, dict) else {}
+    source_mapping = element.get("source_mapping") or {}
+    contract_obj = element.get("contract")
+    if isinstance(contract_obj, dict):
+        contract_name = contract_obj.get("name", "unknown")
+    elif isinstance(contract_obj, str):
+        contract_name = contract_obj
+    else:
+        contract_name = "unknown"
+
+    external_calls = element.get("external_calls") if isinstance(element, dict) else []
+    if not isinstance(external_calls, list):
+        external_calls = []
+
+    location = finding.location or finding.file or "unknown"
+    if source_mapping.get("filename_short") and source_mapping.get("lines"):
+        location = f"{source_mapping.get('filename_short')}:{source_mapping.get('lines')}"
+
+    function_name = "unknown"
+    if isinstance(element, dict) and element.get("name"):
+        function_name = str(element.get("name"))
+
+    privilege_required = "owner" in function_name.lower() or "onlyowner" in str(location).lower()
+    return {
+        "id": f"{finding.type}_{hashlib.md5(str(raw).encode()).hexdigest()[:8]}",
+        "vulnerability_type": finding.type,
+        "severity": finding.severity or "medium",
+        "description": finding.description or "",
+        "contract": contract_name,
+        "function_name": function_name,
+        "location": location,
+        "contract_path": finding.file or fallback_contract_path,
+        "external_call_depth": len(external_calls),
+        "cross_contract": any(isinstance(c, dict) and c.get("type") == "external" for c in external_calls),
+        "privilege_required": privilege_required,
+        "permissionless": not privilege_required,
+        "consensus_score": max(0.0, min(1.0, finding.confidence if isinstance(finding.confidence, float) else 0.0)),
+        "affected_asset": contract_name,
+    }

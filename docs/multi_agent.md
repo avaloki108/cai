@@ -57,6 +57,9 @@ CAI> /agent list
 | **blue_team_red_team_shared_context** | redteam_agent + blueteam_agent | Shared | Red and blue team agents sharing the same message history |
 | **blue_team_red_team_split_context** | redteam_agent + blueteam_agent | Split | Red and blue team agents with separate contexts for independent analysis |
 | **purple_team_gctr** ⭐ | redteam_agent + blueteam_agent (enhanced with G-CTR) | Shared | Combines red and blue team agents with shared GCTR tracking for unified game-theoretic analysis (⭐ this is a [CAI PRO](https://aliasrobotics.com/cybersecurityai.php) capability)|
+| **web3_hunter_judge_poc_pattern** | web3_bug_bounty_agent + defi_bounty_judge_agent + retester_agent | Split | Web3 exploitability-first workflow: Hunter generates candidates, Judge filters to bounty-eligible findings, PoC builder validates survivors |
+| **web3_fp_filter_pattern** | web3_bug_bounty_agent + skeptic_alpha + skeptic_gamma | Split | False-positive pressure test for candidate findings before Judge handoff |
+| **web3_main_heavy_pattern** | planner + web3_bug_bounty_agent + critic + retester_agent | Shared | High-coverage Web3 audit flow with planning, adversarial review, and verification |
 
 **To use a pattern:**
 

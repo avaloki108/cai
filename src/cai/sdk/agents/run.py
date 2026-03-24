@@ -4,10 +4,12 @@ import asyncio
 import copy
 import os
 import logging
+import uuid
 from dataclasses import dataclass, field
 from typing import Any, cast
 
 from openai.types.responses import ResponseCompletedEvent
+from cai.core.engagement_state import EngagementState
 
 logger = logging.getLogger(__name__)
 
@@ -150,6 +152,12 @@ class RunConfig:
 
 
 class Runner:
+    @staticmethod
+    def _normalize_run_context(context: TContext | None) -> Any:
+        if context is None:
+            return EngagementState()
+        return context
+
     @classmethod
     async def run(
         cls,
@@ -240,8 +248,10 @@ class Runner:
             model_responses: list[ModelResponse] = []
 
             context_wrapper: RunContextWrapper[TContext] = RunContextWrapper(
-                context=context,  # type: ignore
+                context=cls._normalize_run_context(context),  # type: ignore
             )
+            if isinstance(context_wrapper.context, EngagementState) and not context_wrapper.context.run_id:
+                context_wrapper.context.run_id = run_config.trace_id or uuid.uuid4().hex
 
             input_guardrail_results: list[InputGuardrailResult] = []
 
@@ -542,8 +552,10 @@ class Runner:
 
         output_schema = cls._get_output_schema(starting_agent)
         context_wrapper: RunContextWrapper[TContext] = RunContextWrapper(
-            context=context  # type: ignore
+            context=cls._normalize_run_context(context)  # type: ignore
         )
+        if isinstance(context_wrapper.context, EngagementState) and not context_wrapper.context.run_id:
+            context_wrapper.context.run_id = run_config.trace_id or uuid.uuid4().hex
 
         streamed_result = RunResultStreaming(
             input=copy.deepcopy(input),
@@ -944,9 +956,27 @@ class Runner:
             streamed_result._event_queue.put_nowait(RawResponsesStreamEvent(data=event))
 
             try:
-                event = await stream_iter.__anext__()
+                try:
+                    stream_chunk_timeout = int(os.getenv("CAI_STREAM_CHUNK_TIMEOUT_SEC", "120"))
+                except ValueError:
+                    stream_chunk_timeout = 120
+                if stream_chunk_timeout <= 0:
+                    stream_chunk_timeout = None
+
+                if stream_chunk_timeout is not None:
+                    event = await asyncio.wait_for(
+                        stream_iter.__anext__(),
+                        timeout=stream_chunk_timeout,
+                    )
+                else:
+                    event = await stream_iter.__anext__()
             except StopAsyncIteration:
                 break
+            except asyncio.TimeoutError:
+                raise ModelBehaviorError(
+                    f"Stream stalled: no data for {stream_chunk_timeout}s "
+                    "(CAI_STREAM_CHUNK_TIMEOUT_SEC). The API may have dropped the connection."
+                ) from None
 
         # 2. At this point, the streaming is complete for this turn of the agent loop.
         if not final_response:
@@ -1210,7 +1240,14 @@ class Runner:
             elif isinstance(run_config.model, str):
                 model_settings.agent_model = run_config.model
 
-        new_response = await model.get_response(
+        try:
+            model_timeout_sec = int(os.getenv("CAI_MODEL_RESPONSE_TIMEOUT_SEC", "300"))
+        except ValueError:
+            model_timeout_sec = 300
+        if model_timeout_sec <= 0:
+            model_timeout_sec = None
+
+        model_coro = model.get_response(
             system_instructions=system_prompt,
             input=input,
             model_settings=model_settings,
@@ -1221,6 +1258,19 @@ class Runner:
                 run_config.tracing_disabled, run_config.trace_include_sensitive_data
             ),
         )
+
+        try:
+            if model_timeout_sec is not None:
+                new_response = await asyncio.wait_for(model_coro, timeout=model_timeout_sec)
+            else:
+                new_response = await model_coro
+        except asyncio.TimeoutError:
+            raise ModelBehaviorError(
+                f"Model did not respond within {model_timeout_sec}s "
+                "(CAI_MODEL_RESPONSE_TIMEOUT_SEC). The API may be overloaded, "
+                "the context may be too large, or the model may be stuck. "
+                "Try: /compact, /flush, or reduce tool count."
+            ) from None
 
         context_wrapper.usage.add(new_response.usage)
 

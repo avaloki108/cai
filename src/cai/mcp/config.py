@@ -227,10 +227,13 @@ def load_mcp_config() -> MCPConfig:
         MCPConfig object with merged configuration
     """
     config = MCPConfig()
+    user_config_exists = False
+    project_config_exists = False
     
     # Load user-level config first
     user_config_path = get_config_path(project_level=False)
     if user_config_path.exists():
+        user_config_exists = True
         try:
             user_config = _load_config_file(user_config_path)
             config = MCPConfig.from_dict(user_config)
@@ -241,6 +244,7 @@ def load_mcp_config() -> MCPConfig:
     # Load and merge project-level config
     project_config_path = get_config_path(project_level=True)
     if project_config_path.exists():
+        project_config_exists = True
         try:
             project_config = _load_config_file(project_config_path)
             project_mcp_config = MCPConfig.from_dict(project_config)
@@ -254,7 +258,44 @@ def load_mcp_config() -> MCPConfig:
         except Exception as e:
             logger.warning(f"Failed to load project MCP config: {e}")
     
+    # No config files found: prefer a minimal default footprint.
+    if not user_config_exists and not project_config_exists:
+        return _default_minimal_mcp_config()
+
     return config
+
+
+def _default_minimal_mcp_config() -> MCPConfig:
+    """
+    Return a minimal default MCP config focused on practical defaults.
+
+    Defaults to Mem0 + Morph MCP only, with wildcard bindings.
+    """
+    morph_enabled = bool(os.getenv("MORPH_API_KEY"))
+    return MCPConfig(
+        servers={
+            "mem0": MCPServerConfig(
+                name="mem0",
+                type="stdio",
+                enabled=True,
+                command="python",
+                args=["-m", "cai.mcp.mem0_server"],
+            ),
+            "morphmcp": MCPServerConfig(
+                name="morphmcp",
+                type="stdio",
+                enabled=morph_enabled,
+                command="bash",
+                args=["-c", "exec npx -y @morphllm/morphmcp"],
+            ),
+        },
+        bindings={"*": ["mem0"] + (["morphmcp"] if morph_enabled else [])},
+        settings={
+            "auto_load": True,
+            "timeout": 30,
+            "verbose": False,
+        },
+    )
 
 
 def _load_config_file(path: Path) -> Dict[str, Any]:
@@ -365,8 +406,12 @@ def auto_load_mcp_servers(verbose: bool = False) -> Dict[str, bool]:
                     "command": server_config.command,
                     "args": server_config.args,
                 }
+                # MCP's default env only inherits a tiny allowlist (HOME, PATH, etc.).
+                # Merge the full process env so .env vars like API keys are available.
+                full_env = dict(os.environ)
                 if server_config.env:
-                    params["env"] = server_config.env
+                    full_env.update(server_config.env)
+                params["env"] = full_env
                 if server_config.cwd:
                     params["cwd"] = server_config.cwd
                     

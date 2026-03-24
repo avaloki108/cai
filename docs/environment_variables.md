@@ -22,6 +22,8 @@ This comprehensive guide documents all environment variables available in CAI, i
 | CAI_PRICE_LIMIT | Price limit for the conversation in dollars. If exceeded, only CLI commands are allowed until increased. If force_until_flag=true, the session will exit | 1 |
 | CAI_TRACING | Enable/disable OpenTelemetry tracing. When enabled, traces execution flow and agent interactions for debugging and analysis | true |
 | CAI_AGENT_TYPE | Specify the agents to use (e.g., boot2root, one_tool, redteam_agent). Use "/agent" command in CLI to list all available agents | redteam_agent |
+| CAI_WORKSPACE_DIR | Base directory containing the active workspace selected by `/hunt` or config commands | - |
+| CAI_WORKSPACE | Active workspace folder name selected by `/hunt` or config commands | - |
 | CAI_STATE | Enable/disable stateful mode. When enabled, the agent will use a state agent to keep track of the state of the network and the flags found | false |
 | CAI_MEMORY | Enable/disable memory mode (episodic: use episodic memory, semantic: use semantic memory, all: use both episodic and semantic memory) | false |
 | CAI_MEMORY_ONLINE | Enable/disable online memory mode | false |
@@ -41,6 +43,9 @@ This comprehensive guide documents all environment variables available in CAI, i
 | CAI_GCTR_NITERATIONS | Number of tool interactions before triggering GCTR (Generative Cut-The-Rope) analysis in bug_bounter_gctr agent. Only applies when using gctr-enabled agents | 5 |
 | CAI_ACTIVE_CONTAINER | Docker container ID where commands should be executed. When set, shell commands and tools execute inside the specified container instead of the host. Automatically set when CTF challenges start (if CTF_INSIDE=true) or when switching containers via /virtualization command | - |
 | CAI_TOOL_TIMEOUT_SEC | Override the default timeout for tool execution in seconds (CLI tools + agent tool calls) | 120 |
+| CAI_MODEL_RESPONSE_TIMEOUT_SEC | Timeout for non-streaming model.get_response() calls. Prevents indefinite hang when model API is slow or stuck | 300 |
+| CAI_API_CALL_TIMEOUT_SEC | Timeout for the raw litellm.acompletion() API call. Catches HTTP-level hangs | 300 |
+| CAI_STREAM_CHUNK_TIMEOUT_SEC | Timeout between stream chunks. Prevents mid-stream hangs when API drops connection | 120 |
 | CAI_DOCKER_TIMEOUT_SEC | Timeout for Docker command invocations in the virtualization UI (seconds) | 30 |
 | CAI_DOCKER_PULL_TIMEOUT_SEC | Timeout for Docker image pulls in virtualization UI (seconds) | 600 |
 | CAI_PRICING_CACHE_MAX | Max entries in pricing cache | 512 |
@@ -71,6 +76,33 @@ CAI resolves configuration in this order (highest wins):
 - Run `cai --setup` to see missing tools and environment guidance.
 - If tools are missing, set the corresponding `WEB3_*_PATH` env vars or install them.
 - If tool runs hang, raise `CAI_TOOL_TIMEOUT_SEC` or `CAI_DOCKER_PULL_TIMEOUT_SEC`.
+
+### Stuck or stops after a handful of commands
+
+If CAI seems to **stop** or **get stuck** after several tool runs or “Thinking…”:
+
+1. **Turn limit (`CAI_MAX_TURNS`)**  
+   A “turn” is one model round; each turn can include many tool calls. If `CAI_MAX_TURNS` is set (e.g. 5, 10, 20), the run ends after that many turns and the stream stops.  
+   - Check: `echo $CAI_MAX_TURNS` or look in `.env`.  
+   - To allow more turns: unset it or set to a higher number (e.g. `CAI_MAX_TURNS=100`) or use `/config CAI_MAX_TURNS=100` in the CLI.
+
+2. **Agent hang (stuck on “Thinking…” or no output)**  
+   After tool calls, the next step is calling the model again. If the API is slow, the context is too large, or the model is overloaded, the agent can appear stuck.  
+   - `CAI_MODEL_RESPONSE_TIMEOUT_SEC` (default 300) limits the non-streaming model response call. If the model doesn’t respond in time, a `ModelBehaviorError` is raised and the agent recovers.  
+   - `CAI_API_CALL_TIMEOUT_SEC` (default 300) limits the raw litellm API call. Catches hangs at the HTTP level.  
+   - `CAI_STREAM_TIMEOUT_SEC` (default 300) limits the whole streaming run.  
+   - `CAI_MODEL_FIRST_CHUNK_TIMEOUT_SEC` (default 120) limits how long to wait for the first token of the next response.  
+   - `CAI_STREAM_CHUNK_TIMEOUT_SEC` (default 120) limits how long to wait between stream chunks (prevents mid-stream hangs).  
+   - To see where it stalls: run with `CAI_DEBUG_STREAM=1` (watch stderr for `[stream] waiting/got event`).  
+   - You can try `CAI_STREAM=false` for non-streaming runs, which can behave differently with slow APIs.  
+   - If context is too large: use `/compact` to summarize history, or `/flush` to clear it.
+
+3. **Session logs with only `session_start` and `session_end` (0 tokens)**  
+   If a run “stuck” and the session JSONL has only those two events and `total_tokens: 0`, it usually means no LLM turn completed: the run hung or was interrupted (e.g. Ctrl+C) before the first response finished. Use `CAI_DEBUG_STREAM=1` to see where the stream stalls. Also, session logs are only written by the Chat Completions model path; if your model uses the Responses API, request/response lines are not written to the JSONL (only session start/end).
+
+4. **`search_memory` / mem0-memory MCP: "No module named 'mem0'"**  
+   The mem0-memory MCP server needs the `mem0` Python package. Install it with: `pip install mem0ai`.  
+   Also: **search_memory** is for querying stored conversation memories, not for reading source files. To read contracts (e.g. Vault.sol), use **cat_file**, **find_file**, or **list_dir** instead.
 
 ---
 

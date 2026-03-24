@@ -6,6 +6,7 @@ the responses from a security testing perspective, including header
 analysis, parameter inspection, and security vulnerability detection.
 """
 
+import json
 from urllib.parse import urlparse
 import requests  # pylint: disable=E0401
 from cai.sdk.agents import function_tool
@@ -19,6 +20,7 @@ def web_request_framework(  # noqa: E501 # pylint: disable=too-many-arguments,to
                             data: dict = None,
                             cookies: dict = None,
                             params: dict = None,
+                            output_format: str = "text",
                             ctf=None) -> str:  # pylint: disable=unused-argument  # noqa: E501
     """
     Analyze HTTP requests and responses in detail for security testing.
@@ -129,11 +131,40 @@ def web_request_framework(  # noqa: E501 # pylint: disable=too-many-arguments,to
             'root'
         ]
 
+        sensitive_hits = []
         for pattern in sensitive_patterns:
             if pattern in response.text.lower():
                 analysis.append(
                     f"\nPotential sensitive information found: '{pattern}'")
+                sensitive_hits.append(pattern)
 
+        replay = {
+            "curl": f"curl -i -X {method.upper()} '{url}'",
+            "request_target": response.request.url,
+            "request_method": response.request.method,
+        }
+
+        structured = {
+            "request": {
+                "url": url,
+                "method": method,
+                "headers": headers or {},
+                "params": params or {},
+                "cookies": cookies or {},
+                "data": data or {},
+            },
+            "response": {
+                "status_code": response.status_code,
+                "headers": dict(response.headers),
+                "size_bytes": len(response.content),
+            },
+            "missing_security_headers": missing_headers,
+            "sensitive_hits": sensitive_hits,
+            "replay": replay,
+        }
+
+        if output_format.lower() == "json":
+            return json.dumps(structured, ensure_ascii=True)
         return "\n".join(analysis)
 
     except Exception as e:  # pylint: disable=broad-except

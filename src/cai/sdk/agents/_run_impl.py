@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import inspect
+import os
 from collections.abc import Awaitable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, cast
@@ -65,6 +66,7 @@ from .tracing import (
     trace,
 )
 from .util import _coro, _error_tracing
+from cai.runtime.task_queue import AsyncTaskQueue
 
 if TYPE_CHECKING:
     from .run import RunConfig
@@ -578,27 +580,52 @@ class RunImpl:
                     span_fn.span_data.output = result
             return result
 
-        tasks = []
-        for tool_run in tool_runs:
-            function_tool = tool_run.function_tool
-            tasks.append(asyncio.create_task(run_single_tool(function_tool, tool_run.tool_call)))
+        use_task_queue = os.getenv("CAI_USE_TASK_QUEUE", "true").lower() in ("true", "1", "yes")
+        if use_task_queue and tool_runs:
+            workers_env = os.getenv("CAI_TOOL_WORKERS", "8")
+            try:
+                workers = int(workers_env)
+            except ValueError:
+                workers = 8
+            queue = AsyncTaskQueue(workers=workers)
+            try:
+                factories = [
+                    (
+                        lambda ft=tool_run.function_tool, tc=tool_run.tool_call: run_single_tool(ft, tc)
+                    )
+                    for tool_run in tool_runs
+                ]
+                queue_results = await queue.run(factories)
+                results = []
+                for queue_result in queue_results:
+                    if queue_result.ok:
+                        results.append(queue_result.result)
+                    else:
+                        raise UserError(queue_result.error or "Tool execution failed")
+            finally:
+                await queue.shutdown()
+        else:
+            tasks = []
+            for tool_run in tool_runs:
+                function_tool = tool_run.function_tool
+                tasks.append(asyncio.create_task(run_single_tool(function_tool, tool_run.tool_call)))
 
-        try:
-            results = await asyncio.gather(*tasks)
-        except (KeyboardInterrupt, asyncio.CancelledError) as e:
-            # When interrupted, return partial results with error messages
-            results = []
-            for i, task in enumerate(tasks):
-                if task.done() and not task.cancelled():
-                    try:
-                        results.append(task.result())
-                    except Exception:
+            try:
+                results = await asyncio.gather(*tasks)
+            except (KeyboardInterrupt, asyncio.CancelledError) as e:
+                # When interrupted, return partial results with error messages
+                results = []
+                for task in tasks:
+                    if task.done() and not task.cancelled():
+                        try:
+                            results.append(task.result())
+                        except Exception:
+                            results.append("Tool execution interrupted")
+                    else:
                         results.append("Tool execution interrupted")
-                else:
-                    results.append("Tool execution interrupted")
-            
-            # Re-raise the exception after collecting results
-            raise e
+
+                # Re-raise the exception after collecting results
+                raise e
 
         return [
             FunctionToolResult(

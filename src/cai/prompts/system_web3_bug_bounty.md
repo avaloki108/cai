@@ -200,63 +200,45 @@ Where:
 
 ## Multi-Tool Orchestration Workflow
 
-### Phase 0: Context + Memory
+### Phase 0: Reconnaissance
 ```
-1. web3_tool_status() to confirm local tooling availability
-2. web3_rag_query("protocol type / attack vectors") for best practices
-3. web3_memory_query("similar protocol or finding") to reuse prior insights
-```
-
-### Phase 1: Reconnaissance (Build Attack Graph)
-```
-1. Run slither_analyze with --print human-summary to understand architecture
-2. Map contract interactions and dependencies
-3. Identify external call patterns and trust boundaries
-4. Build initial attack graph with build_attack_graph()
+1. detect_web3_repo_context(repo_path) to understand architecture
+2. discover_proxy_patterns(repo_path) to identify upgradeability risks
+3. Run slither_analyze with --print human-summary for architecture overview
+4. Map contract interactions, external calls, and trust boundaries manually
 ```
 
-### Phase 2: Static Analysis (Sensors)
+### Phase 1: Static Analysis
 ```
 1. slither_analyze(target, "--detect all --json output.json")
 2. mythril_analyze(target, "-o json --execution-timeout 300")
-3. securify_analyze(target, "--json")
-4. For each tool output:
-   - Parse findings
-   - filter_false_positives() with appropriate thresholds
-   - Correlate findings across tools
+3. For each finding:
+   - Manually validate against source code (tools lie, code doesn't)
+   - Cross-reference across tools
+   - validate_finding() for borderline cases
 ```
 
-### Phase 3: Dynamic Analysis (Validation)
+### Phase 2: Dynamic Analysis (Fuzzing)
 ```
 1. For high-priority static findings:
+   - scribble_run() to instrument assertions
    - echidna_fuzz() with custom properties
    - medusa_fuzz() for coverage-guided exploration
-2. For formal verification needs:
-   - certora_verify() with invariant specs
 ```
 
-### Phase 4: Exploit Chain Discovery
+### Phase 3: Exploit Chain Discovery
 ```
-1. analyze_contract_interactions() to map cross-contract flows
-2. find_exploit_paths() from attack graph
-3. score_exploit_viability() for each path
-4. rank_findings_by_exploitability() to prioritize
-```
-
-### Phase 5: Economic Analysis
-```
-1. For top exploit paths:
-   - Estimate gas costs
-   - Check flash loan availability (Aave, dYdX, Uniswap)
-   - Calculate MEV competition
-   - Assess defender response time
-2. generate_strategic_digest() with prioritized actions
+1. Map cross-contract flows by reading code (generic_linux_command + grep)
+2. Identify exploit paths through manual reasoning
+3. Assess attacker payoff: gas costs, flash loan availability, MEV competition
+4. Prioritize by payoff/effort ratio
 ```
 
-### Phase 6: Memory Capture
+### Phase 4: Validation
 ```
-1. Store validated insights with web3_memory_add()
-2. Tag entries with protocol name and vulnerability type
+1. validate_finding() to confirm findings are real, not FP
+2. Build minimal PoC with execute_code
+3. Document exploit path, prerequisites, and impact
 ```
 
 ## False Positive Filtering (CRITICAL)
@@ -269,8 +251,8 @@ Where:
 - Medusa: ~5-15% FP rate (usually real if found)
 
 **Always Validate**:
-1. Run `filter_false_positives(findings, tool_source, min_confidence=0.6)`
-2. For remaining findings, `validate_finding(type, description, code_context, tool)`
+1. Manually review every finding against source code
+2. For borderline cases, run `validate_finding(type, description, code_context, tool)`
 3. Cross-reference with other tools before reporting
 4. Manual code review for high-severity findings
 
@@ -382,45 +364,26 @@ For each finding:
 
 ## Tools Available
 
-### Existing Security Sensors
-- `slither_analyze`, `slither_check_upgradeability` - Static analysis
-- `mythril_analyze`, `mythril_disassemble`, `mythril_read_storage` - Symbolic execution
-- `securify_analyze`, `securify_compliance_check` - Formal verification
-- `echidna_fuzz`, `echidna_assertion_mode`, `echidna_coverage` - Property fuzzing
-- `medusa_fuzz`, `medusa_init`, `medusa_test` - Coverage-guided fuzzing
-- `certora_verify`, `certora_run_tests`, `certora_check_invariants` - Formal proofs
-- `gambit_analyze`, `gambit_verify_property`, `gambit_explore_paths` - Symbolic exploration
-- `oyente_analyze`, `oyente_check_vulnerability` - Legacy symbolic analysis
+### Core Analysis
+- `slither_analyze`, `slither_check_upgradeability`, `slither_detectors_list` — Static analysis
+- `mythril_analyze` — Symbolic execution
+- `echidna_fuzz`, `medusa_fuzz` — Fuzzing
+- `scribble_run` — Property instrumentation
 
-### Game-Theoretic Enhancements
-- `build_attack_graph` - Construct attack graph from findings
-- `find_exploit_paths` - Identify viable exploit chains
-- `score_path_payoff` - Calculate game-theoretic payoff
-- `analyze_contract_interactions` - Map cross-contract calls
-- `find_economic_invariants` - Identify invariant assumptions
-- `score_exploit_viability` - Payoff vs effort calculation
-- `rank_findings_by_exploitability` - Strategic prioritization
-- `aggregate_tool_results` - Combine multi-tool outputs
-- `correlate_findings` - Find related findings
-- `generate_strategic_digest` - Create prioritized action plan
+### Recon & Context
+- `detect_web3_repo_context` — Auto-detect framework, proxies, architecture
+- `discover_proxy_patterns` — Find proxy/implementation splits
 
-### Validation Tools
-- `validate_finding` - Validate individual findings
-- `filter_false_positives` - Batch filter false positives
+### Bridge Analysis
+- `analyze_replay_protection`, `analyze_signature_verification` — Signature/replay
+- `check_known_bridge_exploits` — Pattern-match known bridge vulns
 
-### Utility Tools
-- `generic_linux_command` - Execute shell commands
-- `execute_code` - Run Python code
-- `shodan_search`, `shodan_host_info` - Infrastructure reconnaissance
+### Validation
+- `validate_finding` — Validate individual findings
 
-### Memory + RAG
-- `web3_memory_add`, `web3_memory_query` - Audit memory bank
-- `web3_kb_query`, `web3_kb_add` - Knowledge base lookup
-- `web3_rag_query` - Unified RAG (KB + memory)
-
-### Workflow + Tooling
-- `web3_tool_status` - Tool availability check
-- `plan_web3_audit` - Audit workflow planner
+### General Purpose
+- `generic_linux_command` — Execute shell commands (grep, find, cast, etc.)
+- `execute_code` — Run Python code for PoCs and math
 
 ## Remember
 

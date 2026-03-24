@@ -26,6 +26,25 @@ from openai import AsyncOpenAI
 
 from cai.sdk.agents import Agent, OpenAIChatCompletionsModel, function_tool
 
+# Minimal Web3 audit tools (from web3_bug_bounty) - only what's needed to run an audit/hunt
+from cai.tools.reconnaissance.generic_linux_command import generic_linux_command
+from cai.tools.reconnaissance.filesystem import (
+    list_dir,
+    cat_file,
+    pwd_command,
+    find_file,
+)
+from cai.tools.reconnaissance.exec_code import execute_code
+from cai.tools.web3_security import (
+    slither_analyze,
+    mythril_analyze,
+    echidna_fuzz,
+    validate_finding,
+    plan_web3_audit,
+    web3_tool_status,
+    detect_web3_repo_context,
+)
+
 load_dotenv()
 
 api_key = (
@@ -445,6 +464,16 @@ Each step should have:
 }
 ```
 
+## Reading source code (CRITICAL)
+
+To read contract or source files (.sol, .py, etc.), you MUST use file tools:
+- **find_file** – locate files by path/name
+- **cat_file** – read full file contents
+- **list_dir** – list directory contents
+- **generic_linux_command** – e.g. find, head, grep
+
+Do NOT use **search_memory** to read source code. search_memory is for querying stored conversation/session memories only. It does not read the filesystem. If you need Vault.sol or LiquidityShares.sol, use find_file then cat_file on the path.
+
 ## Adaptive Refinement
 
 After each step completes:
@@ -652,14 +681,34 @@ planning_tools = [
     get_plan_summary,
 ]
 
-# Create the planner agent
+# Minimal Web3 audit tools - only what's necessary to run an audit/bug bounty hunt
+web3_audit_tools = [
+    generic_linux_command,
+    list_dir,
+    cat_file,
+    pwd_command,
+    find_file,
+    execute_code,
+    slither_analyze,
+    mythril_analyze,
+    echidna_fuzz,
+    validate_finding,
+    plan_web3_audit,
+    web3_tool_status,
+    detect_web3_repo_context,
+]
+
+# Create the planner agent (planning + minimal web3 audit tools)
 planner = Agent(
     name="Audit Planner",
     instructions=PLANNER_PROMPT,
     description="""Pre-Act planning agent that creates and manages multi-step audit 
     execution plans. Coordinates agent delegation and tracks progress through 
-    adaptive refinement based on observations.""",
-    tools=planning_tools,
+    adaptive refinement based on observations. Has minimal Web3 audit tools: 
+    filesystem (generic_linux_command, list_dir, cat_file, pwd, find_file), 
+    execute_code, slither_analyze, mythril_analyze, echidna_fuzz, validate_finding, 
+    plan_web3_audit, web3_tool_status, detect_web3_repo_context.""",
+    tools=planning_tools + web3_audit_tools,
     model=OpenAIChatCompletionsModel(
         model=os.getenv('AEGIS_MODEL', 'gpt-4o'),
         openai_client=AsyncOpenAI(api_key=api_key),

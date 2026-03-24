@@ -3380,8 +3380,14 @@ class OpenAIChatCompletionsModel(Model):
         and retry once silently.
         """
         try:
+            api_timeout_sec = int(os.getenv("CAI_API_CALL_TIMEOUT_SEC", "300"))
+        except ValueError:
+            api_timeout_sec = 300
+        if api_timeout_sec <= 0:
+            api_timeout_sec = None
+
+        try:
             if stream:
-                # Standard LiteLLM handling for streaming
                 ret = await litellm.acompletion(**kwargs)
                 stream_obj = await litellm.acompletion(**kwargs)
 
@@ -3401,29 +3407,37 @@ class OpenAIChatCompletionsModel(Model):
                 )
                 return response, stream_obj
             else:
-                # Standard OpenAI handling for non-streaming
-                ret = await litellm.acompletion(**kwargs)
+                coro = litellm.acompletion(**kwargs)
+                if api_timeout_sec is not None:
+                    ret = await asyncio.wait_for(coro, timeout=api_timeout_sec)
+                else:
+                    ret = await coro
                 return ret
+        except asyncio.TimeoutError:
+            model_name = kwargs.get("model", "unknown")
+            msg_count = len(kwargs.get("messages", []))
+            raise asyncio.TimeoutError(
+                f"API call to {model_name} timed out after {api_timeout_sec}s "
+                f"(CAI_API_CALL_TIMEOUT_SEC) with {msg_count} messages. "
+                f"The model may be overloaded or the context too large. "
+                f"Try: /compact, /flush, or reduce tool count."
+            )
         except Exception as e:
             error_msg = str(e)
-            # Handle both OpenAI and Anthropic error messages for tool_call_id
             if (
                 "string too long" in error_msg
                 or "Invalid 'messages" in error_msg
                 and "tool_call_id" in error_msg
                 and "maximum length" in error_msg
             ):
-                # Truncate all tool_call ids in all messages to 40 characters
                 messages = kwargs.get("messages", [])
                 for msg in messages:
-                    # Truncate tool_call_id in the message itself if present
                     if (
                         "tool_call_id" in msg
                         and isinstance(msg["tool_call_id"], str)
                         and len(msg["tool_call_id"]) > 40
                     ):
                         msg["tool_call_id"] = msg["tool_call_id"][:40]
-                    # Truncate tool_call ids in tool_calls if present
                     if "tool_calls" in msg and isinstance(msg["tool_calls"], list):
                         for tool_call in msg["tool_calls"]:
                             if (
@@ -3434,7 +3448,6 @@ class OpenAIChatCompletionsModel(Model):
                             ):
                                 tool_call["id"] = tool_call["id"][:40]
                 kwargs["messages"] = messages
-                # Retry once, silently
                 if stream:
                     ret = await litellm.acompletion(**kwargs)
                     stream_obj = await litellm.acompletion(**kwargs)
@@ -3561,18 +3574,33 @@ class OpenAIChatCompletionsModel(Model):
             )
 
     def _get_model_max_tokens(self, model_name: str) -> int:
-        """Get the maximum input tokens for a model from pricing.json or default."""
+        """Get the maximum input tokens for a model from pricing.json or default.
+        
+        Tries exact match first, then prefix/substring matching for model variants.
+        """
         try:
             import pathlib
             pricing_path = pathlib.Path("pricing.json")
             if pricing_path.exists():
                 with open(pricing_path, encoding="utf-8") as f:
                     pricing_data = json.load(f)
-                    model_info = pricing_data.get(model_name, {})
-                    return model_info.get("max_input_tokens", 200000)
+
+                    # Exact match
+                    if model_name in pricing_data:
+                        return pricing_data[model_name].get("max_input_tokens", 200000)
+
+                    # Try without provider prefix (e.g. "mistral/devstral-latest" -> "devstral-latest")
+                    bare_name = model_name.split("/", 1)[-1] if "/" in model_name else model_name
+                    if bare_name in pricing_data:
+                        return pricing_data[bare_name].get("max_input_tokens", 200000)
+
+                    # Substring match: find any pricing key that contains the bare model name
+                    model_lower = bare_name.lower()
+                    for key, info in pricing_data.items():
+                        if model_lower in key.lower() or key.lower() in model_lower:
+                            return info.get("max_input_tokens", 200000)
         except Exception:
             pass
-        # Default to 200k if not found
         return 200000
 
     async def _auto_compact_if_needed(self, estimated_tokens: int, input: str | list[TResponseInputItem], system_instructions: str | None) -> tuple[str | list[TResponseInputItem], str | None, bool]:

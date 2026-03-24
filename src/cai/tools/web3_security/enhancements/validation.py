@@ -114,74 +114,27 @@ def validate_finding(
         - False positive likelihood
         - Validation reasoning
     """
+    # Legacy compatibility wrapper: route to canonical validator so there is
+    # a single source of truth for exploitability/false-positive gating.
     try:
         finding_data = json.loads(finding) if isinstance(finding, str) else finding
-        
-        finding_type = finding_data.get("type", finding_data.get("check", "unknown")).lower()
-        original_confidence = finding_data.get("confidence", 0.7)
-        
-        if isinstance(original_confidence, str):
-            confidence_map = {"high": 0.9, "medium": 0.6, "low": 0.3}
-            original_confidence = confidence_map.get(original_confidence.lower(), 0.6)
-        
-        # Check for false positive conditions
-        matched_conditions = []
-        confidence_reduction = 0
-        
-        if contract_code:
-            matched_conditions = _check_false_positive_conditions(finding_data, contract_code)
-        
-        # Apply false positive pattern matching
-        for pattern_type, pattern_info in FALSE_POSITIVE_PATTERNS.items():
-            if pattern_type in finding_type:
-                matching_fp_conditions = [c for c in pattern_info["conditions"] if c in matched_conditions]
-                if matching_fp_conditions:
-                    confidence_reduction = max(confidence_reduction, 
-                                               pattern_info["confidence_reduction"] * len(matching_fp_conditions) / len(pattern_info["conditions"]))
-        
-        # Calculate adjusted confidence
-        adjusted_confidence = original_confidence * (1 - confidence_reduction)
-        
-        # Determine false positive likelihood
-        if confidence_reduction > 0.5:
-            fp_likelihood = "HIGH"
-        elif confidence_reduction > 0.2:
-            fp_likelihood = "MEDIUM"
-        else:
-            fp_likelihood = "LOW"
-        
-        # Generate reasoning
-        reasoning = []
-        if matched_conditions:
-            reasoning.append(f"Detected patterns: {', '.join(matched_conditions)}")
-        if confidence_reduction > 0:
-            reasoning.append(f"Confidence reduced by {confidence_reduction:.0%} due to false positive indicators")
-        if not reasoning:
-            reasoning.append("No false positive indicators detected")
-        
-        # Recommendation
-        if fp_likelihood == "HIGH":
-            recommendation = "LIKELY_FALSE_POSITIVE - Manual review recommended before reporting"
-        elif fp_likelihood == "MEDIUM":
-            recommendation = "NEEDS_VERIFICATION - Additional analysis recommended"
-        else:
-            recommendation = "LIKELY_VALID - Proceed with standard reporting"
-        
-        return json.dumps({
-            "original_confidence": original_confidence,
-            "adjusted_confidence": round(adjusted_confidence, 3),
-            "confidence_reduction": round(confidence_reduction, 3),
-            "false_positive_likelihood": fp_likelihood,
-            "matched_conditions": matched_conditions,
-            "reasoning": reasoning,
-            "recommendation": recommendation,
-            "validated_finding": {
-                **finding_data,
-                "validated_confidence": round(adjusted_confidence, 3),
-                "validation_status": recommendation.split(" - ")[0],
-            },
-        }, indent=2)
-        
+        finding_type = str(
+            finding_data.get("type", finding_data.get("check", "unknown"))
+        )
+        description = str(finding_data.get("description", finding_data.get("title", "")))
+        code_context = contract_code or additional_context or str(
+            finding_data.get("location", "")
+        )
+        from cai.tools.web3_security.validate_findings import (
+            validate_finding as canonical_validate_finding,
+        )
+
+        return canonical_validate_finding(
+            finding_type=finding_type,
+            finding_description=description,
+            code_context=code_context,
+            tool_source=str(finding_data.get("tool", "slither")),
+        )
     except Exception as e:
         return json.dumps({"error": f"Error validating finding: {str(e)}"})
 
@@ -204,53 +157,18 @@ def filter_false_positives(
     Returns:
         JSON string with filtered findings and statistics
     """
+    # Legacy compatibility wrapper: route to canonical batch filter.
     try:
-        findings_list = json.loads(findings) if isinstance(findings, str) else findings
-        
-        if not isinstance(findings_list, list):
-            findings_list = [findings_list]
-        
-        validated_findings = []
-        filtered_out = []
-        
-        for finding in findings_list:
-            validation_result = validate_finding(
-                json.dumps(finding),
-                contract_code=contract_code
-            )
-            validation_data = json.loads(validation_result)
-            
-            if "error" in validation_data:
-                # Keep findings that couldn't be validated
-                validated_findings.append(finding)
-                continue
-            
-            adjusted_confidence = validation_data.get("adjusted_confidence", 0.5)
-            
-            if adjusted_confidence >= threshold:
-                validated_findings.append({
-                    **finding,
-                    "validated_confidence": adjusted_confidence,
-                    "fp_likelihood": validation_data["false_positive_likelihood"],
-                })
-            else:
-                filtered_out.append({
-                    "finding": finding,
-                    "reason": validation_data["reasoning"],
-                    "adjusted_confidence": adjusted_confidence,
-                })
-        
-        return json.dumps({
-            "filtered_findings": validated_findings,
-            "filtered_out": filtered_out,
-            "statistics": {
-                "original_count": len(findings_list),
-                "remaining_count": len(validated_findings),
-                "filtered_count": len(filtered_out),
-                "filter_rate": round(len(filtered_out) / max(len(findings_list), 1), 3),
-            },
-        }, indent=2)
-        
+        from cai.tools.web3_security.validate_findings import (
+            filter_false_positives as canonical_filter_false_positives,
+        )
+
+        # Keep legacy parameter name `threshold` mapped to canonical `min_confidence`.
+        return canonical_filter_false_positives(
+            findings_json=findings,
+            tool_source="slither",
+            min_confidence=threshold,
+        )
     except Exception as e:
         return json.dumps({"error": f"Error filtering false positives: {str(e)}"})
 

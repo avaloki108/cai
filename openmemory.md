@@ -37,6 +37,8 @@ Two modes, both running through CAI Runner:
    Discovery → Risk Queue → Skeptic Gate → Fork Exploit → Formal
 2. **Judge-gated bounty** (Hunter → Judge → PoC):
    `web3_bug_bounty_agent` → `defi_bounty_judge_agent` → `retester_agent`
+3. **Interactive hunt** (`/hunt`):
+   Sets workspace + selects `web3_bug_bounty_agent` for agent-led exploration.
 
 ### Memory integration (Mem0 / OpenMemory)
 
@@ -58,12 +60,23 @@ Memory is accessed as a CAI extension layer:
 | MEV Analyzer | `src/cai/agents/mev_analyzer.py` | Sandwich/frontrun/backrun |
 | Perpetuals Analyzer | `src/cai/agents/perpetuals_analyzer.py` | Funding/liquidation/margin |
 | Composite Audit Pattern | `src/cai/agents/patterns/composite_audit.py` | HMAW + Adversarial + Ensemble |
+| Engagement State | `src/cai/core/engagement_state.py` | Run-scoped attack context graph (targets/endpoints/tokens/callbacks) |
+| Runtime Task Queue | `src/cai/runtime/task_queue.py` | Bounded async worker queue for tool-execution fanout |
+| Web Exploit Modules | `src/cai/tools/web/{ssrf_probe,xss_engine,desync_probe,auth_logic_tester}.py` | First-class web exploit lane tools |
+| OAST Client | `src/cai/tools/web/oast_client.py` | Callback token registration and callback log polling |
+| Exploit Bundle Exporter | `src/cai/reporting/exploit_bundle.py` | Reproducible JSON/Markdown exploit artifacts |
 
 ## Patterns
 
 - `agents.yml` drives parallel mode (auto-loaded at startup)
 - Judge Gate pipeline: `docs/judge_gate_pipeline.md`
 - Parallel patterns: `docs/multi_agent.md`
+- Canonical Web3 mode contracts are documented in `docs/agents/web3/overview.md`
+- Deterministic reports now include exploitability verdict buckets and stage-level quality metrics
+- Runner now normalizes missing context to `EngagementState` for run-scoped memory
+- Function tool execution can use `AsyncTaskQueue` via `CAI_USE_TASK_QUEUE=true`
+- Pipeline can export exploit bundles by setting `CAI_EXPORT_EXPLOIT_BUNDLES=<dir>`
+- Web3 plugin runner supports surface-scoped execution (`agent` vs `mcp`) with typed plugin metadata, policy levels (`safe|balanced|aggressive`), dry-run preflight, and request-scoped observability envelope
 
 ## User Defined Namespaces
 

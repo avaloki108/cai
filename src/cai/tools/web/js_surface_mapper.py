@@ -195,6 +195,7 @@ def js_surface_mapper(  # pylint: disable=too-many-arguments,too-many-locals
     max_bytes_per_asset: int = 2_000_000,
     include_sourcemaps: bool = False,
     timeout: int = 10,
+    include_repro_hints: bool = True,
 ) -> str:
     """
     Extract JS-derived attack surface hints from a web application.
@@ -330,5 +331,13 @@ def js_surface_mapper(  # pylint: disable=too-many-arguments,too-many-locals
         "evidence": {k: sorted(list(v))[:3] for k, v in evidence.items()},
         "errors": errors,
     }
+    if include_repro_hints:
+        output["repro_hints"] = [
+            {
+                "step": "request_endpoint",
+                "example": f"curl -i '{base_url}{ep}'",
+            }
+            for ep in sorted(extraction.endpoints)[:10]
+        ]
 
     return json.dumps(output, ensure_ascii=True)

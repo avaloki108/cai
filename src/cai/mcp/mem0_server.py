@@ -4,6 +4,9 @@ mem0 MCP Server for CAI.
 Exposes mem0 long-term memory as MCP tools so that any cai agent can
 persist and retrieve memories across sessions.
 
+Requires: pip install mem0ai  (the package provides the "mem0" module).
+If you see "No module named 'mem0'", install with: pip install mem0ai
+
 Memory is keyed by user_id (default: "cai") so different users/workspaces
 can maintain separate memory spaces.
 

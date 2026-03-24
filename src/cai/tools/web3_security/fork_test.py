@@ -183,19 +183,20 @@ def run_fork_test(test_file: str, ctf=None) -> str:
     Run previously generated fork test with Foundry.
 
     Executes the test file using forge test command.
-    Captures output and analyzes results.
+    Captures stdout and stderr for downstream analysis.
 
     Args:
         test_file: Path to .t.sol test file
         ctf: CTF flag for testing
 
     Returns:
-        JSON with test execution results
+        JSON with test execution results including stdout/stderr
     """
+    import shutil
+    import subprocess
+
     try:
-        # Check if forge is installed
-        forge_check = os.system("which forge > /dev/null 2>&1")
-        if forge_check != 0:
+        if not shutil.which("forge"):
             return json.dumps(
                 {
                     "error": "Foundry is not installed or not in PATH",
@@ -203,23 +204,34 @@ def run_fork_test(test_file: str, ctf=None) -> str:
                 }
             )
 
-        # Run forge test
-        command = (
-            f"forge test --match-path test/ --match-contract ForkTest -vv {test_file}"
-        )
+        args = [
+            "forge", "test",
+            "--match-path", "test/",
+            "--match-contract", "ForkTest",
+            "-vv",
+            test_file,
+        ]
 
-        result = os.system(command + " 2>&1")
+        proc = subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
 
         return json.dumps(
             {
-                "status": "executed" if result == 0 else "failed",
-                "exit_code": result,
-                "command": command,
+                "status": "executed" if proc.returncode == 0 else "failed",
+                "exit_code": proc.returncode,
                 "test_file": test_file,
+                "stdout": proc.stdout,
+                "stderr": proc.stderr,
             },
             indent=2,
         )
 
+    except subprocess.TimeoutExpired:
+        return json.dumps({"error": "Fork test timed out after 120 seconds"})
     except Exception as e:
         return json.dumps({"error": f"Error running fork test: {str(e)}"})
 
